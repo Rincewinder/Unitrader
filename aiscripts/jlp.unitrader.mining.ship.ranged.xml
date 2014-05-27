@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<aiscript name="jlp.unitrader.mining.ship.ranged" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="1">
+    <params>
+        <param name="PageId" default="8570"/>
+        <param name="basket" default="null" />
+
+        <param name="debugchance" default="0"/>
+    </params>
+    <init>
+        <set_command command="command.freemining" />
+    </init>
+    <attention min="unknown">
+        <actions>
+
+			<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 800">
+				<set_value name="$ActualZone" exact="this.zone" />
+				<run_script name="'move.refuel'" />
+				<do_if value="this.zone != $ActualZone">
+					<run_script name="'move.generic'">
+						<param name="destination" value="$ActualZone" />
+					</run_script>
+				</do_if>
+			</do_if>
+			
+            <run_script name="'jlp.unitrader.mining.ship.free'" sinceversion="1">
+                <param name="PageId" value="$PageId"/>
+                <param name="basketoverride" value="$basket" />
+                <param name="debugchance" value="$debugchance" />
+            </run_script>
+        </actions>
+    </attention>
+</aiscript>

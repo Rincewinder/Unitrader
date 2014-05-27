@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	This file is part of the Universe trader.
+	
+	Author: JohnLukePicard
+    
+-->
+
+<diff xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="rfc5261.xsd">
+    <add sel="/language[@id='49']">
+        <page id="8570" title="Interface" descr="Universe Trade by JLP" voice="no">
+			<t id="1">$ENTITYNAME$</t>
+			<t id="2">$ENTITYTYPE$ $ENTITYNAME$ </t>
+			<t id="3">$ENTITYNAME$ auf $OBJECTNAME$</t>
+			<t id="4">$ENTITYTYPE$ $ENTITYNAME$ auf $OBJECTNAME$</t>
+			<t id="5">$ENTITYNAME$ auf $OBJECTNAME$ im Sektor $SECTOR$:</t>
+			<t id="10">$ENTITYTYPE$ $ENTITYNAME$ auf $OBJECTNAME$ im Sektor $SECTOR$:</t>
+			<t id="11">$CLUSTER$(Short) / $SECTOR$(Short) / $ZONE$(Short) / $ENTITYNAME$ </t>
+			
+			<t id="100">Unbekannt</t>
+			
+            <t id="1000">Universums Versorger</t>
+            <t id="1010">Händler starten</t>
+            <t id="1011">Händler stoppen</t>
+			<t id="2010">Schürfer starten</t>
+			<t id="2011">Schürfer stoppen</t>
+			<t id="3010">Talente anzeigen</t>
+			<t id="4010">erw. Logbuch on</t>
+			<t id="4011">erw. Logbuch off</t>
+
+			<t id="10000">%1: '%2' Ich konnte keine Ware in diesen Cluster zum Schürfen finden!</t>
+			
+			<t id="50000">%1: '%2' Verkaufte '%3' von '%4' vorhandene Lagermenge %5 für %6 %7Cr Stückpreis. Verkaufte an '%8' gewünschte Lagermenge%9 für %10Cr %11Cr Stückpreis.</t>
+            <t id="50100">%1: '%2' Ich überweise den Rest meines Budget über %3Cr.</t>
+            <t id="50200">%1: '%2' Ich habe beim %3 Skill um 1 Stern dazugelernt \(%4 Sterne\).</t>
+            <t id="50210">Meine Skills sind:\n Organisationtalent:    '$WAITTIME$s'\n Technisches Talent:'  '$SEARCHTIME$s'\n Austrahlungsbonus:  '$EXTRAFACTION$%'\n Mut:                                '$COURAGE$%'\n Effektivität:                     '$EFFICIENCY$%'.</t>
+			<t id="50300">Ich habe ein Handel gefunden.\n Ware: '$TRADEWARE$  \('$WAREPRICEMIN$.$WAREPRICEMINCT$Cr' - '$WAREPRICEMAX$.$WAREPRICEMINCT$Cr'\)'    Volumen: '$TRADEWAREVOLUME$'.\n Kaufpreis: '$WAREPRICESELLOFFER$.$WAREPRICESELLOFFERCT$Cr' Verkaufspreis: '$WAREPRICEBUYOFFER$.$WAREPRICEBUYOFFERCT$Cr'</t>
+			<t id="50301">'$TRADESOURCE$ \(max: $TRADESOURCEAMOUNT$\)' mit\n '$TRADEDESTINATION$  \(max: '$TRADEDESTAMOUNT$'\)'</t>
+			<t id="50310">Ich konnte $AMOUNTKAT$ von '$AMOUNT$' \(max: '$SHIPAMOUNTMAX$'\) aushandeln.</t>
+			<t id="50320">eine große Menge</t>
+			<t id="50321">eine gute Menge</t>
+			<t id="50322">eine normal Menge</t>
+			<t id="50323">eine unterdurschnittliche Menge</t>
+			<t id="50324">eine schlechte Menge</t>
+			
+			<t id="50400">Ich habe erfolgreich ein Handel getätigt.\n $TRADE$</t>
+           
+
+			
+
+		</page>
+    </add>
+</diff>

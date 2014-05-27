@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<content id="JLPUniTrader" name="Universe Trader" description="Universe Trader" author="JohnLukePicard"  version="23" date="2014-5-26" save="0" enabled="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="content.xsd">
+	<text language="33" name="UniTrader" description="Fournisseur Universel" author="JohnLukePicard" />
+	<text language="44" name="UniTrader" description="Universe Trader" author="JohnLukePicard" />
+	<text language="49" name="UniTrader" description="Universum Händler" author="JohnLukePicard" />
+</content>

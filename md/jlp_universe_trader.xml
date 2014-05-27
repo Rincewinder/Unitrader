@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mdscript name="JLP_universetrader" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="md.xsd">
+	<cues>
+		<cue name="JLPUniTradeInitMainMenu" instantiate="true" namespace="this">
+			<conditions>
+				<check_any>
+					<event_conversation_next_section
+						sectionprefix="gOrders_" />
+					<event_conversation_returned_to_section
+						sectionprefix="gOrders_" />
+					<event_cue_completed cue="md.BKCommMenu.Setup" />
+					<check_all>
+						<event_player_created />
+						<check_value value="@md.BKCommMenu.Setup.state" exact="cuestate.complete"
+							negate="true" />
+					</check_all>
+				</check_any>
+			</conditions>
+			<actions>
+				<do_if value="@event.object.ship">
+					<do_if
+						value="(event.object.owner == faction.player) and (event.object.type == entitytype.commander) and (event.object.ship.cargo.capacity gt 0)">
+						<add_player_choice_sub text="{8570,1000}"
+							position="right" section="g_JLPUniTrade_autotrade_select"
+							baseparam="event.param2" />
+					</do_if>
+				</do_if>
+			</actions>
+		</cue>
+
+		<cue name="JLPUniTradeInitSelect" instantiate="true" namespace="this">
+			<conditions>
+			<check_any>
+				<event_conversation_next_section sectionprefix="g_JLPUniTrade_autotrade_select"/>
+				<event_conversation_next_section
+						section="gBKComm_Relay" />
+				<event_conversation_returned_to_section
+						section="gBKComm_Relay" />
+			</check_any>
+			</conditions>
+			<actions>
+				<set_value name="$commander" exact="event.object" />
+				<set_value name="$isTradeRun" exact="@$commander.$jlpUniTraderRun" />
+				<set_value name="$isMiningRun" exact="@$commander.$jlpUniMiningRun" />
+				<set_value name="$isTransportable" exact="false" />
+				<set_value name="$isMiningable" exact="false" />
+				<set_value name="$isShowExtLB"
+					exact="@$commander.$jlp_unitrader_show_extendedlogbook" />
+				<set_value name="$drones" exact="0" />
+
+				<do_all exact="unitcategory.transport.maxmk" counter="$i">
+					<set_value name="$drones" operation="add"
+						exact="@$commander.ship.units.{unitcategory.transport}.mk.{$i}.count" />
+				</do_all>
+				<do_if value="$drones ge 10">
+					<set_value name="$isTransportable" exact="true" />
+				</do_if>
+
+				<set_value name="$drones" exact="0" />
+				<do_all exact="unitcategory.gascollector.maxmk" counter="$i">
+					<set_value name="$drones" operation="add"
+						exact="@$commander.ship.units.{unitcategory.gascollector}.mk.{$i}.count" />
+				</do_all>
+				<do_if value="$drones ge 10">
+					<set_value name="$isMiningable" exact="true" />
+				</do_if>
+
+				<do_if value="$isMiningable" negate="true">
+					<set_value name="$drones" exact="0" />
+					<do_all exact="unitcategory.orecollector.maxmk" counter="$i">
+						<set_value name="$drones" operation="add"
+							exact="@$commander.ship.units.{unitcategory.orecollector}.mk.{$i}.count" />
+					</do_all>
+					<do_if value="$drones ge 10">
+						<set_value name="$isMiningable" exact="true" />
+					</do_if>
+				</do_if>
+				<remove_value name="$drones" />
+
+				<do_if value="$isMiningable">
+					<!-- TODO: change to check ship tags instead of cargo, so we can deal 
+						with count = 0 cases; need adding of ?? -->
+					<set_value name="$isMiningable" exact="false" />
+					<do_if value="@$commander.ship.units.{unitcategory.gascollector}.count">
+						<set_value name="$ware" exact="ware.hydrogen" />
+						<do_if value="@$commander.ship.cargo.{$ware}.max" min="1">
+							<set_value name="$isMiningable" exact="true" />
+						</do_if>
+
+						<set_value name="$ware" exact="ware.ions" />
+						<do_if value="@$commander.ship.cargo.{$ware}.max" min="1">
+							<set_value name="$isMiningable" exact="true" />
+						</do_if>
+						<set_value name="$ware" exact="ware.plasma" />
+						<do_if value="@$commander.ship.cargo.{$ware}.max" min="1">
+							<set_value name="$isMiningable" exact="true" />
+						</do_if>
+						<set_value name="$ware" exact="ware.water" />
+						<do_if value="@$commander.ship.cargo.{$ware}.max" min="1">
+							<set_value name="$isMiningable" exact="true" />
+						</do_if>
+
+					</do_if>
+
+					<do_if value="@$commander.ship.units.{unitcategory.orecollector}.count">
+						<set_value name="$ware" exact="ware.ore" />
+						<do_if value="@$commander.ship.cargo.{$ware}.max" min="1">
+							<set_value name="$isMiningable" exact="true" />
+						</do_if>
+						<set_value name="$ware" exact="ware.silicon" />
+						<do_if value="@$commander.ship.cargo.{$ware}.max" min="1">
+							<set_value name="$isMiningable" exact="true" />
+						</do_if>
+						<set_value name="$ware" exact="ware.crystals" />
+						<do_if value="@$commander.ship.cargo.{$ware}.max" min="1">
+							<set_value name="$isMiningable" exact="true" />
+						</do_if>
+						<set_value name="$ware" exact="ware.nividium" />
+						<do_if value="@$commander.ship.cargo.{$ware}.max" min="1">
+							<set_value name="$isMiningable" exact="true" />
+						</do_if>
+						<set_value name="$ware" exact="ware.ice" />
+						<do_if value="@$commander.ship.cargo.{$ware}.max" min="1">
+							<set_value name="$isMiningable" exact="true" />
+						</do_if>
+					</do_if>
+				</do_if>
+
+				<do_if value="$isTradeRun or  $isMiningRun">
+					<add_player_choice_sub text="{8570,3010}"
+						position="right" section="g_JLPUniTrade_autotrade_showskills" />
+				</do_if>
+
+				<!-- <do_if value="$isShowExtLB" exact="true" > <add_player_choice text="{8570,4010}" 
+					position="bottom_left" section="g_JLPUniTrade_autotrade_showExtLB_on" /> 
+					</do_if> <do_else> <add_player_choice text="{8570,4011}" position="bottom_left" 
+					section="g_JLPUniTrade_autotrade_showExtLB_off" /> </do_else> <do_if value="$isTradeRun 
+					or $isMiningRun"> <add_player_choice text="'cheat Money'" position="bottom_left" 
+					section="g_JLPUniTrade_autotrade_giveMoney" /> </do_if> -->
+				<do_if value="$isTransportable and not  $isMiningRun">
+					<do_if value="not $isTradeRun">
+						<add_player_choice_sub text="{8570,1010}"
+							position="top_left" section="g_JLPUniTrade_autotrade_start" />
+					</do_if>
+					<do_else>
+						<add_player_choice_sub text="{8570,1011}"
+							position="top_left" section="g_JLPUniTrade_autotrade_stop" />
+					</do_else>
+				</do_if>
+				<do_if value="$isTransportable and $isMiningable and not $isTradeRun">
+					<do_if value="not $isMiningRun">
+						<add_player_choice_sub text="{8570,2010}"
+							position="top_right" section="g_JLPUniTrade_automining_start" />
+					</do_if>
+					<do_else>
+						<add_player_choice_sub text="{8570,2011}"
+							position="top_right" section="g_JLPUniTrade_automining_stop" />
+					</do_else>
+				</do_if>
+				<add_player_choice_return text="{1002,20}"
+					position="bottom_right" comment="(Back)" />
+
+				<remove_value name="$isTransportable" />
+				<remove_value name="$isMiningable" />
+				<remove_value name="$isTradeRun" />
+			</actions>
+		</cue>
+
+		<cue name="JLPUniTradeStart" instantiate="true" namespace="this">
+			<conditions>
+				<event_conversation_next_section
+					sectionprefix="g_JLPUniTrade_autotrade_start" />
+			</conditions>
+			<actions>
+				<set_value name="$Captain" exact="event.object" />
+				<set_value name="$Captain.$jlpUniTraderRun" exact="true" />
+				<set_value name="$Captain.$jlpUniMiningRun" exact="false" />
+				<!-- genreal config ###not used yet###, can't read from 't' after PageId 
+					is used in Parameter of other script and i call {$..,$..} -->
+				<set_value name="$PageId" exact="8570i" />
+				<!-- MaxBudget in ct -->
+				<set_value name="$maxBudget" exact="100000000ct" />
+				<!-- MinBudget in ct -->
+				<set_value name="$minBudget" exact="10000000ct" />
+				<!--Trade config -->
+				<!--minBuy Jumps -->
+				<set_value name="$minbuy" exact="0i" />
+				<!--maxBuy Jumps -->
+				<set_value name="$maxbuy" exact="15i" />
+				<!--minSell Jumps -->
+				<set_value name="$minsell" exact="0i" />
+				<!--maxSell Jumps -->
+				<set_value name="$maxsell" exact="15i" />
+
+				<set_value name="$capship"
+					exact="$Captain.ship.isclass.ship_l or $Captain.ship.isclass.ship_xl" />
+				<do_if value="$capship">
+					<!-- MaxBudget in ct -->
+					<set_value name="$maxBudget" exact="1000000000ct" />
+					<!-- MinBudget in ct -->
+					<set_value name="$minBudget" exact="100000000ct" />
+				</do_if>
+
+				<set_actor_account actor="$Captain" min="0ct"
+					max="$maxBudget*10ct" />
+
+				<do_if value="$Captain.money" min="$minBudget">
+					<add_npc_line speaker="$Captain" line="1151"
+						comment="Deal confirmed, we are on our way" />
+				</do_if>
+				<do_else>
+					<add_npc_line speaker="$Captain" line="[4160, 4750].random"
+						comment="How many do you want? OR How much?" />
+					<set_value name="$minBudgetDiff" exact="$minBudget - $Captain.money" />
+					<open_conversation_menu menu="MoneyTransferMenu"
+						param="[0, 0, event.object, $minBudgetDiff]" />
+					<add_conversation_view view="closeupdetailmonitor" />
+				</do_else>
+
+				<start_script object="$Captain" name="'jlp.unitrader.trading'">
+					<param name="PageId" value="8570i" />
+					<param name="maxBudget" value="$maxBudget" />
+					<param name="minbuy" value="$minbuy" />
+					<param name="maxbuy" value="$maxbuy" />
+					<param name="minsell" value="$minsell" />
+					<param name="maxsell" value="$maxsell" />
+				</start_script>
+				<remove_value name="$Captain" />
+				<remove_value name="$PageId" />
+				<remove_value name="$maxBudget" />
+				<remove_value name="$minBudget" />
+				<remove_value name="$minbuy" />
+				<remove_value name="$maxbuy" />
+				<remove_value name="$minsell" />
+				<remove_value name="$maxsell" />
+			</actions>
+		</cue>
+
+		<cue name="JLPUniTradeStop" instantiate="true" namespace="this">
+			<conditions>
+				<event_conversation_next_section
+					sectionprefix="g_JLPUniTrade_autotrade_stop" />
+			</conditions>
+			<actions>
+				<set_value name="$Captain" exact="event.object" />
+				<set_value name="$Captain.$jlpUniTraderRun" exact="false" />
+				<set_value name="$Captain.$jlpUniMiningRun" exact="false" />
+
+				<add_npc_line speaker="$Captain" line="1058"
+					comment="Ready for new orders, Sir." />
+				<!-- TODO its bad stop script -->
+
+				<start_script object="$Captain" name="'jlp.return.null'">
+					<param name="Entity" value="$Captain" />
+				</start_script>
+			</actions>
+		</cue>
+
+		<cue name="JLPUniMiningStart" instantiate="true" namespace="this">
+			<conditions>
+				<event_conversation_next_section
+					sectionprefix="g_JLPUniTrade_automining_start" />
+			</conditions>
+			<actions>
+				<set_value name="$Captain" exact="event.object" />
+				<set_value name="$Captain.$jlpUniMiningRun" exact="true" />
+				<set_value name="$Captain.$jlpUniTraderRun" exact="false" />
+				<!-- genreal config ###not used yet###, can't read from 't' after PageId 
+					is used in Parameter of other script and i call {$..,$..} -->
+				<set_value name="$PageId" exact="8570i" />
+				<!-- MaxBudget in ct -->
+				<set_value name="$maxBudget" exact="10000000ct" />
+				<!-- MinBudget in ct -->
+				<set_value name="$minBudget" exact="1000000ct" />
+
+				<set_value name="$capship"
+					exact="$Captain.ship.isclass.ship_l or $Captain.ship.isclass.ship_xl" />
+				<do_if value="$capship">
+					<!-- MaxBudget in ct -->
+					<set_value name="$maxBudget" exact="100000000ct" />
+					<!-- MinBudget in ct -->
+					<set_value name="$minBudget" exact="10000000ct" />
+				</do_if>
+
+				<set_actor_account actor="$Captain" min="0ct"
+					max="$maxBudget*10ct" />
+
+				<do_if value="$Captain.money" min="$minBudget">
+					<add_npc_line speaker="$Captain" line="1151"
+						comment="Deal confirmed, we are on our way" />
+				</do_if>
+				<do_else>
+					<add_npc_line speaker="$Captain" line="[4160, 4750].random"
+						comment="How many do you want? OR How much?" />
+					<set_value name="$minBudgetDiff" exact="$minBudget - $Captain.money" />
+					<open_conversation_menu menu="MoneyTransferMenu"
+						param="[0, 0, event.object, $minBudgetDiff]" />
+					<add_conversation_view view="closeupdetailmonitor" />
+				</do_else>
+				<start_script object="$Captain" name="'jlp.unitrader.mining'">
+					<param name="PageId" value="8570i" />
+					<param name="maxBudget" value="$maxBudget" />
+				</start_script>
+				<remove_value name="$Captain" />
+				<remove_value name="$PageId" />
+				<remove_value name="$maxBudget" />
+				<remove_value name="$minBudget" />
+				<remove_value name="$capship" />
+			</actions>
+		</cue>
+		<cue name="JLPUniMiningstop" instantiate="true" namespace="this">
+			<conditions>
+				<event_conversation_next_section
+					sectionprefix="g_JLPUniTrade_automining_stop" />
+			</conditions>
+			<actions>
+				<set_value name="$Captain" exact="event.object" />
+				<set_value name="$Captain.$jlpUniTraderRun" exact="false" />
+				<set_value name="$Captain.$jlpUniMiningRun" exact="false" />
+
+				<add_npc_line speaker="$Captain" line="1058"
+					comment="Ready for new orders, Sir." />
+				<!-- TODO its bad stop script -->
+				<start_script object="$Captain" name="'jlp.return.null'">
+					<param name="Entity" value="$Captain" />
+				</start_script>
+				<remove_value name="$Captain" />
+			</actions>
+		</cue>
+
+		<cue name="JLPUniTradeShowSkills" instantiate="true" namespace="this">
+			<conditions>
+				<event_conversation_next_section
+					sectionprefix="g_JLPUniTrade_autotrade_showskills" />
+			</conditions>
+			<actions>
+				<set_value name="$Captain" exact="event.object" />
+				<start_script object="player.entity" name="'jlp.unitrader.skills'">
+					<param name="Mode" value="'show'" />
+					<param name="Entity" value="$Captain" />
+				</start_script>
+				<remove_value name="$Captain" />
+			</actions>
+		</cue>
+
+		<cue name="JLPUniTradeShowExtendedLoogbookOn" instantiate="true"
+			namespace="this">
+			<conditions>
+				<event_conversation_next_section
+					sectionprefix="g_JLPUniTrade_autotrade_showExtLB_on" />
+			</conditions>
+			<actions>
+				<set_value name="event.object.$jlp_unitrader_show_extendedlogbook"
+					exact="true" />
+			</actions>
+		</cue>
+
+		<cue name="JLPUniTradeShowExtendedLoogbookOff" instantiate="true"
+			namespace="this">
+			<conditions>
+				<event_conversation_next_section
+					sectionprefix="g_JLPUniTrade_autotrade_showExtLB_off" />
+			</conditions>
+			<actions>
+				<set_value name="event.object.$jlp_unitrader_show_extendedlogbook"
+					exact="false" />
+			</actions>
+		</cue>
+
+		<!-- Support for third mods -->
+		<!-- MCE -->
+		<cue name="Setup">
+			<conditions>
+				<check_any>
+					<event_cue_completed cue="@md.BKCommMenu.Setup" />
+					<check_all>
+						<event_player_created />
+						<check_value value="@md.BKCommMenu.Setup.state" exact="cuestate.complete" />
+					</check_all>
+				</check_any>
+			</conditions>
+			<actions>
+				<!-- Please try to make the Parameter strings unique. We don't want mod 
+					conflicts. -->
+				<append_to_list name="global.$BKCommMenuInSquad"
+					exact="['g_JLPUniTrade_autotrade_select', {8570,1000}]" />
+				<append_to_list name="global.$BKCommMenuNonSquad"
+					exact="['g_JLPUniTrade_autotrade_select', {8570,1000}]" />
+
+			</actions>
+		</cue>
+
+	</cues>
+</mdscript>

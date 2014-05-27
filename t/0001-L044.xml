@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	This file is part of the Universe trader.
+	
+	Author: JohnLukePicard
+    
+-->
+
+<diff xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="rfc5261.xsd">
+    <add sel="/language[@id='44']">
+        <page id="8570" title="Interface" descr="Universe Trade by JLP" voice="no">
+			<t id="1">$ENTITYNAME$</t>
+			<t id="2">$ENTITYTYPE$ $ENTITYNAME$ </t>
+			<t id="3">$ENTITYNAME$ of $OBJECTNAME$</t>
+			<t id="4">$ENTITYTYPE$ $ENTITYNAME$ of $OBJECTNAME$</t>
+			<t id="5">$ENTITYNAME$ of $OBJECTNAME$ in sector $SECTOR$:</t>
+			<t id="10">$ENTITYTYPE$ $ENTITYNAME$ of $OBJECTNAME$ in sector $SECTOR$:</t>
+			<t id="11">$CLUSTER$(Short) / $SECTOR$(Short) / $ZONE$(Short) / $ENTITYNAME$ </t>
+			
+			<t id="100">Unknown</t>
+			
+			<t id="1000">Universe Provider</t>
+            <t id="1010">Start Trader</t>
+            <t id="1011">Stop Trader</t>
+			<t id="2010">Start Miner</t>
+			<t id="2011">Stop Miner</t>
+			<t id="3010">Show Talents</t>
+			<t id="4010">ext. Logbook on</t>
+			<t id="4011">ext. Logbook off</t>
+
+
+			<t id="10000">%1: '%2' unable to find any ware that can be collected by this ship in this cluster!</t>
+			
+			<t id="50000">%1: '%2' Trade '%3'  from '%4' \(available amount: %5 \) for '%6'\(%7Cr price per unit\).  Sell to '%8' \(wanted amount %9\) for '%10' \(%11Cr price per unit\)</t>
+            <t id="50100">%1: '%2' Transfer the differences from my max Budget by %3Cr.</t>
+            <t id="50200">%1: '%2' I trained following skills %3 \(Stars:%4\).</t>
+			<t id="50210">My skills are:\n arrangement talent:    '$WAITTIME$s'\n technical understand: '$SEARCHTIME$s'\n Charisma:                '$EXTRAFACTION$%'\n Courage:                      '$COURAGE$%'\n Efficiency:                       '$EFFICIENCY$'.</t>
+			<t id="50300">I found a deal. I want buy ware '$TRADEWARE$  \($WAREPRICEMIN$.$WAREPRICEMINCT$Cr - $WAREPRICEMAX$.$WAREPRICEMAXCT$Cr\)'    Volume: '$TRADEWAREVOLUME$'.\n Buy price '$WAREPRICESELLOFFER$.$WAREPRICESELLOFFERCT$Cr' Sell Price '$WAREPRICEBUYOFFER$.$WAREPRICEBUYOFFERCT$Cr'</t>
+			<t id="50301">'$TRADESOURCE$ \(max: $TRADESOURCEAMOUNT$\)' with\n '$TRADEDESTINATION$  \(max: '$TRADEDESTAMOUNT$'\)</t>
+			<t id="50310">I negotiate $AMOUNTKAT$ of '$AMOUNT$' \(max offer: '$SHIPAMOUNTMAX$'\).</t>
+			
+			<t id="50320">many amount</t>
+			<t id="50321">good amount</t>
+			<t id="50322">normal amount</t>
+			<t id="50323">little amount</t>
+			<t id="50324">poor amount</t>			
+			
+			<t id="50400">I'm successfully make a Deal.\n $TRADE$</t>
+			
+
+        </page>
+    </add>
+</diff>

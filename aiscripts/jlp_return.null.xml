@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<aiscript name="jlp.return.null" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="1">
+	<params>
+		<param name="Entity" default="this"/>
+	</params>
+	<attention min="unknown">
+	 <actions>
+		 <remove_ware_reservation object="$Entity.ship"  />
+		<return/>
+    </actions>
+  </attention>
+</aiscript>

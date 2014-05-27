@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	This file is part of the Universe trader.
+	
+	Author: JohnLukePicard
+    
+-->
+
+<diff xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="rfc5261.xsd">
+    <add sel="/language[@id='33']">
+        <page id="8570" title="Interface" descr="Universe Trade by JLP" voice="no">
+			<t id="1">$ENTITYNAME$</t>
+			<t id="2">$ENTITYTYPE$ $ENTITYNAME$ </t>
+			<t id="3">$ENTITYNAME$ du $OBJECTNAME$</t>
+			<t id="4">$ENTITYTYPE$ $ENTITYNAME$ de $OBJECTNAME$</t>
+			<t id="5">$ENTITYNAME$ du $OBJECTNAME$ dans le secteur $SECTOR$:</t>
+			<t id="10">$ENTITYTYPE$ $ENTITYNAME$ du $OBJECTNAME$ dans le secteur $SECTOR$:</t>
+			<t id="11">$CLUSTER$(Cours) / $SECTOR$(Cours) / $ZONE$(Cours) / $ENTITYNAME$ </t>
+			
+			<t id="100">Inconnu</t>
+			
+			<t id="1000">Fournisseur Universel</t>
+            <t id="1010">Démarrer Commerce</t>
+            <t id="1011">Arrêter Commerce</t>
+			<t id="2010">Démarrer Mineur</t>
+			<t id="2011">arrêter Mineur</t>
+			<t id="3010">Afficher Compétences</t>
+			<t id="4010">ext. Logbook on</t>
+			<t id="4011">ext. Logbook off</t>
+
+
+			<t id="10000">%1: '%2' impossible de trouver la moindre marchandise utilisable par ce vaisseau dans ce secteur!</t>
+			
+			<t id="50000">%1: '%2' Acheté '%3'  à '%4' \(montant disponible : %5 \) pour '%6'\(%7Cr prix par unité\).  Vendu à '%8' \(montant demandé %9\) pour '%10' \(%11Cr prix par unité\)</t>
+            <t id="50100">%1: '%2' Transférer le surplus à partir de %3Cr.</t>
+            <t id="50200">%1: '%2' J'ai obtenu les compétences suivantes %3 \(Etoiles :%4\).</t>
+			<t id="50210">Mes compétences sont :\n Vitesse d'organisation :    '$WAITTIME$ s'\n Vitesse d'execution : '$SEARCHTIME$ s'\n Niveau de Charisme :                '$EXTRAFACTION$ %'\n Niveau de Courrage :                      '$COURAGE$ %'\n Efficacité:                       '$EFFICIENCY$'.</t>
+			<t id="50300">J\'ai trouvé une affaire. Je vais acheter les marchandises '$TRADEWARE$  \($WAREPRICEMIN$.$WAREPRICEMINCT$ Cr - $WAREPRICEMAX$.$WAREPRICEMAXCT$ Cr\)'    Quantité: '$TRADEWAREVOLUME$'.\n Prix d\'achat: '$WAREPRICESELLOFFER$.$WAREPRICESELLOFFERCT$ Cr' Prix de vente: '$WAREPRICEBUYOFFER$.$WAREPRICEBUYOFFERCT$ Cr'</t>
+			<t id="50301">'$TRADESOURCE$ \(max: $TRADESOURCEAMOUNT$ Cr\)' avec\n '$TRADEDESTINATION$  \(max: '$TRADEDESTAMOUNT$'\)</t>
+			<t id="50310">J\'ai négotié $AMOUNTKAT$ de '$AMOUNT$ Cr' \(Offre max : '$SHIPAMOUNTMAX$ Cr'\).</t>
+			
+			<t id="50320">à un prix très élévé</t>
+			<t id="50321">à un prix élevé</t>
+			<t id="50322">à un prix normal</t>
+			<t id="50323">à un prix moyen</t>
+			<t id="50324">à un prix faible</t>			
+			
+			<t id="50400">J\'ai conclu une transaction.\n $TRADE$ </t>
+			
+
+        </page>
+    </add>
+</diff>
