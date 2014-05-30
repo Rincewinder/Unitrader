@@ -6,7 +6,7 @@
     
 -->
 
-<diff xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="rfc5261.xsd">
+<diff>
     <add sel="/language[@id='44']">
         <page id="8570" title="Interface" descr="Universe Trade by JLP" voice="no">
 			<t id="1">$ENTITYNAME$</t>
@@ -45,7 +45,7 @@
 			<t id="50323">little amount</t>
 			<t id="50324">poor amount</t>			
 			
-			<t id="50400">I'm successfully make a Deal.\n $TRADE$</t>
+			<t id="50400">$SHIP$\n I'm successfully make a Deal.\n Ware: $WARE$ Amount: $AMOUNT$\n Buy price: $PRICEBUY$ Sell price: $PRICESELL$ \n Profit: $PROFIT$</t>
 			
 
         </page>

@@ -16,7 +16,7 @@
 		<param name="debugchance2" default="0" />
 	</params>
 	<init>
-		<set_command command="command.trade"/>
+		<set_command command="command.trade" />
 	</init>
 	<attention min="unknown">
 		<actions>
@@ -254,15 +254,6 @@
 								<wait min="3s" max="9s" />
 								<write_to_logbook category="squad"
 									text="'%1\n %2\n %3 \n %4'.[$notiDears, $detail1, $detail2, $detail3]" />
-
-								<!-- TODO: check how to make the tradeoffer visible in shoppinglist 
-									of player <do_if value="$isbuyoffer" negate="true"> <add_buy_order object="this.ship" 
-									trade="$tradeoffer" amount="$amount" price="$warePrice" unbundle="@$tradeoffer.unbundle" 
-									/> <add_sell_order object="this.ship" trade="$buyoffer" amount="$amount" 
-									price="$warePriceBuyOffer" unbundle="@$buyoffer.unbundle" /> </do_if> <add_buy_order 
-									object="player.primaryship" trade="$tradeoffer" amount="$amount" price="$warePrice" 
-									unbundle="@$tradeoffer.unbundle" /> <add_sell_order object="player.primaryship" 
-									trade="$buyoffer" amount="$amount" price="$warePriceBuyOffer" unbundle="@$buyoffer.unbundle"/> -->
 								<resume label="move to target object" />
 							</do_if>
 							<do_else>
@@ -495,40 +486,6 @@
 						<resume label="finish" />
 					</do_if>
 
-					<!-- keep this block for savegame compatibility for now -->
-					<do_if value="$tradeoffer.exists">
-						<!-- prepare texts for notifcation since the actual trade can be deleted 
-							by the time this is displayed! -->
-						<set_value name="$price"
-							exact="($tradeoffer.transferredamount + $tradeoffer.destroyedamount) * $tradeoffer.unitprice" />
-
-						<do_if value="@$tradeoffer.seller">
-							<substitute_text text="$tradedetail2" source="{1015, 2}">
-								<replace string="'$AMOUNT$'" with="$tradeoffer.transferredamount" />
-								<replace string="'$WARE$'" with="$tradeoffer.ware.name" />
-								<replace string="'$PRICE$'" with="$price / 100" />
-							</substitute_text>
-							<do_if value="$tradeoffer.destroyedamount > 0">
-								<substitute_text text="$tradedetail3" source="{1015, 3}">
-									<replace string="'$AMOUNT$'" with="$tradeoffer.destroyedamount" />
-									<replace string="'$WARE$'" with="$tradeoffer.ware.name" />
-								</substitute_text>
-								<set_value name="$tradedetails" exact="[$tradedetail2, $tradedetail3]" />
-							</do_if>
-							<do_else>
-								<set_value name="$tradedetails" exact="[$tradedetail2]" />
-							</do_else>
-						</do_if>
-						<do_elseif value="@$tradeoffer.buyer">
-							<substitute_text text="$tradedetail2" source="{1015, 4}">
-								<replace string="'$AMOUNT$'"
-									with="$tradeoffer.transferredamount + $tradeoffer.destroyedamount" />
-								<replace string="'$WARE$'" with="$tradeoffer.ware.name" />
-								<replace string="'$PRICE$'" with="$price / 100" />
-							</substitute_text>
-							<set_value name="$tradedetails" exact="[$tradedetail2]" />
-						</do_elseif>
-					</do_if>
 
 					<!-- now execute the trade -->
 					<wait min="1s" max="3s" />
@@ -536,6 +493,24 @@
 						amount="$amount" result="$traderesult" unbundle="@$tradeoffer.unbundle">
 						<interrupt_after_time time="121min" />
 					</execute_trade>
+
+					<!-- keep this block for savegame compatibility for now -->
+					<do_if value="$tradeoffer.exists">
+						<!-- prepare texts for notifcation since the actual trade can be deleted 
+							by the time this is displayed! -->
+						<set_value name="$price" exact="($tradeoffer.transferredamount + $tradeoffer.destroyedamount) * $tradeoffer.unitprice" />
+						<set_value name="$PRICE" exact="$price / 100" />
+						<set_value name="$WARE" exact="$tradeoffer.ware.name" />
+						<set_value name="$AMOUNT" exact="0" />
+						<do_if value="@$tradeoffer.seller">
+							<set_value name="$AMOUNT" exact="$tradeoffer.transferredamount" />
+						</do_if>
+						<do_elseif value="@$tradeoffer.buyer">
+							<set_value name="$AMOUNT"	exact="$tradeoffer.transferredamount + $tradeoffer.destroyedamount" />
+						</do_elseif>
+						<set_value name="$tradedetails" exact="[$targetobject, $AMOUNT, $WARE, $PRICE]" />
+					</do_if>
+
 
 					<do_if value="@$isbuyoffer">
 						<!-- buyoffers remove their reservation directly after the trade -->

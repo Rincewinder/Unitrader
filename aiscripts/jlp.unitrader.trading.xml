@@ -51,15 +51,11 @@
 						<wait min="4s" max="9s"/>
 					</do_if>
                 </do_if>
-            	<wait_for_prev_script/>    
-                <save_ai_action_state entity="this" previous="this"/>
                 <run_script name="'jlp.unitrader.skills'" sinceversion="1">
                     <param name="Mode" value="'init'"/>
                     <param name="debugchance"  value="$debugchance"/>
                 </run_script>
                 <wait min="4s" max="9s"/>
-            	<wait_for_prev_script/>    
-                <save_ai_action_state entity="this" previous="this"/>
                 <run_script name="'jlp.unitrader.trade.ship.ranged'" sinceversion="1">
                     <param name="PageId" value="$PageId"/>
                     <param name="minbuy" value="$minbuy"/>
