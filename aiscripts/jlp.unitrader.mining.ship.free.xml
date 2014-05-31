@@ -14,9 +14,6 @@
 	<interrupts>
 		<handler ref="AttackHandler" />
 	</interrupts>
-	<init>
-		<set_command command="command.freemining" />
-	</init>
 
 	<attention min="unknown">
 		<actions>

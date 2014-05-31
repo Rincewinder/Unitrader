@@ -13,9 +13,6 @@
 		<param name="debugchance" default="0" />
 		<param name="debugchance2" default="0" />
 	</params>
-	<init>
-		<set_command  command="command.freetrade"/>
-	</init>
 	<attention min="unknown">
 		<actions>
 			<!-- set up initial state for trade runs -->
@@ -127,7 +124,7 @@
 				<find_sector name="$closestRegions" known="true"
 					multiple="true"
 				>
-					<match_distance object="this.ship" min="1" max="$buyrange.{1}" />
+					<match_distance object="this.ship" min="$buyrange.{1}/2" max="$buyrange.{1}" />
 					<match_selloffer wares="$warelist" />
 				</find_sector>
 				<do_if value="$closestRegions.count">

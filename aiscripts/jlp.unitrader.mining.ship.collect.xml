@@ -14,7 +14,9 @@
     <param name="shoppinglist"/>
     <param name="debugchance"/>
   </params>
-
+  <init>
+  	<set_command command="command.mining" param="$zone"/>
+	</init>
   <attention min="visible">
     <actions>
       <set_value name="$dronelaunchdelay" exact="3s" comment="the minimum delay between two drone launches"/>
