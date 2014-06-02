@@ -20,7 +20,7 @@
 				</check_any>
 			</conditions>
 			<actions>
-				<do_if value="event.param == 'gOrders_main'">
+<!-- 				<do_if value="event.param == 'gOrders_main'"> -->
 					<do_if value="@event.object.ship">
 						<do_if
 							value="(event.object.owner == faction.player) and (event.object.type == entitytype.commander) and (event.object.ship.cargo.capacity gt 0)"
@@ -37,7 +37,6 @@
 								section="g_JLPUniTrade_autotrade_select" />
 						</do_if>
 					</do_if>
-				</do_if>
 			</actions>
 		</cue>
 
