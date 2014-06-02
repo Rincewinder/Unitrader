@@ -1,81 +1,111 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
-<aiscript name="jlp.unitrader.trading" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd"  version="1">
-    <params>
-        <param name="PageId" default="8570" />
-        <param name="maxBudget"   default="500000000ct"/>
-        <param name="minbuy" default="0" />
-        <param name="maxbuy" default="20"/>
-        <param name="minsell" default="0"/>
-        <param name="maxsell" default="20"/>
-        <param name="debugchance" default="0"/>
-    </params>
-	<!--
+<aiscript name="jlp.unitrader.trading" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="1"
+>
+	<params>
+		<param name="PageId" default="8570" />
+		<param name="maxBudget" default="500000000ct" />
+		<param name="minbuy" default="0" />
+		<param name="maxbuy" default="25" />
+		<param name="minsell" default="0" />
+		<param name="maxsell" default="25" />
+		<param name="debugchance" default="0" />
+	</params>
 	<interrupts>
-        <handler ref="AttackHandler" />
-        <handler ref="ScannedHandler" />
-    </interrupts>
-   
-        <handler>
-            <conditions>
-                <event_object_money_updated object="this"/>
-            </conditions>
-            <actions>
-                <do_if value="(this.minbudget gt 0) and (this.money lt this.minbudget)">
-                    <debug_text text="'money below budget. Money: ' + event.param2 + ' Min budget: ' + this.minbudget" chance="$debugchance"/>
+		<handler ref="AttackHandler" />
+		<handler ref="ScannedHandler" />
+		<!-- Stop ORDERS -->
+<!--
+		<handler>
+			<conditions>
+				<event_object_signalled object="this.ship"
+					param="'stop order'" />
+				<check_value value="this.command.value != command.follow" />
+				<check_value
+					value="(not @this.$shiptrader_docking) and (not @this.$ship_parking) and (not this.ship.dockslot) and (not this.ship.docklink)" />
+			</conditions>
+			<actions>
+				<set_value name="$command" exact="this.command.value" />
+				<run_interrupt_script name="'jlp.interrupt.stoporder'"
+					abortscripts="true"
+				>
+					<param name="prevcommand" value="$command" />
+				</run_interrupt_script>
 
-                    <run_interrupt_script name="'player.interaction.budget'"/>
-                </do_if>
-            </actions>
-        </handler>
-    </interrupts>
--->
-    <attention min="unknown">
-        <actions>
-			
-            <!-- trade loop start -->
-            <label name="start" />
-            <!--  initial  -->
-			<set_actor_account actor="this" min="0ct" max="$maxBudget*10"/>
-			
+			</actions>
+		</handler>
 
-            <do_if value="this.$jlpUniTraderRun" exact="true">
+		
+			<handler>
+			<conditions>
+			<event_object_money_updated object="this" />
+			</conditions>
+			<actions>
+			<do_if value="(this.minbudget gt 0) and (this.money lt this.minbudget)">
+			<debug_text
+			text="'money below budget. Money: ' + event.param2 + ' Min budget: ' +
+			this.minbudget"
+			chance="$debugchance" />
 
-                <!--<set_actor_max_budget actor="this" amount="$MaxBudget"/>  -->
-                <!--   check maxbudget and give the rest to player -->
+			<run_interrupt_script name="'player.interaction.budget'" />
+			</do_if>
+			</actions>
+			</handler>
+		-->
+	</interrupts>
+
+	<attention min="unknown">
+		<actions>
+
+			<!-- trade loop start -->
+			<label name="start" />
+			<!-- initial -->
+			<set_actor_account actor="this" min="0ct" max="$maxBudget*10" />
+
+
+			<do_if value="this.$jlpUniTraderRun" exact="true">
+
+				<!--<set_actor_max_budget actor="this" amount="$MaxBudget"/> -->
+				<!-- check maxbudget and give the rest to player -->
 				<do_if value="this.money" min="$maxBudget">
-					<set_value name="$transferMoney" exact="this.money - $maxBudget"/>
-					<wait min="4s" max="9s"/>
+					<set_value name="$transferMoney" exact="this.money - $maxBudget" />
+					<wait min="4s" max="9s" />
 					<do_if value="$transferMoney" min="1">
-						<transfer_money from="this" to="player.entity" amount="$transferMoney" result="$result" />
-						<write_to_logbook category="squad" text="{8570,50100}.[this.ship.knownname, this.knownname, $transferMoney / 1Cr]"/>
-						<wait min="4s" max="9s"/>
+						<transfer_money from="this" to="player.entity"
+							amount="$transferMoney" result="$result" />
+						<write_to_logbook category="squad"
+							text="{8570,50100}.[this.ship.knownname, this.knownname, $transferMoney / 1Cr]" />
+						<wait min="4s" max="9s" />
 					</do_if>
-                </do_if>
-                <run_script name="'jlp.unitrader.skills'" sinceversion="1">
-                    <param name="Mode" value="'init'"/>
-                    <param name="debugchance"  value="$debugchance"/>
-                </run_script>
-                <wait min="4s" max="9s"/>
-                <run_script name="'jlp.unitrader.trade.ship.ranged'" sinceversion="1">
-                    <param name="PageId" value="$PageId"/>
-                    <param name="minbuy" value="$minbuy"/>
-                    <param name="maxbuy" value="$maxbuy"/>
-                    <param name="minsell" value="$minsell"/>
-                    <param name="maxsell" value="$maxsell"/>
-                    <param name="debugchance"  value="$debugchance"/>
-                </run_script>
-                <!-- Take a break -->
-                <wait exact="this.$jlp_unitrader_waittime"/>
+				</do_if>
+				<run_script name="'jlp.unitrader.skills'" sinceversion="1">
+					<param name="Mode" value="'init'" />
+					<param name="debugchance" value="$debugchance" />
+				</run_script>
+				<wait min="4s" max="9s" />
+				<run_script name="'jlp.unitrader.trade.ship.ranged'"
+					sinceversion="1"
+				>
+					<param name="PageId" value="$PageId" />
+					<param name="minbuy" value="$minbuy" />
+					<param name="maxbuy" value="$maxbuy" />
+					<param name="minsell" value="$minsell" />
+					<param name="maxsell" value="$maxsell" />
+					<param name="debugchance" value="$debugchance" />
+				</run_script>
+				<!-- Take a break -->
+				<wait exact="this.$jlp_unitrader_waittime" />
 
-                <resume label="start" />
-            </do_if>
+				<resume label="start" />
+			</do_if>
 			<do_else>
-				<!-- Finished trade and stop-->
-				<add_npc_line speaker="this" line="1058" comment="Ready for new orders, Sir."/>
+				<!-- Finished trade and follow player -->
+				<add_npc_line speaker="this" line="1058"
+					comment="Ready for new orders, Sir." />
 			</do_else>
-        </actions>
-    </attention>
+		</actions>
+	</attention>
 	<on_abort>
-			<set_value name="this.$jlpUniTraderRun" exact="false" />
+		<set_value name="this.$jlpUniTraderRun" exact="false" />
 	</on_abort>
 </aiscript>

@@ -1,430 +1,572 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
-<aiscript name="jlp.unitrader.mining.ship.collect" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="2">
-  <!--
-  This script does the actual mining both high and low attention. While there is
-  no difference between gas and mineral mining in low attention, both cases are
-  separated in high attention (because gases can't be picked up).
-  by Michael and Benedikt
-  -->
-  <params>
-    <param name="region"/>
-    <param name="zone"/>
-    <param name="ware"/>
-    <param name="secwares"/>
-    <param name="shoppinglist"/>
-    <param name="debugchance"/>
-  </params>
-  <init>
-  	<set_command command="command.mining" param="$zone"/>
+<aiscript name="jlp.unitrader.mining.ship.collect" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="2"
+>
+	<!--
+		This script does the actual mining both high and low attention. While there 
+		is
+		no difference between gas and mineral mining in low attention, both cases 
+		are
+		separated in high attention (because gases can't be picked up).
+		by Michael and Benedikt
+	-->
+	<params>
+		<param name="region" />
+		<param name="zone" />
+		<param name="ware" />
+		<param name="secwares" />
+		<param name="shoppinglist" />
+		<param name="debugchance" />
+	</params>
+	<init>
+		<set_command command="command.mining" param="$zone" />
 	</init>
-  <attention min="visible">
-    <actions>
-      <set_value name="$dronelaunchdelay" exact="3s" comment="the minimum delay between two drone launches"/>
-      <set_value name="$gathertime" min="172s" max="188s" comment="the time spent to gather resources at a certain location (gases only)"/>
-      <set_value name="$traveltime" min="76s" max="84s" comment="the time between gathering at two different locations (gases only)"/>
+	<attention min="visible">
+		<actions>
+			<do_if value="this.$jlpUniMiningRun" exact="true" negate="true">
+				<return value="'aborted'" />
+			</do_if>
 
-      <get_safe_pos result="$destination" zone="$zone" radius="this.ship.size" min="1km" max="35km" />
 
-      <!-- Move to destination zone -->
-      <do_if value="this.ship.zone != $zone">
-        <debug_text text="'Go mining to zone: ' + $zone.knownname + ' region: ' + $region.knownname " chance="$debugchance" />
-        <!-- If the zone to mine is a highway -->
-        <do_if value="$zone.isclass.highway">
-          <debug_text text="'Error moving to %1. This zone is a highway'" />
-          <!-- <resume label="start" /> -->
-        </do_if>
-        <run_script name="'move.generic'" sinceversion="2">
-          <param name="destination" value="$zone"/>
-          <param name="debugchance" value="$debugchance"/>
-        </run_script>
-      </do_if>
+			<set_value name="$dronelaunchdelay" exact="3s"
+				comment="the minimum delay between two drone launches" />
+			<set_value name="$gathertime" min="172s" max="188s"
+				comment="the time spent to gather resources at a certain location (gases only)" />
+			<set_value name="$traveltime" min="76s" max="84s"
+				comment="the time between gathering at two different locations (gases only)" />
 
-      <label name="start" />
+			<get_safe_pos result="$destination" zone="$zone"
+				radius="this.ship.size" min="1km" max="35km" />
 
-      <!-- gas mining -->
-      <do_if value="$ware.tags.indexof.{tag.liquid}">
-        <!-- chance to skip initial movement -->
-        <do_if value="true" chance="$gathertime / ($gathertime + $traveltime) * 100">
-          <set_value name="$skipmovement" exact="true"/>
-        </do_if>
-        <do_else>
-          <set_value name="$skipmovement" exact="false"/>
-        </do_else>
-        <set_value name="$gathercounter" exact="0s"/>
-        <!-- loop as long as there is at least 5% free cargo space -->
-        <do_while value="(this.ship.cargo.{$ware}.free)f / this.ship.cargo.{$ware}.max" min="0.05">
-          <do_if value="not $zone.exists">
-            <return value="'aborted'" />
-          </do_if>
-          <do_if value="$skipmovement" exact="false">
-            <do_if value="this.ship.distanceto.{$destination} lt 4km">
-              <debug_text text="player.age+' destination almost reached, creating a new destination'" chance="$debugchance"/>
-              <get_safe_pos result="$destination" zone="$zone" radius="this.ship.size" min="1km" max="35km" />
-            </do_if>
-            <debug_text text="player.age+' movement started (destination: '+this.ship.distanceto.{$destination}+'m)'" chance="$debugchance"/>
-            <move_to object="this.ship" destination="this.ship.zone" finishonapproach="true" forceposition="false">
-              <position value="$destination"/>
-              <interrupt_after_time time="1s"/>
-            </move_to>
-            <wait exact="$traveltime"/>
-            <debug_text text="player.age+' movement stopped, preparing to mine'" chance="$debugchance"/>
-            <stop_moving object="this.ship" immediate="false"/>
-            <wait min="4s" max="6s"/>
-          </do_if>
-          <do_else>
-            <set_value name="$skipmovement" exact="false"/>
-          </do_else>
-          <!-- launch drones to collect gas -->
-          <debug_text text="player.age+' starting to launch drones'" chance="$debugchance"/>
-          <set_value name="$gatherstart" exact="player.age"/>
-          <do_while value="player.age lt ($gatherstart + $gathertime)">
-            <do_if value="(this.ship.cargo.{$ware}.free)f / this.ship.cargo.{$ware}.max" max="0.05">
-              <break/>
-            </do_if>
-            <launch_drone name="$drone" object="this.ship" group="unitcategory.gascollector" exact="1"/>
-            <do_if value="$drone.isoperational">
-              <start_script name="'mining.ship.drone'" object="$drone.pilot">
-                <param name="homebase" value="this.ship"/>
-                <param name="ware" value="$ware"/>
-              </start_script>
-            </do_if>
-            <wait exact="$dronelaunchdelay"/>
-            <set_value name="$gathercounter" exact="$gathercounter + $dronelaunchdelay" />
-            <!-- gas gathering uses low attention mechanic -->
-            <do_if value="$gathercounter ge 15s">
-              <set_value name="$gathercounter" exact="15s" />
-              <do_if value="($gatherstart + $traveltime) lt player.age">
-                <get_resource_gatherrate name="$gatherrate" refobject="this.ship" region="$region" zone="$zone" ware="$ware"/>
-                <set_value name="$gathered" min="$gatherrate * $gathercounter * 0.75" max="$gatherrate * $gathercounter * 1.25"/>
-                <deplete_yield region="$region" zone="$zone" container="this.ship" ware="$ware" amount="$gathered"/>
-                <debug_text text="player.age + ' collected %1 units of %2 (%3 units/s on average)'.[$gathered, $ware, $gatherrate]" chance="$debugchance"/>
-                <set_value name="$gathercounter" exact="0"/>
-              </do_if>
-            </do_if>
-          </do_while>
-          <debug_text text="player.age+' stop launching drones'" chance="$debugchance"/>
-        </do_while>
-        <debug_text text="player.age+' less than 5% free cargo space'" chance="$debugchance"/>
-      </do_if>
-      <do_else>
-        <!-- mineral mining (capital ships) -->
-        <do_if value="this.ship.isclass.ship_xl or this.ship.isclass.ship_l">
-          <set_value name="$moving" exact="false"/>
-          <set_value name="$hullbuffer" exact="0"/>
-          <set_value name="$idletime" exact="0"/>
-          <do_while value="(this.ship.cargo.{$ware}.free)f / this.ship.cargo.{$ware}.max" min="0.05">
-            <do_if value="not $zone.exists">
-              <return value="'aborted'" />
-            </do_if>
-            <set_value name="$checkware" exact="$ware"/>
-            <do_if value="$secwares.count gt 1">
-              <set_value name="$checkware" exact="$secwares.random"/>
-            </do_if>
-            <do_if value="this.ship.distanceto.{$destination} lt 1km">
-              <debug_text text="player.age+' destination almost reached, creating a new one'" chance="$debugchance"/>
-              <get_safe_pos zone="$zone" radius="this.ship.size" result="$destination" min="1km" max="50km" />
-            </do_if>
-            <!-- find pickup (filtered by ownership) and target -->
-            <set_value name="$pickuptarget" exact="false"/>
-            <set_value name="$skill" exact="(this.combinedskill - 50) * 3" />
-            <find_asteroid_in_region name="$pickup" region="$region" refobject="this.ship" canpickup="true" multiple="true" maxdistance="4km" viewangle="360deg" ware="$checkware" />
-            <do_all exact="$pickup.count" counter="$i" reverse="true">
-              <do_if value="$pickup.{$i}.owner">
-                <remove_value name="$pickup.{$i}" />
-              </do_if>
-              <do_elseif value="not $pickup.{$i}.canbepickedup">
-                <debug_text text="'%1 in %2 (region: %3) cannot be picked up!'.[$pickup.{$i}, $pickup.{$i}.zone.knownname, $region.knownname]" chance="$debugchance"/>
-                <remove_value name="$pickup.{$i}" />
-              </do_elseif>
-              <do_elseif value="$pickup.{$i}.wares.{$checkware}.count le 0" chance="$skill">
-                <remove_value name="$pickup.{$i}" />
-              </do_elseif>
-            </do_all>
-            <!-- find asteroids and calculate their total hull -->
-            <set_value name="$asteroidhull" exact="0"/>
-            <find_asteroid_in_region name="$asteroids" region="$region" refobject="this.ship" canpickup="false" multiple="true" maxdistance="3km + this.ship.size" viewangle="360deg" ware="$checkware" />
-            <do_all exact="$asteroids.count" counter="$i">
-              <set_value name="$asteroidhull" exact="$asteroids.{$i}.hull" operation="add"/>
-            </do_all>
-            <do_if value="$asteroids.count" min="1">
-              <set_turret_targets object="this.ship" target="$asteroids" weapontype="mining"/>
-            </do_if>
-            <do_if value="($pickup.count ge 50) or ((($asteroids.count ge 5) or ($asteroidhull ge 1000000)) and ($idletime lt 40))">
-              <!-- enough targets in range, stop moving -->
-              <do_if value="$moving">
-                <set_value name="$moving" exact="false"/>
-                <debug_text text="'%1 movement stopped [pickup count: %2, asteroid count: %3 (%4)]'.[player.age, $pickup.count, $asteroids.count, ($asteroidhull)L]" chance="$debugchance"/>
-                <stop_moving object="this.ship" immediate="false"/>
-              </do_if>
-            </do_if>
-            <do_elseif value="$moving and $distantasteroidpos?">
-              <do_if value="this.ship.distanceto.{$distantasteroidpos} lt this.ship.size * 2">
-                <debug_text text="'distance: ' + this.ship.distanceto.{$distantasteroidpos} + ' size: ' + this.ship.size * 2" chance="$debugchance"/>
+			<!-- Move to destination zone -->
+			<do_if value="this.ship.zone != $zone">
+				<debug_text
+					text="'Go mining to zone: ' + $zone.knownname + ' region: ' + $region.knownname "
+					chance="$debugchance" />
+				<!-- If the zone to mine is a highway -->
+				<do_if value="$zone.isclass.highway">
+					<debug_text text="'Error moving to %1. This zone is a highway'" />
+					<!-- <resume label="start" /> -->
+				</do_if>
+				<run_script name="'move.generic'" sinceversion="2">
+					<param name="destination" value="$zone" />
+					<param name="debugchance" value="$debugchance" />
+				</run_script>
+			</do_if>
 
-                <set_value name="$moving" exact="false"/>
-                <remove_value name="$distantasteroidpos"/>
+			<label name="start" />
 
-                <debug_text text="'%1 movement stopped 2 [pickup count: %2, asteroid count: %3 (%4)]'.[player.age, $pickup.count, $asteroids.count, ($asteroidhull)L]" chance="$debugchance"/>
-                <stop_moving object="this.ship" immediate="false"/>
-              </do_if>
-            </do_elseif>
-            <do_elseif value="not $moving">
-              <!-- not enough targets in range, start moving -->
-              <debug_text text="'%1 movement started [pickup count: %2, asteroid count: %3 (%4)]'.[player.age, $pickup.count, $asteroids.count, ($asteroidhull)L]" chance="$debugchance"/>
-              <do_if value="not $distantasteroidpos?">
-                <find_asteroid_in_region name="$distantasteroid" region="$region" refobject="this.ship" canpickup="false" multiple="false" maxdistance="30km" viewangle="90deg" ware="$checkware" />
-                <do_if value="$distantasteroid">
-                  <create_position name="$distantasteroidpos" object="$distantasteroid" exact="$distantasteroid.size"/>
-                  <remove_value name="$distantasteroid"/>
-                  
-                  <!--Chance to linger for a while and shoot-->
-                  <do_if value="$asteroids.count" chance="25">
-                    <wait exact="3s" sinceversion="2"/>
-                  </do_if>
-                </do_if>
-              </do_if>
+			<!-- gas mining -->
+			<do_if value="$ware.tags.indexof.{tag.liquid}">
+				<!-- chance to skip initial movement -->
+				<do_if value="true" chance="$gathertime / ($gathertime + $traveltime) * 100">
+					<set_value name="$skipmovement" exact="true" />
+				</do_if>
+				<do_else>
+					<set_value name="$skipmovement" exact="false" />
+				</do_else>
+				<set_value name="$gathercounter" exact="0s" />
+				<!-- loop as long as there is at least 5% free cargo space -->
+				<do_while
+					value="(this.ship.cargo.{$ware}.free)f / this.ship.cargo.{$ware}.max"
+					min="0.05"
+				>
+					<do_if value="not $zone.exists">
+						<return value="'aborted'" />
+					</do_if>
+					<do_if value="$skipmovement" exact="false">
+						<do_if value="this.ship.distanceto.{$destination} lt 4km">
+							<debug_text
+								text="player.age+' destination almost reached, creating a new destination'"
+								chance="$debugchance" />
+							<get_safe_pos result="$destination" zone="$zone"
+								radius="this.ship.size" min="1km" max="35km" />
+						</do_if>
+						<debug_text
+							text="player.age+' movement started (destination: '+this.ship.distanceto.{$destination}+'m)'"
+							chance="$debugchance" />
+						<move_to object="this.ship" destination="this.ship.zone"
+							finishonapproach="true" forceposition="false"
+						>
+							<position value="$destination" />
+							<interrupt_after_time time="1s" />
+						</move_to>
+						<wait exact="$traveltime" />
+						<debug_text text="player.age+' movement stopped, preparing to mine'"
+							chance="$debugchance" />
+						<stop_moving object="this.ship" immediate="false" />
+						<wait min="4s" max="6s" />
+					</do_if>
+					<do_else>
+						<set_value name="$skipmovement" exact="false" />
+					</do_else>
+					<!-- launch drones to collect gas -->
+					<debug_text text="player.age+' starting to launch drones'"
+						chance="$debugchance" />
+					<set_value name="$gatherstart" exact="player.age" />
+					<do_while value="player.age lt ($gatherstart + $gathertime)">
+						<do_if
+							value="(this.ship.cargo.{$ware}.free)f / this.ship.cargo.{$ware}.max"
+							max="0.05"
+						>
+							<break />
+						</do_if>
+						<launch_drone name="$drone" object="this.ship"
+							group="unitcategory.gascollector" exact="1" />
+						<do_if value="$drone.isoperational">
+							<start_script name="'mining.ship.drone'" object="$drone.pilot">
+								<param name="homebase" value="this.ship" />
+								<param name="ware" value="$ware" />
+							</start_script>
+						</do_if>
+						<wait exact="$dronelaunchdelay" />
+						<set_value name="$gathercounter" exact="$gathercounter + $dronelaunchdelay" />
+						<!-- gas gathering uses low attention mechanic -->
+						<do_if value="$gathercounter ge 15s">
+							<set_value name="$gathercounter" exact="15s" />
+							<do_if value="($gatherstart + $traveltime) lt player.age">
+								<get_resource_gatherrate name="$gatherrate"
+									refobject="this.ship" region="$region" zone="$zone" ware="$ware" />
+								<set_value name="$gathered" min="$gatherrate * $gathercounter * 0.75"
+									max="$gatherrate * $gathercounter * 1.25" />
+								<deplete_yield region="$region" zone="$zone"
+									container="this.ship" ware="$ware" amount="$gathered" />
+								<debug_text
+									text="player.age + ' collected %1 units of %2 (%3 units/s on average)'.[$gathered, $ware, $gatherrate]"
+									chance="$debugchance" />
+								<set_value name="$gathercounter" exact="0" />
+							</do_if>
+						</do_if>
+					</do_while>
+					<debug_text text="player.age+' stop launching drones'"
+						chance="$debugchance" />
+				</do_while>
+				<debug_text text="player.age+' less than 5% free cargo space'"
+					chance="$debugchance" />
+			</do_if>
+			<do_else>
+				<!-- mineral mining (capital ships) -->
+				<do_if value="this.ship.isclass.ship_xl or this.ship.isclass.ship_l">
+					<set_value name="$moving" exact="false" />
+					<set_value name="$hullbuffer" exact="0" />
+					<set_value name="$idletime" exact="0" />
+					<do_while
+						value="(this.ship.cargo.{$ware}.free)f / this.ship.cargo.{$ware}.max"
+						min="0.05"
+					>
+						<do_if value="not $zone.exists">
+							<return value="'aborted'" />
+						</do_if>
+						<set_value name="$checkware" exact="$ware" />
+						<do_if value="$secwares.count gt 1">
+							<set_value name="$checkware" exact="$secwares.random" />
+						</do_if>
+						<do_if value="this.ship.distanceto.{$destination} lt 1km">
+							<debug_text
+								text="player.age+' destination almost reached, creating a new one'"
+								chance="$debugchance" />
+							<get_safe_pos zone="$zone" radius="this.ship.size"
+								result="$destination" min="1km" max="50km" />
+						</do_if>
+						<!-- find pickup (filtered by ownership) and target -->
+						<set_value name="$pickuptarget" exact="false" />
+						<set_value name="$skill" exact="(this.combinedskill - 50) * 3" />
+						<find_asteroid_in_region name="$pickup"
+							region="$region" refobject="this.ship" canpickup="true" multiple="true"
+							maxdistance="4km" viewangle="360deg" ware="$checkware" />
+						<do_all exact="$pickup.count" counter="$i" reverse="true">
+							<do_if value="$pickup.{$i}.owner">
+								<remove_value name="$pickup.{$i}" />
+							</do_if>
+							<do_elseif value="not $pickup.{$i}.canbepickedup">
+								<debug_text
+									text="'%1 in %2 (region: %3) cannot be picked up!'.[$pickup.{$i}, $pickup.{$i}.zone.knownname, $region.knownname]"
+									chance="$debugchance" />
+								<remove_value name="$pickup.{$i}" />
+							</do_elseif>
+							<do_elseif value="$pickup.{$i}.wares.{$checkware}.count le 0"
+								chance="$skill"
+							>
+								<remove_value name="$pickup.{$i}" />
+							</do_elseif>
+						</do_all>
+						<!-- find asteroids and calculate their total hull -->
+						<set_value name="$asteroidhull" exact="0" />
+						<find_asteroid_in_region name="$asteroids"
+							region="$region" refobject="this.ship" canpickup="false"
+							multiple="true" maxdistance="3km + this.ship.size" viewangle="360deg"
+							ware="$checkware" />
+						<do_all exact="$asteroids.count" counter="$i">
+							<set_value name="$asteroidhull" exact="$asteroids.{$i}.hull"
+								operation="add" />
+						</do_all>
+						<do_if value="$asteroids.count" min="1">
+							<set_turret_targets object="this.ship" target="$asteroids"
+								weapontype="mining" />
+						</do_if>
+						<do_if
+							value="($pickup.count ge 50) or ((($asteroids.count ge 5) or ($asteroidhull ge 1000000)) and ($idletime lt 40))"
+						>
+							<!-- enough targets in range, stop moving -->
+							<do_if value="$moving">
+								<set_value name="$moving" exact="false" />
+								<debug_text
+									text="'%1 movement stopped [pickup count: %2, asteroid count: %3 (%4)]'.[player.age, $pickup.count, $asteroids.count, ($asteroidhull)L]"
+									chance="$debugchance" />
+								<stop_moving object="this.ship" immediate="false" />
+							</do_if>
+						</do_if>
+						<do_elseif value="$moving and $distantasteroidpos?">
+							<do_if
+								value="this.ship.distanceto.{$distantasteroidpos} lt this.ship.size * 2"
+							>
+								<debug_text
+									text="'distance: ' + this.ship.distanceto.{$distantasteroidpos} + ' size: ' + this.ship.size * 2"
+									chance="$debugchance" />
 
-              <set_value name="$moving" exact="true"/>
-              <do_if value="$distantasteroidpos?">
-                <debug_text text="'flying to asteroid at: ' + $distantasteroidpos" chance="$debugchance"/>
-                <move_to object="this.ship" destination="this.ship.zone" finishonapproach="true" forceposition="false" abortpath="true" sinceversion="2">
-                  <position value="$distantasteroidpos"/>
-                  <interrupt_after_time time="10s"/>
-                </move_to>
-              </do_if>
-              <do_else>
-                <move_to object="this.ship" destination="this.ship.zone" finishonapproach="true" forceposition="false" abortpath="true">
-                  <position value="$destination"/>
-                  <interrupt_after_time time="20s"/>
-                </move_to>
-              </do_else>
-            </do_elseif>
-            <!-- launch drone to pick up the target -->
-            <do_if value="$pickup.count">
-              <set_value name="$pickuptarget" exact="$pickup.random"/>
-              <set_region_object_persistence object="$pickuptarget" persistent="true" />
-              <launch_drone name="$drone" object="this.ship" group="unitcategory.orecollector" exact="1"/>
-              <do_if value="$drone.isoperational">
-                <debug_text text="'%1 drone launched [pickup count: %2, asteroid count: %3 (%4)]'.[player.age, $pickup.count, $asteroids.count, ($asteroidhull)L]" chance="$debugchance"/>
-                <start_script name="'mining.ship.drone'" object="$drone.pilot">
-                  <param name="homebase" value="this.ship" />
-                  <param name="target" value="$pickuptarget"/>
-                </start_script>
-                <set_owner object="$pickuptarget" faction="this.ship.owner"/>
-              </do_if>
-              <do_else>
-                <debug_text text="'%1 no drone available [pickup count: %2, asteroid count: %3 (%4)]'.[player.age, $pickup.count, $asteroids.count, ($asteroidhull)L]" chance="$debugchance"/>
-              </do_else>
-            </do_if>
-            <do_else>
-              <debug_text text="'%1 no target available [pickup count: %2, asteroid count: %3 (%4)]'.[player.age, $pickup.count, $asteroids.count, ($asteroidhull)L]" chance="$debugchance"/>
-            </do_else>
-            <wait exact="$dronelaunchdelay"/>
-            <!-- compare current asteroid hull with previously buffered value -->
-            <do_if value="$asteroidhull" exact="$hullbuffer">
-              <set_value name="$idletime" exact="$dronelaunchdelay" operation="add"/>
-            </do_if>
-            <do_else>
-              <set_value name="$idletime" exact="0"/>
-            </do_else>
-            <set_value name="$hullbuffer" exact="$asteroidhull"/>
+								<set_value name="$moving" exact="false" />
+								<remove_value name="$distantasteroidpos" />
 
-            <do_if value="$moving and ($idletime ge 40s)">
-              <!-- temp workaround to stop ships from getting stuck -->
-              <!-- this can help if somehow the moveto is ended prematurly but $moving is still true. Could happen due to interupts. Needs a better way.-->
-              <set_value name="$moving" exact="false" />
-              <set_value name="$idletime" exact="0"/>
-            </do_if>
+								<debug_text
+									text="'%1 movement stopped 2 [pickup count: %2, asteroid count: %3 (%4)]'.[player.age, $pickup.count, $asteroids.count, ($asteroidhull)L]"
+									chance="$debugchance" />
+								<stop_moving object="this.ship" immediate="false" />
+							</do_if>
+						</do_elseif>
+						<do_elseif value="not $moving">
+							<!-- not enough targets in range, start moving -->
+							<debug_text
+								text="'%1 movement started [pickup count: %2, asteroid count: %3 (%4)]'.[player.age, $pickup.count, $asteroids.count, ($asteroidhull)L]"
+								chance="$debugchance" />
+							<do_if value="not $distantasteroidpos?">
+								<find_asteroid_in_region name="$distantasteroid"
+									region="$region" refobject="this.ship" canpickup="false"
+									multiple="false" maxdistance="30km" viewangle="90deg" ware="$checkware" />
+								<do_if value="$distantasteroid">
+									<create_position name="$distantasteroidpos"
+										object="$distantasteroid" exact="$distantasteroid.size" />
+									<remove_value name="$distantasteroid" />
 
-          </do_while>
-          <debug_text text="player.age+' less than 5% free cargo space'" chance="$debugchance"/>
-        </do_if>
-        <do_else>
-          <!-- mineral mining (medium ships) -->
-          <do_while value="(this.ship.cargo.{$ware}.free)f / this.ship.cargo.{$ware}.max" min="0.05">
-            <do_if value="not $zone.exists">
-              <return value="'aborted'" />
-            </do_if>
-            <set_value name="$checkware" exact="$ware" />
-            <do_if value="$secwares.count gt 1">
-              <set_value name="$checkware" exact="$secwares.random" />
-            </do_if>
-            <!-- find pickup (filtered by ownership) and target -->
-            <set_value name="$pickuptarget" exact="false"/>
-            <set_value name="$skill" exact="(this.combinedskill - 50) * 3" />
-            <find_asteroid_in_region name="$pickup" region="$region" refobject="this.ship" canpickup="true" multiple="true" maxdistance="2km" ware="$checkware" />
-            <do_all exact="$pickup.count" counter="$i" reverse="true">
-              <do_if value="$pickup.{$i}.owner">
-                <remove_value name="$pickup.{$i}" />
-              </do_if>
-              <do_elseif value="not $pickup.{$i}.canbepickedup">
-                <debug_text text="'%1 in %2 (region: %3) cannot be picked up!'.[$pickup.{$i}, $pickup.{$i}.zone.knownname, $region.knownname]" chance="$debugchance"/>
-                <remove_value name="$pickup.{$i}" />
-              </do_elseif>
-              <do_elseif value="$pickup.{$i}.wares.{$checkware}.count le 0" chance="$skill">
-                <remove_value name="$pickup.{$i}" />
-              </do_elseif>
-            </do_all>
-            <!-- evaluate movement -->
-            <do_if value="$pickup.count lt (this.ship.units.collect.{$checkware}.count * 2)">
-              <!-- find asteroids and the best target -->
-              <find_asteroid_in_region name="$asteroids" region="$region" refobject="this.ship" canpickup="false" multiple="true" maxdistance="3km" ware="$checkware"/>
-              <do_if value="not $target?">
-                <set_value name="$attackposition" exact="false"/>
-                <do_if value="$asteroids.count" min="1">
-                  <set_value name="$target" exact="$asteroids.{1}"/>
-                  <set_value name="$bestasteroid" exact="$asteroids.{1}.hull"/>
-                  <do_all exact="$asteroids.count" counter="$i">
-                    <do_if value="$asteroids.{$i}.hull lt $bestasteroid">
-                      <set_value name="$target" exact="$asteroids.{$i}"/>
-                      <set_value name="$bestasteroid" exact="$asteroids.{$i}.hull"/>
-                    </do_if>
-                  </do_all>
-                  <debug_text text="'%1 new target [pickup count: %2, asteroid count: %3 (%4)]'.[player.age, $pickup.count, $asteroids.count, $bestasteroid]" chance="$debugchance"/>
-                </do_if>
-                <do_else>
-                  <find_asteroid_in_region name="$target" region="$region" refobject="this.ship" canpickup="false" maxdistance="25km" ware="$checkware"/>
-                </do_else>
-              </do_if>
-              <do_if value="$target.exists and not $attackposition">
-                <do_if value="this.ship.distanceto.{$target} - ($target.size/2.f)" min="1200m">
-                  <!-- the target is out of firing range, we have to move closer -->
-                  <debug_text text="player.age+' target is out of range ('+ (this.ship.distanceto.{$target} - ($target.size/2.f)) +'m)'" chance="$debugchance"/>
-                  <move_to object="this.ship" destination="$target.zone" forceposition="false" finishonapproach="true">
-                    <position value="$target.position" />
-                    <interrupt_after_time time="1s"/>
-                  </move_to>
-                </do_if>
-                <do_else>
-                  <!-- stop and rotate -->
-                  <debug_text text="player.age+' target is now in range ('+ (this.ship.distanceto.{$target} - ($target.size/2.f)) +'m)'" chance="$debugchance"/>
-                  <move_to object="this.ship" destination="$target.zone" forcerotation="true" forcesteering="true" flightbehaviour="flightbehaviour.mining">
-                    <position value="$target.position" />
-                    <interrupt_after_time time="1s" />
-                  </move_to>
-                  <do_if value="$target.exists">
-                    <set_value name="$attackposition" exact="true"/>
-                    <!-- <shoot object="this.ship" slot="tag.primary_slot" weapontype="mining"/> -->
-                    <shoot_at object="this.ship" slot="tag.primary_slot" target="$target" tolerance="5.0deg" weapontype="mining" />
-                  </do_if>
-                </do_else>
-              </do_if>
-              <do_if value="not $target.exists">
-                <remove_value name="$target"/>
-                <set_value name="$attackposition" exact="false"/>
-                <stop_shooting object="this.ship" slot="tag.primary_slot"/>
-                <set_flight_control_model object="this.ship" flightcontrolmodel="flightcontrolmodel.spline" />
+									<!--Chance to linger for a while and shoot -->
+									<do_if value="$asteroids.count" chance="25">
+										<wait exact="3s" sinceversion="2" />
+									</do_if>
+								</do_if>
+							</do_if>
 
-                <!-- when no asteroid found and nothing to pickup-->
-                <do_if value="not $pickup.count">
-                  <debug_text text="'no resources found, flying to random position'" />
-                  <get_safe_pos result="$destination" zone="$zone" radius="this.ship.size" min="1km" max="35km" />
-                  <!-- Fly to a random pos in zone -->
-                  <move_to object="this.ship" destination="$zone" sinceversion="1">
-                    <position value="$destination" />
-                    <interrupt_after_time time="2min" />
-                  </move_to>
-                </do_if>
+							<set_value name="$moving" exact="true" />
+							<do_if value="$distantasteroidpos?">
+								<debug_text text="'flying to asteroid at: ' + $distantasteroidpos"
+									chance="$debugchance" />
+								<move_to object="this.ship" destination="this.ship.zone"
+									finishonapproach="true" forceposition="false" abortpath="true"
+									sinceversion="2"
+								>
+									<position value="$distantasteroidpos" />
+									<interrupt_after_time time="10s" />
+								</move_to>
+							</do_if>
+							<do_else>
+								<move_to object="this.ship" destination="this.ship.zone"
+									finishonapproach="true" forceposition="false" abortpath="true"
+								>
+									<position value="$destination" />
+									<interrupt_after_time time="20s" />
+								</move_to>
+							</do_else>
+						</do_elseif>
+						<!-- launch drone to pick up the target -->
+						<do_if value="$pickup.count">
+							<set_value name="$pickuptarget" exact="$pickup.random" />
+							<set_region_object_persistence
+								object="$pickuptarget" persistent="true" />
+							<launch_drone name="$drone" object="this.ship"
+								group="unitcategory.orecollector" exact="1" />
+							<do_if value="$drone.isoperational">
+								<debug_text
+									text="'%1 drone launched [pickup count: %2, asteroid count: %3 (%4)]'.[player.age, $pickup.count, $asteroids.count, ($asteroidhull)L]"
+									chance="$debugchance" />
+								<start_script name="'mining.ship.drone'" object="$drone.pilot">
+									<param name="homebase" value="this.ship" />
+									<param name="target" value="$pickuptarget" />
+								</start_script>
+								<set_owner object="$pickuptarget" faction="this.ship.owner" />
+							</do_if>
+							<do_else>
+								<debug_text
+									text="'%1 no drone available [pickup count: %2, asteroid count: %3 (%4)]'.[player.age, $pickup.count, $asteroids.count, ($asteroidhull)L]"
+									chance="$debugchance" />
+							</do_else>
+						</do_if>
+						<do_else>
+							<debug_text
+								text="'%1 no target available [pickup count: %2, asteroid count: %3 (%4)]'.[player.age, $pickup.count, $asteroids.count, ($asteroidhull)L]"
+								chance="$debugchance" />
+						</do_else>
+						<wait exact="$dronelaunchdelay" />
+						<!-- compare current asteroid hull with previously buffered value -->
+						<do_if value="$asteroidhull" exact="$hullbuffer">
+							<set_value name="$idletime" exact="$dronelaunchdelay"
+								operation="add" />
+						</do_if>
+						<do_else>
+							<set_value name="$idletime" exact="0" />
+						</do_else>
+						<set_value name="$hullbuffer" exact="$asteroidhull" />
 
-              </do_if>
-            </do_if>
-            <!--<debug_text text="'$target: %1, $target.exists: %2, $attackposition: %3'.[$target, $target.exists, $attackposition]"/>-->
-            <!-- launch drone to pick up the target -->
-            <do_elseif value="$pickup.count">
-              <set_value name="$pickuptarget" exact="$pickup.random"/>
-              <set_region_object_persistence object="$pickuptarget" persistent="true" />
-              <launch_drone name="$drone" object="this.ship" group="unitcategory.orecollector" exact="1"/>
-              <do_if value="$drone.isoperational">
-                <debug_text text="'%1 drone launched [pickup count: %2, asteroid count: %3]'.[player.age, $pickup.count, $asteroids.count]" chance="$debugchance"/>
-                <start_script name="'mining.ship.drone'" object="$drone.pilot">
-                  <param name="homebase" value="this.ship" />
-                  <param name="target" value="$pickuptarget"/>
-                </start_script>
-                <set_owner object="$pickuptarget" faction="this.ship.owner"/>
-              </do_if>
-              <!--<do_else>
-                <debug_text text="'%1 no drone available [pickup count: %2, asteroid count: %3]'.[player.age, $pickup.count, $asteroids.count]" chance="$debugchance"/>
-              </do_else>-->
-            </do_elseif>
-            <!--<do_else>
-              <debug_text text="'%1 no target available [pickup count: %2, asteroid count: %3]'.[player.age, $pickup.count, $asteroids.count]" chance="$debugchance"/>
-            </do_else>-->
-            <wait exact="$dronelaunchdelay"/>
-          </do_while>
-        </do_else>
-      </do_else>
+						<do_if value="$moving and ($idletime ge 40s)">
+							<!-- temp workaround to stop ships from getting stuck -->
+							<!-- this can help if somehow the moveto is ended prematurly but $moving 
+								is still true. Could happen due to interupts. Needs a better way. -->
+							<set_value name="$moving" exact="false" />
+							<set_value name="$idletime" exact="0" />
+						</do_if>
 
-      <return value="'cargofull'" />
+					</do_while>
+					<debug_text text="player.age+' less than 5% free cargo space'"
+						chance="$debugchance" />
+				</do_if>
+				<do_else>
+					<!-- mineral mining (medium ships) -->
+					<do_while
+						value="(this.ship.cargo.{$ware}.free)f / this.ship.cargo.{$ware}.max"
+						min="0.05"
+					>
+						<do_if value="not $zone.exists">
+							<return value="'aborted'" />
+						</do_if>
+						<set_value name="$checkware" exact="$ware" />
+						<do_if value="$secwares.count gt 1">
+							<set_value name="$checkware" exact="$secwares.random" />
+						</do_if>
+						<!-- find pickup (filtered by ownership) and target -->
+						<set_value name="$pickuptarget" exact="false" />
+						<set_value name="$skill" exact="(this.combinedskill - 50) * 3" />
+						<find_asteroid_in_region name="$pickup"
+							region="$region" refobject="this.ship" canpickup="true" multiple="true"
+							maxdistance="2km" ware="$checkware" />
+						<do_all exact="$pickup.count" counter="$i" reverse="true">
+							<do_if value="$pickup.{$i}.owner">
+								<remove_value name="$pickup.{$i}" />
+							</do_if>
+							<do_elseif value="not $pickup.{$i}.canbepickedup">
+								<debug_text
+									text="'%1 in %2 (region: %3) cannot be picked up!'.[$pickup.{$i}, $pickup.{$i}.zone.knownname, $region.knownname]"
+									chance="$debugchance" />
+								<remove_value name="$pickup.{$i}" />
+							</do_elseif>
+							<do_elseif value="$pickup.{$i}.wares.{$checkware}.count le 0"
+								chance="$skill"
+							>
+								<remove_value name="$pickup.{$i}" />
+							</do_elseif>
+						</do_all>
+						<!-- evaluate movement -->
+						<do_if
+							value="$pickup.count lt (this.ship.units.collect.{$checkware}.count * 2)"
+						>
+							<!-- find asteroids and the best target -->
+							<find_asteroid_in_region name="$asteroids"
+								region="$region" refobject="this.ship" canpickup="false"
+								multiple="true" maxdistance="3km" ware="$checkware" />
+							<do_if value="not $target?">
+								<set_value name="$attackposition" exact="false" />
+								<do_if value="$asteroids.count" min="1">
+									<set_value name="$target" exact="$asteroids.{1}" />
+									<set_value name="$bestasteroid" exact="$asteroids.{1}.hull" />
+									<do_all exact="$asteroids.count" counter="$i">
+										<do_if value="$asteroids.{$i}.hull lt $bestasteroid">
+											<set_value name="$target" exact="$asteroids.{$i}" />
+											<set_value name="$bestasteroid" exact="$asteroids.{$i}.hull" />
+										</do_if>
+									</do_all>
+									<debug_text
+										text="'%1 new target [pickup count: %2, asteroid count: %3 (%4)]'.[player.age, $pickup.count, $asteroids.count, $bestasteroid]"
+										chance="$debugchance" />
+								</do_if>
+								<do_else>
+									<find_asteroid_in_region name="$target"
+										region="$region" refobject="this.ship" canpickup="false"
+										maxdistance="25km" ware="$checkware" />
+								</do_else>
+							</do_if>
+							<do_if value="$target.exists and not $attackposition">
+								<do_if value="this.ship.distanceto.{$target} - ($target.size/2.f)"
+									min="1200m"
+								>
+									<!-- the target is out of firing range, we have to move closer -->
+									<debug_text
+										text="player.age+' target is out of range ('+ (this.ship.distanceto.{$target} - ($target.size/2.f)) +'m)'"
+										chance="$debugchance" />
+									<move_to object="this.ship" destination="$target.zone"
+										forceposition="false" finishonapproach="true"
+									>
+										<position value="$target.position" />
+										<interrupt_after_time time="1s" />
+									</move_to>
+								</do_if>
+								<do_else>
+									<!-- stop and rotate -->
+									<debug_text
+										text="player.age+' target is now in range ('+ (this.ship.distanceto.{$target} - ($target.size/2.f)) +'m)'"
+										chance="$debugchance" />
+									<move_to object="this.ship" destination="$target.zone"
+										forcerotation="true" forcesteering="true" flightbehaviour="flightbehaviour.mining"
+									>
+										<position value="$target.position" />
+										<interrupt_after_time time="1s" />
+									</move_to>
+									<do_if value="$target.exists">
+										<set_value name="$attackposition" exact="true" />
+										<!-- <shoot object="this.ship" slot="tag.primary_slot" weapontype="mining"/> -->
+										<shoot_at object="this.ship" slot="tag.primary_slot"
+											target="$target" tolerance="5.0deg" weapontype="mining" />
+									</do_if>
+								</do_else>
+							</do_if>
+							<do_if value="not $target.exists">
+								<remove_value name="$target" />
+								<set_value name="$attackposition" exact="false" />
+								<stop_shooting object="this.ship" slot="tag.primary_slot" />
+								<set_flight_control_model object="this.ship"
+									flightcontrolmodel="flightcontrolmodel.spline" />
 
-    </actions>
-  </attention>
-  <attention min="unknown">
-    <actions>
+								<!-- when no asteroid found and nothing to pickup -->
+								<do_if value="not $pickup.count">
+									<debug_text text="'no resources found, flying to random position'" />
+									<get_safe_pos result="$destination" zone="$zone"
+										radius="this.ship.size" min="1km" max="35km" />
+									<!-- Fly to a random pos in zone -->
+									<move_to object="this.ship" destination="$zone"
+										sinceversion="1"
+									>
+										<position value="$destination" />
+										<interrupt_after_time time="2min" />
+									</move_to>
+								</do_if>
 
-      <set_value name="$dronelaunchdelay" exact="3s" comment="the minimum delay between two drone launches"/>
-      <set_value name="$gathertime" min="172s" max="188s" comment="the time spent to gather resources at a certain location (gases only)"/>
-      <set_value name="$traveltime" min="76s" max="84s" comment="the time between gathering at two different locations (gases only)"/>
+							</do_if>
+						</do_if>
+						<!--<debug_text text="'$target: %1, $target.exists: %2, $attackposition: 
+							%3'.[$target, $target.exists, $attackposition]"/> -->
+						<!-- launch drone to pick up the target -->
+						<do_elseif value="$pickup.count">
+							<set_value name="$pickuptarget" exact="$pickup.random" />
+							<set_region_object_persistence
+								object="$pickuptarget" persistent="true" />
+							<launch_drone name="$drone" object="this.ship"
+								group="unitcategory.orecollector" exact="1" />
+							<do_if value="$drone.isoperational">
+								<debug_text
+									text="'%1 drone launched [pickup count: %2, asteroid count: %3]'.[player.age, $pickup.count, $asteroids.count]"
+									chance="$debugchance" />
+								<start_script name="'mining.ship.drone'" object="$drone.pilot">
+									<param name="homebase" value="this.ship" />
+									<param name="target" value="$pickuptarget" />
+								</start_script>
+								<set_owner object="$pickuptarget" faction="this.ship.owner" />
+							</do_if>
+							<!--<do_else>
+								<debug_text text="'%1 no drone available [pickup count: %2, asteroid 
+								count: %3]'.[player.age, $pickup.count, $asteroids.count]" chance="$debugchance"/>
+								</do_else> -->
+						</do_elseif>
+						<!--<do_else>
+							<debug_text text="'%1 no target available [pickup count: %2, asteroid 
+							count: %3]'.[player.age, $pickup.count, $asteroids.count]" chance="$debugchance"/>
+							</do_else> -->
+						<wait exact="$dronelaunchdelay" />
+					</do_while>
+				</do_else>
+			</do_else>
 
-      <get_safe_pos result="$destination" zone="$zone" radius="this.ship.size" min="1km" max="35km" />
+			<return value="'cargofull'" />
 
-      <!-- Move to destination zone -->
-      <do_if value="this.ship.zone != $zone">
-        <debug_text text="'Go mining to zone: ' + $zone.knownname + ' region: ' + $region.knownname " chance="$debugchance" />
-        <!-- If the zone to mine is a highway -->
-        <do_if value="$zone.isclass.highway">
-          <debug_text text="'Error moving to %1. This zone is a highway'" />
-          <!-- <resume label="start" /> -->
-        </do_if>
-        <run_script name="'move.generic'" sinceversion="2">
-          <param name="destination" value="$zone"/>
-          <param name="debugchance" value="$debugchance"/>
-        </run_script>
-      </do_if>
+		</actions>
+	</attention>
+	<attention min="unknown">
+		<actions>
 
-      <label name="start" />
+			<set_value name="$dronelaunchdelay" exact="3s"
+				comment="the minimum delay between two drone launches" />
+			<set_value name="$gathertime" min="172s" max="188s"
+				comment="the time spent to gather resources at a certain location (gases only)" />
+			<set_value name="$traveltime" min="76s" max="84s"
+				comment="the time between gathering at two different locations (gases only)" />
 
-      <wait min="8s" max="12s" />
-      <do_while value="this.ship.cargo.{$ware}.free gt 0">
-        <do_if value="not $zone.exists">
-          <return value="'aborted'" />
-        </do_if>
-        <set_value name="$currentware" exact="$ware" />
-        <!-- 20% chance that we try to collect one of the other resources that can be gathered in this zone if they are useful to our homebase, $tryware can be the same as $ware -->
-        <do_if value="$secwares.count" chance="20">
-          <set_value name="$tryware" exact="$shoppinglist.random" />
-          <do_if value="$secwares.indexof.{$tryware}" min="1">
-            <set_value name="$currentware" exact="$tryware" />
-          </do_if>
-        </do_if>
-        <get_resource_gatherrate name="$gatherrate" refobject="this.ship" region="$region" zone="$zone" ware="$currentware" />
-        <do_if value="$gatherrate" max="0">
-          <debug_text text="player.age + ' WARNING: gatherrate for %1 in zone %2, region %3 is %4'.[$currentware, $zone.knownname, $region.knownname, $gatherrate]" chance="$debugchance" />
-        </do_if>
-        <set_value name="$gatherstart" exact="player.age" />
-        <!-- smaller mining ships need some time to gather more than zero resources -->
-        <do_if value="this.ship.isclass.ship_xl or this.ship.isclass.ship_l">
-          <wait min="16s" max="24s"/>
-        </do_if>
-        <do_else>
-          <wait min="112s" max="128s"/>
-        </do_else>
-        <set_value name="$gathertime" exact="player.age - $gatherstart" />
-        <set_value name="$gathered" exact="$gathertime * $gatherrate" />
-        <do_if value="this.ship.cargo.{$currentware}.free lt $gathered">
-          <set_value name="$gathered" exact="this.ship.cargo.{$currentware}.free" />
-        </do_if>
-        <deplete_yield region="$region" zone="$zone" container="this.ship" ware="$currentware" amount="$gathered" />
-        <debug_text text="player.age + ' collected %1 units of %2 in zone %3 in %4 seconds (%5 units/s)'.[$gathered, $currentware, $zone.knownname, $gathertime, $gatherrate]" chance="$debugchance" />
-        <do_if value="$gathered" exact="0" >
-          <break />
-        </do_if>
-        <!-- TODO: some moving around in the zone (but still within the region!) -->
-      </do_while>
+			<get_safe_pos result="$destination" zone="$zone"
+				radius="this.ship.size" min="1km" max="35km" />
 
-      <debug_text text="player.age + ' %1(job: \'%2\') completed gather-run of %3 in %4. Cargo: %5'.[this.ship.knownname, this.ship.job, $ware, $zone.knownname, this.ship.cargo.list]" chance="$debugchance" />
+			<!-- Move to destination zone -->
+			<do_if value="this.ship.zone != $zone">
+				<debug_text
+					text="'Go mining to zone: ' + $zone.knownname + ' region: ' + $region.knownname "
+					chance="$debugchance" />
+				<!-- If the zone to mine is a highway -->
+				<do_if value="$zone.isclass.highway">
+					<debug_text text="'Error moving to %1. This zone is a highway'" />
+					<!-- <resume label="start" /> -->
+				</do_if>
+				<run_script name="'move.generic'" sinceversion="2">
+					<param name="destination" value="$zone" />
+					<param name="debugchance" value="$debugchance" />
+				</run_script>
+			</do_if>
 
-      <return value="'cargofull'" />
+			<label name="start" />
 
-    </actions>
-  </attention>
+			<wait min="8s" max="12s" />
+			<do_while value="this.ship.cargo.{$ware}.free gt 0">
+				<do_if value="not $zone.exists">
+					<return value="'aborted'" />
+				</do_if>
+				<set_value name="$currentware" exact="$ware" />
+				<!-- 20% chance that we try to collect one of the other resources that 
+					can be gathered in this zone if they are useful to our homebase, $tryware 
+					can be the same as $ware -->
+				<do_if value="$secwares.count" chance="20">
+					<set_value name="$tryware" exact="$shoppinglist.random" />
+					<do_if value="$secwares.indexof.{$tryware}" min="1">
+						<set_value name="$currentware" exact="$tryware" />
+					</do_if>
+				</do_if>
+				<get_resource_gatherrate name="$gatherrate"
+					refobject="this.ship" region="$region" zone="$zone" ware="$currentware" />
+				<do_if value="$gatherrate" max="0">
+					<debug_text
+						text="player.age + ' WARNING: gatherrate for %1 in zone %2, region %3 is %4'.[$currentware, $zone.knownname, $region.knownname, $gatherrate]"
+						chance="$debugchance" />
+				</do_if>
+				<set_value name="$gatherstart" exact="player.age" />
+				<!-- smaller mining ships need some time to gather more than zero resources -->
+				<do_if value="this.ship.isclass.ship_xl or this.ship.isclass.ship_l">
+					<wait min="16s" max="24s" />
+				</do_if>
+				<do_else>
+					<wait min="112s" max="128s" />
+				</do_else>
+				<set_value name="$gathertime" exact="player.age - $gatherstart" />
+				<set_value name="$gathered" exact="$gathertime * $gatherrate" />
+				<do_if value="this.ship.cargo.{$currentware}.free lt $gathered">
+					<set_value name="$gathered" exact="this.ship.cargo.{$currentware}.free" />
+				</do_if>
+				<deplete_yield region="$region" zone="$zone"
+					container="this.ship" ware="$currentware" amount="$gathered" />
+				<debug_text
+					text="player.age + ' collected %1 units of %2 in zone %3 in %4 seconds (%5 units/s)'.[$gathered, $currentware, $zone.knownname, $gathertime, $gatherrate]"
+					chance="$debugchance" />
+				<do_if value="$gathered" exact="0">
+					<break />
+				</do_if>
+				<!-- TODO: some moving around in the zone (but still within the region!) -->
+			</do_while>
+
+			<debug_text
+				text="player.age + ' %1(job: \'%2\') completed gather-run of %3 in %4. Cargo: %5'.[this.ship.knownname, this.ship.job, $ware, $zone.knownname, this.ship.cargo.list]"
+				chance="$debugchance" />
+
+			<return value="'cargofull'" />
+
+		</actions>
+	</attention>
 </aiscript>

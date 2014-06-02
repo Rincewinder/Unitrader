@@ -3,9 +3,9 @@
     <params>
         <param name="PageId" default="8570"/>
         <param name="minbuy" default="0"/>
-        <param name="maxbuy" default="50"/>
+        <param name="maxbuy" default="25"/>
         <param name="minsell" default="0"/>
-        <param name="maxsell" default="50"/>
+        <param name="maxsell" default="25"/>
         <param name="debugchance" default="0"/>
     </params>
     <init>

@@ -36,7 +36,12 @@
 				chance="$debugchance" />
 
 			<label name="start" />
-
+			<do_if value="this.$jlpUniTraderRun" exact="true" negate="true">
+				<return>
+					<retval name="buyoffer" value="null" />
+					<retval name="selloffer" value="null" />
+				</return>
+			</do_if>
 			<set_value name="$currentcargo" exact="this.ship.cargo.list" />
 			<set_value name="$buyoffer" exact="null" />
 			<set_value name="$selloffer" exact="null" />
@@ -153,11 +158,10 @@
 						text="player.age + ' checking if we can sell cargo to builder ships in ' + $checkrange.knownname"
 						chance="$debugchance" />
 					<find_buy_offer tradepartner="this.ship" space="$checkrange"
-						result="$buyoffer" wares="$currentcargo" knowntoplayer="$onlyKnownBuy"
+						result="$buyoffer" wares="$currentcargo" knowntoplayer="true"
 					>
-						<match_buyer>
+						<match_buyer owner="faction.player">
 							<match class="class.ship_xl" />
-							<match owner="faction.player" />
 						</match_buyer>
 					</find_buy_offer>
 					<!--TODO: Filter the found trades. Pick the best one based on price
@@ -178,7 +182,7 @@
 						<!-- if we have <= 50% free cargospace, also accept buyoffers for less
 							to increase the chance of selling off cargo
 							TODO: what we do with scaldis multi cargo transportable for exampl -->
-						<set_value name="$sellvolume" exact="$minvolume/2" />
+						<set_value name="$sellvolume" exact="$minvolume/20" />
 					</do_elseif>
 
 					<debug_text
@@ -190,6 +194,12 @@
 					>
 						<match_buyer>
 							<match negate="true" class="class.ship_xl" />
+							<match_any>
+								<match_relation faction="faction.player"
+									comparison="exact" relation="friend" />
+								<match_relation faction="faction.player"
+									comparison="exact" relation="neutral" />
+							</match_any>
 						</match_buyer>
 						<totalvolume min="$sellvolume" />
 					</find_buy_offer>
@@ -318,7 +328,12 @@
 						result="$buildoffers" multiple="true" knowntoplayer="$onlyKnownBuy"
 					>
 						<match_buyer class="class.ship_xl">
-							<match_relation relation="friend" />
+							<match_any>
+								<match_relation faction="faction.player"
+									comparison="exact" relation="friend" />
+								<match_relation faction="faction.player"
+									comparison="exact" relation="neutral" />
+							</match_any>
 						</match_buyer>
 					</find_buy_offer>
 					<do_if value="$buildoffers.count gt 0">
@@ -377,8 +392,10 @@
 							<totalvolume min="1" />
 							<match_seller class="class.ship_xl">
 								<match_any>
-									<match_relation relation="friend" />
-									<match_relation relation="neutral" />
+									<match_relation faction="faction.player"
+										comparison="exact" relation="friend" />
+									<match_relation faction="faction.player"
+										comparison="exact" relation="neutral" />
 								</match_any>
 							</match_seller>
 						</find_sell_offer>
@@ -406,8 +423,12 @@
 							<relativeprice max="$relPrice" />
 							<match_seller>
 								<match_any>
-									<match_relation relation="friend" />
-									<match_relation relation="neutral" />
+									<match_any>
+										<match_relation faction="faction.player"
+											comparison="exact" relation="friend" />
+										<match_relation faction="faction.player"
+											comparison="exact" relation="neutral" />
+									</match_any>
 								</match_any>
 							</match_seller>
 							<!--<relativeprice max="0.999999f" comment="this effectively means
@@ -429,54 +450,57 @@
 						<do_if
 							value="not $soldwares.indexof.{$selloffers.{$Counter}.ware} and (this.ship.cargo.{$selloffers.{$Counter}.ware}.free gt this.ship.cargo.{$selloffers.{$Counter}.ware}.max/10)"
 						>
-									<set_value name="$destination" exact="$selloffers.{$Counter}.seller" />
-									<do_if value="$capship">
-										<get_global_path component="$pathcomponents"
-											multiple="1" usehighways="false"
-										>
-											<start object="this.ship" />
-											<end object="$destination" />
-										</get_global_path>
-									</do_if>
-									<do_else>
-										<get_global_path component="$pathcomponents"
-											multiple="1" usehighways="true"
-										>
-											<start object="this.ship" />
-											<end object="$buyoffers.buyer" />
-										</get_global_path>
-									</do_else>
-									<do_all exact="$pathcomponents.count" counter="$Counter">
-										<do_if value="$pathcomponents.{$Counter}.hascontext.{$destination}">
-											<do_if
-												value="$pathcomponents.{$Counter}.isclass.zone and @$pathcomponents.{$Counter}.haspriority"
-											>
-												<set_value name="$targetzone" exact="$pathcomponents.{$Counter}" />
-												<break />
-											</do_if>
-											<do_elseif value="$pathcomponents.{$Counter}.isclass.object">
-												<set_value name="$targetzone" exact="$pathcomponents.{$Counter}.zone" />
-												<check_object result="$isEnemy" object="$targetzone">
-													<match_relation relation="enemy" />
-												</check_object>
-												<do_if value="$isEnemy">
-													<continue />
-												</do_if>
-											</do_elseif>
-										</do_if>
-									</do_all>
-						
-							<do_if negate="true"
-								value="$selloffers.{$Counter}.ware.illegalto.{$selloffers.{$Counter}.seller.owner}.{this.ship.owner}"
-							>
-
-								<append_to_list name="$soldwares"
-									exact="$selloffers.{$Counter}.ware" chance="this.$jlp_unitrader_courage" />
+							<set_value name="$destination" exact="$selloffers.{$Counter}.seller" />
+							<do_if value="$capship">
+								<get_global_path component="$pathcomponents"
+									multiple="1" usehighways="false"
+								>
+									<start object="this.ship" />
+									<end object="$destination" />
+								</get_global_path>
 							</do_if>
 							<do_else>
-								<append_to_list name="$soldwares"
-									exact="$selloffers.{$Counter}.ware" />
+								<get_global_path component="$pathcomponents"
+									multiple="1" usehighways="true"
+								>
+									<start object="this.ship" />
+									<end object="$buyoffers.buyer" />
+								</get_global_path>
 							</do_else>
+							<set_value name="$offerAdd" exact="true" />
+							<do_all exact="$pathcomponents.count" counter="$Counter2">
+								<do_if value="$pathcomponents.{$Counter2}.hascontext.{$destination}">
+									<do_if
+										value="$pathcomponents.{$Counter2}.isclass.zone and @$pathcomponents.{$Counter2}.haspriority"
+									>
+										<set_value name="$targetzoneOwner" exact="$pathcomponents.{$Counter2}.owner" />
+									</do_if>
+									<do_elseif value="$pathcomponents.{$Counter2}.isclass.object">
+										<set_value name="$targetzoneOwner"
+											exact="$pathcomponents.{$Counter2}.zone.owner" />
+									</do_elseif>
+									<get_factions_by_relation result="$EnemyFactions"
+										faction="faction.player" relation="enemy" />
+									<do_if value="$EnemyFactions.indexof.{$targetzoneOwner}">
+										<set_value name="$offerAdd" exact="false" />
+										<break />
+									</do_if>
+								</do_if>
+							</do_all>
+
+							<do_if value="$offerAdd" exact="true">
+								<do_if negate="true"
+									value="$selloffers.{$Counter}.ware.illegalto.{$selloffers.{$Counter}.seller.owner}.{this.ship.owner}"
+								>
+
+									<append_to_list name="$soldwares"
+										exact="$selloffers.{$Counter}.ware" chance="this.$jlp_unitrader_courage" />
+								</do_if>
+								<do_else>
+									<append_to_list name="$soldwares"
+										exact="$selloffers.{$Counter}.ware" />
+								</do_else>
+							</do_if>
 						</do_if>
 					</do_all>
 
@@ -504,8 +528,10 @@
 								<relativeprice max="$relPrice" />
 								<match_buyer>
 									<match_any>
-										<match_relation relation="friend" />
-										<match_relation relation="neutral" />
+										<match_relation faction="faction.player"
+											comparison="exact" relation="friend" />
+										<match_relation faction="faction.player"
+											comparison="exact" relation="neutral" />
 									</match_any>
 								</match_buyer>
 							</find_buy_offer>
@@ -534,35 +560,41 @@
 											<end object="$buyoffers.buyer" />
 										</get_global_path>
 									</do_else>
-									<do_all exact="$pathcomponents.count" counter="$Counter">
-										<do_if value="$pathcomponents.{$Counter}.hascontext.{$destination}">
+									<set_value name="$offerAdd" exact="true" />
+									<do_all exact="$pathcomponents.count" counter="$Counter3">
+										<do_if value="$pathcomponents.{$Counter3}.hascontext.{$destination}">
 											<do_if
-												value="$pathcomponents.{$Counter}.isclass.zone and @$pathcomponents.{$Counter}.haspriority"
+												value="$pathcomponents.{$Counter3}.isclass.zone and @$pathcomponents.{$Counter3}.haspriority"
 											>
-												<set_value name="$targetzone" exact="$pathcomponents.{$Counter}" />
+												<set_value name="$targetzoneOwner"
+													exact="$pathcomponents.{$Counter3}.owner" />
+											</do_if>
+											<do_elseif value="$pathcomponents.{$Counter3}.isclass.object">
+												<set_value name="$targetzoneOwner"
+													exact="$pathcomponents.{$Counter3}.zone.owner" />
+											</do_elseif>
+											<get_factions_by_relation result="$EnemyFactions"
+												faction="faction.player" relation="enemy" />
+											<do_if value="$EnemyFactions.indexof.{$targetzoneOwner}">
+												<set_value name="$offerAdd" exact="false" />
 												<break />
 											</do_if>
-											<do_elseif value="$pathcomponents.{$Counter}.isclass.object">
-												<set_value name="$targetzone" exact="$pathcomponents.{$Counter}.zone" />
-												<check_object result="$isEnemy" object="$targetzone">
-													<match_relation relation="enemy" />
-												</check_object>
-												<do_if value="$isEnemy">
-													<continue />
-												</do_if>
-											</do_elseif>
 										</do_if>
 									</do_all>
-									<debug_text text="'adding to list of tradeablewares'"
-										chance="$debugchance2" />
-									<append_to_list name="$tradablewares"
-										exact="$buyoffers.{$Counter2}.ware" />
-									<append_to_list name="$bestbuyoffers" exact="$buyoffers.{$Counter2}" />
-									<do_if value="$soldwares.count == $tradablewares.count">
-										<break />
+
+									<do_if value="$offerAdd" exact="true">
+										<debug_text text="'adding to list of tradeablewares'"
+											chance="$debugchance2" />
+										<append_to_list name="$tradablewares"
+											exact="$buyoffers.{$Counter2}.ware" />
+										<append_to_list name="$bestbuyoffers" exact="$buyoffers.{$Counter2}" />
+										<do_if value="$soldwares.count == $tradablewares.count">
+											<break />
+										</do_if>
 									</do_if>
 								</do_if>
 							</do_all>
+
 							<do_if value="$soldwares.count == $tradablewares.count">
 								<break />
 							</do_if>
@@ -581,8 +613,10 @@
 							<relativeprice max="$relPrice" />
 							<match_buyer>
 								<match_any>
-									<match_relation relation="friend" />
-									<match_relation relation="neutral" />
+									<match_relation faction="faction.player"
+										comparison="exact" relation="friend" />
+									<match_relation faction="faction.player"
+										comparison="exact" relation="neutral" />
 								</match_any>
 							</match_buyer>
 						</find_buy_offer>

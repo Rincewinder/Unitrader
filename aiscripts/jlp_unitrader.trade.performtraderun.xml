@@ -21,6 +21,12 @@
 	<attention min="unknown">
 		<actions>
 			
+			<do_if value="this.$jlpUniTraderRun" exact="true" negate="true">
+				<return>
+					<retval name="traderesult" value="0" />
+					<retval name="success" value="false" />
+				</return>
+			</do_if>
 			<!-- BUG sometimes is Buyoffer null, prevent this. -->
 			<do_if value="@$buyoffer.available" negate="true">
 				<debug_text chance="$debugchance"
@@ -285,7 +291,7 @@
 						entity="this" />
 				</do_if>
 				<!-- true -> to show the reason why cant -->
-				<do_if value="true">
+				<do_if value="false">
 					<write_to_logbook category="squad"
 						text="'Bad Trade for my skills:\n %1\n%2\n%3\n%4\nReason: %5'.[$notiDears, $detail1, $detail2,  $detail3,  $tradeFailReason ]" />
 				</do_if>
@@ -300,6 +306,13 @@
 			</do_if>
 
 			<label name="move to target object" />
+			
+			<do_if value="this.$jlpUniTraderRun" exact="true" negate="true">
+				<return>
+					<retval name="traderesult" value="0" />
+					<retval name="success" value="false" />
+				</return>
+			</do_if>
 
 			<do_if value="this.zone != $targetobject.zone">
 				<run_script name="'move.generic'" sinceversion="1">

@@ -23,7 +23,9 @@
 			<!-- basic checks first -->
 			<label name="init" />
 			<wait min="5s" max="15s" />
-
+			<do_if value="this.$jlpUniMiningRun" exact="true" negate="true">
+				<return />				
+			</do_if>
 			<do_if value="this.ship.cargo.capacity" max="0">
 				<debug_text text="'%1 has cargo capacity of %2!'.[this.ship.knownname, this.ship.cargo.capacity]" chance="$debugchance" />
 				<set_value name="$failreason" exact="'ERR_NO_CARGOSPACE'" />
@@ -79,6 +81,9 @@
 
 			<!-- primary loop start -->
 			<label name="loop" />
+			<do_if value="this.$jlpUniMiningRun" exact="true" negate="true">
+				<return />				
+			</do_if>
 
 			<!-- find a buyoffer for the mineable wares in this cluster, split into sector searches to keep the spikes lower 
       go to a random sector in the cluster and look for offers there, then a random matching offer is chosen -->
