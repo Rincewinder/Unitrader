@@ -181,7 +181,7 @@
 
 
 			<set_value name="$profit" exact="0" />
-			<set_value name="$success" exact="true" />
+			<set_value name="$success" exact="false" />
 			<do_while value="$selloffer.available or $buyoffer.available">
 				<run_script name="'jlp.unitrader.trade.performtraderun'"
 					sinceversion="2"
