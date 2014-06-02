@@ -181,6 +181,7 @@
 
 
 			<set_value name="$profit" exact="0" />
+			<set_value name="$success" exact="true" />
 			<do_while value="$selloffer.available or $buyoffer.available">
 				<run_script name="'jlp.unitrader.trade.performtraderun'"
 					sinceversion="2"
@@ -193,13 +194,7 @@
 				</run_script>
 
 				<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 800">
-					<set_value name="$ActualZone" exact="this.zone" />
 					<run_script name="'move.refuel'" sinceversion="2" />
-					<do_if value="this.zone != $ActualZone">
-						<run_script name="'move.generic'" sinceversion="2">
-							<param name="destination" value="$ActualZone" />
-						</run_script>
-					</do_if>
 				</do_if>
 				<do_if value="not $success">
 					<set_value name="$selloffer" exact="null" />
