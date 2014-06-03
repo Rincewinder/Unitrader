@@ -10,7 +10,7 @@
 						section="gOrders_advanced" />
 					<event_conversation_returned_to_section
 						sectionprefix="gOrders_advanced" />
-					<event_cue_completed cue="md.BKCommMenu.Setup" /> <!-- TODO need this?? -->
+<!-- 					<event_cue_completed cue="md.BKCommMenu.Setup" /> <!- TODO need this?? -->
 					<check_all>
 						<event_player_created />
 						<check_value value="@md.BKCommMenu.Setup.state" exact="cuestate.complete"
@@ -80,6 +80,10 @@
 						<set_value name="$isTransportable" exact="true" />
 					</do_if>
 				</do_if>
+				<do_else>
+					<!--  S / M ships dont have transportdrones -->
+					<set_value name="$isTransportable" exact="true" />
+				</do_else>
 
 				<set_value name="$drones" exact="0" />
 				<do_all exact="unitcategory.gascollector.maxmk" counter="$i">
