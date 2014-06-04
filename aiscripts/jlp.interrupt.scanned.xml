@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<aiscript name="jlp.interrupt.scanned" priority="9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd">
+  <params>
+    <param name="scanner" default="null" />
+  </params>
+  <interrupts>
+    <library>
+      <handler name="JLPUnitraderScannedHandler">
+        <conditions>
+          <event_scan_finished scanned="this.defensible" />
+        </conditions>
+        <actions>
+          <!--<debug_text text="'%1(%2) has been scanned by %3(%4)'.[this.ship.knownname, this.ship, event.param.knownname, event.param]" />-->
+          <do_if value="not global.$last_npc_notification?">
+            <set_value name="global.$last_npc_notification" exact="0s"/>
+          </do_if>
+          <do_if value="event.param.defensible.isplayerowned">
+
+            <set_value name="$Speak" exact="false"/>
+            <set_value name="$Speak_Line" exact="0"/>
+
+            <!--Only say something if no one has said anything for a few seconds-->
+            <do_if value="global.$last_npc_notification" max="player.age - 20s">
+              <set_value name="$Speak" exact="this.page != 0"/>
+            </do_if>
+
+            <!--
+            <t id="21">(ship scanned - complicit)Scan away.</t>
+            <t id="22">(ship scanned - neutral)What are you scanning me for?</t>
+            <t id="23">(ship scanned - illegal)Oi! You can't scan me!</t>
+            <t id="24">(ship scanned - enemy)You think you can scan me and get away with it?!</t>
+            <t id="25">(ship scanned - confident)I don't think you'll find anything in there.</t>
+            <t id="26">(ship scanned - possessing)Err, I have a permit for that, somewhere.</t>            
+            -->
+
+            <do_if value="this.hasrelation.enemy.{event.param}">
+              <set_value name="$Speak_Line" list="[24] "/>
+            </do_if>
+            <do_elseif value="event.param.maxlegalscanlevel.{this.ship}" min="this.ship.scannedlevel">
+              <do_if value="@(this.inventory.illegalto.{this.zone.owner}) or @(this.ship.cargo.illegalto.{this.zone.owner})">
+                <set_value name="$Speak_Line" list="[26] "/>
+              </do_if>
+              <do_else>
+                <set_value name="$Speak_Line" list="[21, 22, 25] "/>
+              </do_else>
+            </do_elseif>
+            <do_else>
+              <set_value name="$Speak_Line" list="[23] "/>
+            </do_else>
+
+            <do_if value="$Speak">
+              <do_if value="$Speak_Line">
+                <start_conversation actor="this" conversation="Speak" type="unqueued" convparam="$Speak_Line" />
+                <set_value name="global.$last_npc_notification" exact="player.age"/>
+              </do_if>
+            </do_if>
+
+            <!--cleanup -->
+            <remove_value name="$Speak"/>
+            <remove_value name="$Speak_Line"/>
+
+          </do_if>
+        </actions>
+
+      </handler>
+    </library>
+  </interrupts>
+</aiscript>

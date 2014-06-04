@@ -12,10 +12,10 @@
 		<param name="debugchance" default="0" />
 	</params>
 	<interrupts>
-		<handler ref="AttackHandler" />
-		<handler ref="ScannedHandler" />
+		<handler ref="JLPUnnitraderShipOwnedAttackedHandler" />
+		<handler ref="JLPUnitraderScannedHandler" />
 		<!-- Stop ORDERS -->
-<!--
+<!-- TODO: I send a signal from md script, but this wont call
 		<handler>
 			<conditions>
 				<event_object_signalled object="this.ship"
@@ -53,12 +53,15 @@
 			</handler>
 		-->
 	</interrupts>
-
+	<init>
+		<set_command command="command.wait"/>
+	</init>
 	<attention min="unknown">
 		<actions>
 
 			<!-- trade loop start -->
 			<label name="start" />
+			<wait chance="0" /> <!-- Reset script if new -->
 			<!-- initial -->
 			<set_actor_account actor="this" min="0ct" max="$maxBudget*10" />
 
@@ -93,8 +96,8 @@
 					<param name="maxsell" value="$maxsell" />
 					<param name="debugchance" value="$debugchance" />
 				</run_script>
-				<!-- Take a break -->
-				<wait exact="this.$jlp_unitrader_waittime" />
+            <!-- Take a break -->
+				<wait exact="this.$jlp_unitrader_waittime" sinceversion="1"/>
 
 				<resume label="start" />
 			</do_if>

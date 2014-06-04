@@ -16,7 +16,15 @@
 		<param name="debugchance2" default="0" />
 	</params>
 	<init>
-		<set_command command="command.trade" />
+		<do_if value="$buyoffer">
+			<set_command command="command.trade" param="$buyoffer.buyer.knownname"/>
+		</do_if>
+		<do_elseif value="$selloffer">
+			<set_command command="command.trade" param="$selloffer.seller.knownname"/>
+		</do_elseif>
+		<do_else>
+			<set_command command="command.trade" />
+		</do_else>
 	</init>
 	<attention min="unknown">
 		<actions>
@@ -27,7 +35,7 @@
 					<retval name="success" value="false" />
 				</return>
 			</do_if>
-			<!-- BUG sometimes is Buyoffer null, prevent this. -->
+			<!-- BUG sometimes is buyoffer null, prevent this. -->
 			<do_if value="@$buyoffer.available" negate="true">
 				<debug_text chance="$debugchance"
 					text="Player.age + '%1 %2 Deny trade. Buyoffer is myself'.[this.ship.knownname, this.knownname]" />
@@ -291,7 +299,7 @@
 						entity="this" />
 				</do_if>
 				<!-- true -> to show the reason why cant -->
-				<do_if value="false">
+				<do_if value="true">
 					<write_to_logbook category="squad"
 						text="'Bad Trade for my skills:\n %1\n%2\n%3\n%4\nReason: %5'.[$notiDears, $detail1, $detail2,  $detail3,  $tradeFailReason ]" />
 				</do_if>

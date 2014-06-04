@@ -28,7 +28,7 @@
 			<set_value name="$selloffer" exact="null" />
 
 			<set_value name="$idletime" min="10s" max="30s" />
-			
+
 			<run_script name="'move.idle'" sinceversion="2">
 				<param name="TimeOut" value="$idletime" />
 			</run_script>
@@ -97,9 +97,6 @@
 					<param name="TimeOut" value="$idletime" />
 				</run_script>
 			</do_if>
-			<do_else>
-				<wait min="10s" max="30s" />
-			</do_else>
 
 			<!--Patch in $debugchance2, $sellrange and $buyrange -->
 			<do_if value="not $sellrange?">
@@ -222,10 +219,21 @@
 				<set_known object="this.ship.cluster" known="true" />
 				<set_known object="this.ship.sector" known="true" />
 				<set_known object="this.ship.zone" known="true" />
-				<set_value name="$CommissionAmount"
-					exact="10*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
-				<set_value name="$CommissionTime"
-					exact="1h*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
+				<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl"
+					negate="true"
+				>
+					<set_value name="$CommissionAmount"
+						exact="4*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
+					<set_value name="$CommissionTime"
+						exact="30min*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
+				</do_if>
+				<do_else>
+					<set_value name="$CommissionAmount"
+						exact="10*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
+					<set_value name="$CommissionTime"
+						exact="1h*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
+
+				</do_else>
 
 
 				<substitute_text text="$notiDearsPilot" source="{8570,2}">
@@ -255,7 +263,7 @@
 							<add_player_discount name="$notiDearsPilot"
 								amount="$CommissionAmount" entity="$BuyerEntity" time="$CommissionTime" />
 							<!-- <find_buy_offer result="$StationOffers" buyer="$Buyer"
-								tradepartner="this.ship" usereservations="false" multiple="true" 
+								tradepartner="this.ship" usereservations="false" multiple="true"
 								knowntoplayer="false"/>
 								<do_all exact="$StationOffers.count" counter="$Counter">
 								<set_known object="$StationOffers.{$Counter}" known="true"/>
@@ -279,7 +287,7 @@
 							<add_player_commission name="$notiDearsPilot"
 								amount="$CommissionAmount" entity="$SellerEntity" time="$CommissionTime" />
 							<!-- <find_sell_offer result="$StationOffers" seller="$Seller"
-								tradepartner="this.ship" usereservations="false" multiple="true" 
+								tradepartner="this.ship" usereservations="false" multiple="true"
 								knowntoplayer="false"/>
 								<do_all exact="$StationOffers.count" counter="$Counter">
 								<set_known object="$StationOffers.{$Counter}" known="true"/>

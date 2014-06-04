@@ -10,7 +10,8 @@
 						section="gOrders_advanced" />
 					<event_conversation_returned_to_section
 						sectionprefix="gOrders_advanced" />
-<!-- 					<event_cue_completed cue="md.BKCommMenu.Setup" /> <!- TODO need this?? -->
+					<!-- <event_cue_completed cue="md.BKCommMenu.Setup" /> <!- TODO need 
+						this?? -->
 					<check_all>
 						<event_player_created />
 						<check_value value="@md.BKCommMenu.Setup.state" exact="cuestate.complete"
@@ -31,10 +32,11 @@
 						</do_if>
 
 						<add_player_choice_sub text="{8570,1000}"
-							position="right" section="g_JLPUniTrade_autotrade_select"
+							position="right" section="JLPUniTrade_autotrade_select"
 							baseparam="event.param2" />
 						<set_conversation_return_section
-							section="g_JLPUniTrade_autotrade_select" />
+								section="gOrders_advanced" />
+
 					</do_if>
 				</do_if>
 			</actions>
@@ -45,163 +47,162 @@
 			<conditions>
 				<check_any>
 					<event_conversation_next_section
-						section="g_JLPUniTrade_autotrade_select" />
+						section="JLPUniTrade_autotrade_select" />
 					<event_conversation_next_section
-						section="gBKComm_Relay" actor="event.object" />
+						section="gBKComm_Relay" />
 					<event_conversation_returned_to_section
-						section="gBKComm_Relay" actor="event.object" />
+						section="gBKComm_Relay" />
+
 				</check_any>
 			</conditions>
 			<actions>
-				<set_value name="$Captain" exact="event.object" />
-				<set_value name="$isTradeRun" exact="@$Captain.$jlpUniTraderRun" />
-				<set_value name="$isMiningRun" exact="@$Captain.$jlpUniMiningRun" />
-				<set_value name="$isTransportable" exact="false" />
-				<set_value name="$isMiningable" exact="false" />
-				<set_value name="$isShowExtLB"
-					exact="@$Captain.$jlp_unitrader_show_extendedlogbook" />
-				<set_value name="$drones" exact="0" />
-				<set_value name="$capship"
-					exact="$Captain.ship.isclass.ship_l or $Captain.ship.isclass.ship_xl" />
-
-				<do_if value="$capship">
-					<set_value name="$maxDrones" exact="10i" />
-				</do_if>
-				<do_else>
-					<set_value name="$maxDrones" exact="1i" />
-				</do_else>
-
-				<do_if value="$capship">
-					<do_all exact="unitcategory.transport.maxmk" counter="$i">
-						<set_value name="$drones" operation="add"
-							exact="@$Captain.ship.units.{unitcategory.transport}.mk.{$i}.count" />
-					</do_all>
-					<do_if value="$drones ge $maxDrones">
-						<set_value name="$isTransportable" exact="true" />
-					</do_if>
-				</do_if>
-				<do_else>
-					<!--  S / M ships dont have transportdrones -->
-					<set_value name="$isTransportable" exact="true" />
-				</do_else>
-
-				<set_value name="$drones" exact="0" />
-				<do_all exact="unitcategory.gascollector.maxmk" counter="$i">
-					<set_value name="$drones" operation="add"
-						exact="@$Captain.ship.units.{unitcategory.gascollector}.mk.{$i}.count" />
-				</do_all>
-				<do_if value="$drones ge $maxDrones">
-					<set_value name="$isMiningable" exact="true" />
-				</do_if>
-
-				<do_if value="$isMiningable" negate="true">
+				<do_if value="(event.object.owner == faction.player)">
+					<set_value name="$Captain" exact="event.object" />
+					<set_value name="$isTradeRun" exact="@$Captain.$jlpUniTraderRun" />
+					<set_value name="$isMiningRun" exact="@$Captain.$jlpUniMiningRun" />
+					<set_value name="$isTransportable" exact="false" />
+					<set_value name="$isMiningable" exact="false" />
+					<set_value name="$isShowExtLB"
+						exact="@$Captain.$jlp_unitrader_show_extendedlogbook" />
 					<set_value name="$drones" exact="0" />
-					<do_all exact="unitcategory.orecollector.maxmk" counter="$i">
+					<set_value name="$capship"
+						exact="$Captain.ship.isclass.ship_l or $Captain.ship.isclass.ship_xl" />
+
+					<do_if value="$capship">
+						<set_value name="$maxDrones" exact="10i" />
+					</do_if>
+					<do_else>
+						<set_value name="$maxDrones" exact="1i" />
+					</do_else>
+
+					<do_if value="$capship">
+						<do_all exact="unitcategory.transport.maxmk" counter="$i">
+							<set_value name="$drones" operation="add"
+								exact="@$Captain.ship.units.{unitcategory.transport}.mk.{$i}.count" />
+						</do_all>
+						<do_if value="$drones ge $maxDrones">
+							<set_value name="$isTransportable" exact="true" />
+						</do_if>
+					</do_if>
+					<do_else>
+						<!-- S / M ships dont have transportdrones -->
+						<set_value name="$isTransportable" exact="true" />
+					</do_else>
+
+					<set_value name="$drones" exact="0" />
+					<do_all exact="unitcategory.gascollector.maxmk" counter="$i">
 						<set_value name="$drones" operation="add"
-							exact="@$Captain.ship.units.{unitcategory.orecollector}.mk.{$i}.count" />
+							exact="@$Captain.ship.units.{unitcategory.gascollector}.mk.{$i}.count" />
 					</do_all>
 					<do_if value="$drones ge $maxDrones">
 						<set_value name="$isMiningable" exact="true" />
 					</do_if>
-				</do_if>
-				<remove_value name="$drones" />
-				<remove_value name="$maxDrones" />
 
-				<do_if value="$isMiningable">
-					<!-- TODO: change to check ship tags instead of cargo, so we can deal
-						with count = 0 cases; need adding of ?? -->
-					<set_value name="$isMiningable" exact="false" />
-					<do_if value="@$Captain.ship.units.{unitcategory.gascollector}.count">
-						<set_value name="$ware" exact="ware.hydrogen" />
-						<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
-							<set_value name="$isMiningable" exact="true" />
-						</do_if>
-						<set_value name="$ware" exact="ware.ions" />
-						<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
-							<set_value name="$isMiningable" exact="true" />
-						</do_if>
-						<set_value name="$ware" exact="ware.plasma" />
-						<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
+					<do_if value="$isMiningable" negate="true">
+						<set_value name="$drones" exact="0" />
+						<do_all exact="unitcategory.orecollector.maxmk" counter="$i">
+							<set_value name="$drones" operation="add"
+								exact="@$Captain.ship.units.{unitcategory.orecollector}.mk.{$i}.count" />
+						</do_all>
+						<do_if value="$drones ge $maxDrones">
 							<set_value name="$isMiningable" exact="true" />
 						</do_if>
 					</do_if>
+					<remove_value name="$drones" />
+					<remove_value name="$maxDrones" />
 
-					<do_if value="@$Captain.ship.units.{unitcategory.orecollector}.count">
-						<set_value name="$ware" exact="ware.ore" />
-						<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
-							<set_value name="$isMiningable" exact="true" />
+					<do_if value="$isMiningable">
+						<!-- TODO: change to check ship tags instead of cargo, so we can deal
+							with count = 0 cases; need adding of ?? -->
+						<set_value name="$isMiningable" exact="false" />
+						<do_if value="@$Captain.ship.units.{unitcategory.gascollector}.count">
+							<set_value name="$ware" exact="ware.hydrogen" />
+							<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
+								<set_value name="$isMiningable" exact="true" />
+							</do_if>
+							<set_value name="$ware" exact="ware.ions" />
+							<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
+								<set_value name="$isMiningable" exact="true" />
+							</do_if>
+							<set_value name="$ware" exact="ware.plasma" />
+							<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
+								<set_value name="$isMiningable" exact="true" />
+							</do_if>
 						</do_if>
-						<set_value name="$ware" exact="ware.silicon" />
-						<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
-							<set_value name="$isMiningable" exact="true" />
-						</do_if>
-						<set_value name="$ware" exact="ware.crystals" />
-						<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
-							<set_value name="$isMiningable" exact="true" />
-						</do_if>
-						<set_value name="$ware" exact="ware.nividium" />
-						<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
-							<set_value name="$isMiningable" exact="true" />
-						</do_if>
-						<set_value name="$ware" exact="ware.ice" />
-						<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
-							<set_value name="$isMiningable" exact="true" />
+
+						<do_if value="@$Captain.ship.units.{unitcategory.orecollector}.count">
+							<set_value name="$ware" exact="ware.ore" />
+							<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
+								<set_value name="$isMiningable" exact="true" />
+							</do_if>
+							<set_value name="$ware" exact="ware.silicon" />
+							<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
+								<set_value name="$isMiningable" exact="true" />
+							</do_if>
+							<set_value name="$ware" exact="ware.crystals" />
+							<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
+								<set_value name="$isMiningable" exact="true" />
+							</do_if>
+							<set_value name="$ware" exact="ware.nividium" />
+							<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
+								<set_value name="$isMiningable" exact="true" />
+							</do_if>
+							<set_value name="$ware" exact="ware.ice" />
+							<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
+								<set_value name="$isMiningable" exact="true" />
+							</do_if>
 						</do_if>
 					</do_if>
-				</do_if>
 
-				<do_if value="$isTradeRun or  $isMiningRun">
-					<add_player_choice_sub text="{8570,3010}"
-						position="right" section="g_JLPUniTrade_autotrade_showskills" />
-				</do_if>
-
-				<!-- <do_if value="$isShowExtLB" exact="true" > <add_player_choice text="{8570,4010}"
-					position="bottom_left" section="g_JLPUniTrade_autotrade_showExtLB_on"
-					/>
-					</do_if> <do_else> <add_player_choice text="{8570,4011}" position="bottom_left"
-					section="g_JLPUniTrade_autotrade_showExtLB_off" /> </do_else> <do_if
-					value="$isTradeRun
-					or $isMiningRun"> <add_player_choice text="'cheat Money'" position="bottom_left"
-					section="g_JLPUniTrade_autotrade_giveMoney" /> </do_if> -->
-				<do_if value="$isTransportable and not  $isMiningRun">
-					<do_if value="not $isTradeRun">
-						<add_player_choice_sub text="{8570,1010}"
-							position="top_left" section="g_JLPUniTrade_autotrade_start"
-							selectable="(not @$Captain.$shiptrader_docking) and (not @$Captain.$ship_parking) and (not @$Captain.ship.dockslot) and (not @$Captain.ship.docklink)" />
+					<do_if value="$isTradeRun or  $isMiningRun">
+						<add_player_choice_sub text="{8570,3010}"
+							position="right" section="JLPUniTrade_autotrade_showskills" />
 					</do_if>
-					<do_else>
-						<add_player_choice_sub text="{8570,1011}"
-							position="top_left" section="g_JLPUniTrade_autotrade_stop"
-							selectable="(not @$Captain.$shiptrader_docking) and (not @$Captain.$ship_parking) and (not @$Captain.ship.dockslot) and (not @$Captain.ship.docklink)" />
-					</do_else>
-				</do_if>
-				<do_if value="$isTransportable and $isMiningable and not $isTradeRun">
-					<do_if value="not $isMiningRun">
-						<add_player_choice_sub text="{8570,2010}"
-							position="top_right" section="g_JLPUniTrade_automining_start"
-							selectable="(not @$Captain.$shiptrader_docking) and (not @$Captain.$ship_parking) and (not @$Captain.ship.dockslot) and (not @$Captain.ship.docklink)" />
-					</do_if>
-					<do_else>
-						<add_player_choice_sub text="{8570,2011}"
-							position="top_right" section="g_JLPUniTrade_automining_stop"
-							selectable="(not @$Captain.$shiptrader_docking) and (not @$Captain.$ship_parking) and (not @$Captain.ship.dockslot) and (not @$Captain.ship.docklink)" />
-					</do_else>
-				</do_if>
-				<add_player_choice_return text="{1002,20}"
-					position="bottom_right" comment="(Back)" />
 
-				<remove_value name="$isTransportable" />
-				<remove_value name="$isMiningable" />
-				<remove_value name="$isTradeRun" />
-				<remove_value name="$Captain" />
-				<remove_value name="$capship" />
+					<!-- <do_if value="$isShowExtLB" exact="true" > <add_player_choice text="{8570,4010}"
+						position="bottom_left" section="g_JLPUniTrade_autotrade_showExtLB_on"
+						/>
+						</do_if> <do_else> <add_player_choice text="{8570,4011}" position="bottom_left"
+						section="JLPUniTrade_autotrade_showExtLB_off" /> </do_else> -->
+					<do_if value="$isTransportable and not  $isMiningRun">
+						<do_if value="not $isTradeRun">
+							<add_player_choice_sub text="{8570,1010}"
+								position="top_left" section="JLPUniTrade_autotrade_start"
+								selectable="(not @$Captain.$shiptrader_docking) and (not @$Captain.$ship_parking) and (not @$Captain.ship.dockslot) and (not @$Captain.ship.docklink)" />
+						</do_if>
+						<do_else>
+							<add_player_choice_sub text="{8570,1011}"
+								position="top_left" section="JLPUniTrade_autotrade_stop"
+								selectable="(not @$Captain.$shiptrader_docking) and (not @$Captain.$ship_parking) and (not @$Captain.ship.dockslot) and (not @$Captain.ship.docklink)" />
+						</do_else>
+					</do_if>
+					<do_if value="$isTransportable and $isMiningable and not $isTradeRun">
+						<do_if value="not $isMiningRun">
+							<add_player_choice_sub text="{8570,2010}"
+								position="top_right" section="JLPUniTrade_automining_start"
+								selectable="(not @$Captain.$shiptrader_docking) and (not @$Captain.$ship_parking) and (not @$Captain.ship.dockslot) and (not @$Captain.ship.docklink)" />
+						</do_if>
+						<do_else>
+							<add_player_choice_sub text="{8570,2011}"
+								position="top_right" section="JLPUniTrade_automining_stop"
+								selectable="(not @$Captain.$shiptrader_docking) and (not @$Captain.$ship_parking) and (not @$Captain.ship.dockslot) and (not @$Captain.ship.docklink)" />
+						</do_else>
+					</do_if>
+					<add_player_choice_return text="{1002,20}"
+						position="bottom_right" comment="(Back)" />
+					<remove_value name="$isTransportable" />
+					<remove_value name="$isMiningable" />
+					<remove_value name="$isTradeRun" />
+					<remove_value name="$Captain" />
+					<remove_value name="$capship" />
+				</do_if>
 			</actions>
 		</cue>
 
 		<cue name="JLPUniTradeStart" instantiate="true" namespace="this">
 			<conditions>
 				<event_conversation_next_section
-					section="g_JLPUniTrade_autotrade_start" />
+					section="JLPUniTrade_autotrade_start" />
 			</conditions>
 			<actions>
 				<set_value name="$Captain" exact="event.object" />
@@ -271,7 +272,7 @@
 		<cue name="JLPUniTradeStop" instantiate="true" namespace="this">
 			<conditions>
 				<event_conversation_next_section
-					section="g_JLPUniTrade_autotrade_stop" />
+					section="JLPUniTrade_autotrade_stop" />
 			</conditions>
 			<actions>
 				<set_value name="$Captain" exact="event.object" />
@@ -310,11 +311,11 @@
 						<do_if value="$isTradeRun or  $isMiningRun">
 
 							<add_player_choice_sub text="{8570,1000}"
-								section="g_JLPUniTrade_autotrade_select" comment="overide Stop current task"
+								section="JLPUniTrade_autotrade_select" comment="overide Stop current task"
 								baseparam="event.param2"
 								selectable="(not @event.object.$shiptrader_docking) and (not @event.object.$ship_parking) and (not event.object.ship.dockslot) and (not event.object.ship.docklink)" />
 							<!-- <add_player_choice_sub text="{8570,1000}"
-								position="right" section="g_JLPUniTrade_autotrade_select"
+								position="right" section="JLPUniTrade_autotrade_select"
 								baseparam="event.param2" />
 							-->
 						</do_if>
@@ -329,7 +330,7 @@
 		<cue name="JLPUniMiningStart" instantiate="true" namespace="this">
 			<conditions>
 				<event_conversation_next_section
-					section="g_JLPUniTrade_automining_start" />
+					section="JLPUniTrade_automining_start" />
 			</conditions>
 			<actions>
 				<set_value name="$Captain" exact="event.object" />
@@ -364,7 +365,7 @@
 						comment="How many do you want? OR How much?" />
 					<set_value name="$minBudgetDiff" exact="$minBudget - $Captain.money" />
 					<open_conversation_menu menu="MoneyTransferMenu"
-						param="[0, 0, event.object, $minBudgetDiff]" />
+						param="[0, 0, event.object, $minBudgetDiff]" interactive="false" />
 					<add_conversation_view view="closeupdetailmonitor" />
 				</do_else>
 				<start_script object="$Captain" name="'jlp.unitrader.mining'">
@@ -382,7 +383,7 @@
 		<cue name="JLPUniMiningstop" instantiate="true" namespace="this">
 			<conditions>
 				<event_conversation_next_section
-					section="g_JLPUniTrade_automining_stop" />
+					section="JLPUniTrade_automining_stop" />
 			</conditions>
 			<actions>
 				<set_value name="$Captain" exact="event.object" />
@@ -402,7 +403,7 @@
 		<cue name="JLPUniTradeShowSkills" instantiate="true" namespace="this">
 			<conditions>
 				<event_conversation_next_section
-					section="g_JLPUniTrade_autotrade_showskills" />
+					section="JLPUniTrade_autotrade_showskills" />
 			</conditions>
 			<actions>
 				<set_value name="$Captain" exact="event.object" />
@@ -419,7 +420,7 @@
 		>
 			<conditions>
 				<event_conversation_next_section
-					section="g_JLPUniTrade_autotrade_showExtLB_on" />
+					section="JLPUniTrade_autotrade_showExtLB_on" />
 			</conditions>
 			<actions>
 				<set_value name="event.object.$jlp_unitrader_show_extendedlogbook"
@@ -432,7 +433,7 @@
 		>
 			<conditions>
 				<event_conversation_next_section
-					section="g_JLPUniTrade_autotrade_showExtLB_off" />
+					section="JLPUniTrade_autotrade_showExtLB_off" />
 			</conditions>
 			<actions>
 				<set_value name="event.object.$jlp_unitrader_show_extendedlogbook"
@@ -456,9 +457,9 @@
 				<!-- Please try to make the Parameter strings unique. We don't want mod
 					conflicts. -->
 				<append_to_list name="global.$BKCommMenuInSquad"
-					exact="['g_JLPUniTrade_autotrade_select', {8570,1000}]" />
+					exact="['JLPUniTrade_autotrade_select', {8570,1000}]" />
 				<append_to_list name="global.$BKCommMenuNonSquad"
-					exact="['g_JLPUniTrade_autotrade_select', {8570,1000}]" />
+					exact="['JLPUniTrade_autotrade_select', {8570,1000}]" />
 
 			</actions>
 		</cue>
