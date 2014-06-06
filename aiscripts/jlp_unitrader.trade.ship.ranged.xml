@@ -31,7 +31,7 @@
 				</do_all>
 
 			-->
-			<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 1200">
+			<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 1200">
 				<run_script name="'move.refuel'" sinceversion="1" />
 			</do_if>
 
