@@ -143,7 +143,7 @@
 			<do_if value="not $selloffer.available or not $buyoffer.available">
 				<set_value name="this.$trade_failedfindruns" operation="add"
 					exact="1" />
-				<wait exact="this.$jlp_unitrader_searchtime" sinceversion="1" />
+				<wait exact="this.$jlp_unitrader_waittime" sinceversion="1" />
 				<resume label="find trade run" />
 			</do_if>
 
