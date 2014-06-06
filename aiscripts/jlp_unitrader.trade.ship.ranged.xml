@@ -1,47 +1,49 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
-<aiscript name="jlp.unitrader.trade.ship.ranged" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="1">
-    <params>
-        <param name="PageId" default="8570"/>
-        <param name="minbuy" default="0"/>
-        <param name="maxbuy" default="25"/>
-        <param name="minsell" default="0"/>
-        <param name="maxsell" default="25"/>
-        <param name="debugchance" default="0"/>
-    </params>
-    <init>
-        <set_command command="command.freetrade" />
-    </init>
+<aiscript name="jlp.unitrader.trade.ship.ranged" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="1"
+>
+	<params>
+		<param name="PageId" default="8570" />
+		<param name="minbuy" default="0" />
+		<param name="maxbuy" default="25" />
+		<param name="minsell" default="0" />
+		<param name="maxsell" default="25" />
+		<param name="debugchance" default="0" />
+	</params>
+	<init>
+		<set_command command="command.wait" />
+	</init>
 
-    <attention min="unknown">
-        <actions>
+	<attention min="unknown">
+		<actions>
 
-			<create_list name="$basket"/>
-<!--
-			<find_object groupname="$wares"  class="class.container"  tag="ware" space="player.galaxy"  multiple="true"/>			<do_all exact="$wares.count" counter="$Counter">
+			<create_list name="$basket" />
+
+<!-- 			<find groupname="$wares" class="class.object" tag="economy"
+				space="player.galaxy" multiple="true" />
+			<do_all exact="$wares.count" counter="$Counter">
 				<do_if value="@this.ship.cargo.{$wares.{$Counter}}.max" min="1">
-					<append_to_list name="$basket" exact="$wares.{$Counter}"/>
-					<write_to_logbook category="squad" text="Player.age + 'can space for ' + $wares.{$Counter}.name + '. can buy more'"/>
+					<append_to_list name="$basket" exact="$wares.{$Counter}" />
+					<write_to_logbook category="squad"
+						text="Player.age + 'have space for 
+				' + $wares.{$Counter}.name" />
 				</do_if>
 			</do_all>
--->
 
-			<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 800">
-				<set_value name="$ActualZone" exact="this.zone" />
-            	<run_script name="'move.refuel'"  sinceversion="1"/>
-				<do_if value="this.zone != $ActualZone">
-					<run_script name="'move.generic'" sinceversion="1">
-						<param name="destination" value="$ActualZone" />
-					</run_script>
-				</do_if>
-			</do_if>
-			
-             <run_script name="'jlp.unitrader.trade.ship'" sinceversion="1">
-                <param name="PageId" value="$PageId"/>
-                <param name="warelist" value="$basket" />
-                <param name="range" value="'ranged'" />
-                <param name="additionalparams" value="[$minsell, $maxsell*this.$jlp_unitrader_courage/100i, $minbuy, $maxbuy*this.$jlp_unitrader_courage/100]"/>
-                <param name="debugchance" value="$debugchance" />
-            </run_script>
-        </actions>
-    </attention>
+ -->
+			<run_script name="'jlp.unitrader.trade.ship'"
+				sinceversion="1"
+			>
+				<param name="PageId" value="$PageId" />
+				<param name="warelist" value="$basket" />
+				<param name="range" value="'ranged'" />
+				<param name="additionalparams"
+					value="[$minsell, $maxsell*this.$jlp_unitrader_courage/100i, $minbuy, $maxbuy*this.$jlp_unitrader_courage/100]" />
+				<param name="debugchance" value="$debugchance" />
+			</run_script>
+
+			<!-- Take a break -->
+			<wait exact="this.$jlp_unitrader_waittime" sinceversion="1" />
+		</actions>
+	</attention>
 </aiscript>

@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
-<aiscript name="jlp.unitrader.mining.ship.free" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="1">
+<aiscript name="jlp.unitrader.mining.ship.free" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="1"
+>
 	<!--
-  This script will try to automatically supply stations and will only work with
-  a valid warebasket parameter (defined via jobs). It can do gas and mineral
-  mining and works for all ship classes. Based on mining.ship.station.
-  by Benedikt
-  -->
+		This script will try to automatically supply stations and will only work 
+		with
+		a valid warebasket parameter (defined via jobs). It can do gas and mineral
+		mining and works for all ship classes. Based on mining.ship.station.
+		by Benedikt
+	-->
 	<params>
-		<param name="PageId" default="8570"/>
-		<param name="basketoverride" default="null" comment="list of wares that takes precedence over any defined warebasket" />
-		<param name="debugchance" default="0"/>
+		<param name="PageId" default="8570" />
+		<param name="basketoverride" default="null"
+			comment="list of wares that takes precedence over any defined warebasket" />
+		<param name="debugchance" default="0" />
 	</params>
-	<interrupts>
-		<handler ref="AttackHandler" />
-	</interrupts>
-
+	<init>
+		<set_command command="command.freemining" />
+	</init>
 	<attention min="unknown">
 		<actions>
 
@@ -22,25 +25,31 @@
 
 			<!-- basic checks first -->
 			<label name="init" />
-			<wait min="5s" max="15s" />
+			<wait min="5s" max="15s" sinceversion="1"/>
 			<do_if value="this.$jlpUniMiningRun" exact="true" negate="true">
-				<return />				
+				<return />
 			</do_if>
 			<do_if value="this.ship.cargo.capacity" max="0">
-				<debug_text text="'%1 has cargo capacity of %2!'.[this.ship.knownname, this.ship.cargo.capacity]" chance="$debugchance" />
+				<debug_text
+					text="'%1 has cargo capacity of %2!'.[this.ship.knownname, this.ship.cargo.capacity]"
+					chance="$debugchance" />
 				<set_value name="$failreason" exact="'ERR_NO_CARGOSPACE'" />
 				<set_value name="$failreason2" exact="'Macro: ' + this.ship.macro.name" />
 				<resume label="finish" />
 			</do_if>
 			<do_if value="this.ship.units.collect.count" exact="0">
-				<debug_text text="'mining ship does not have any units for collecting!'" chance="$debugchance" />
+				<debug_text text="'mining ship does not have any units for collecting!'"
+					chance="$debugchance" />
 				<set_value name="$failreason" exact="'ERR_NO_COLLECT'" />
-				<set_value name="$failreason2" exact="'Macro: %1, Job: %2'.[this.ship.macro.name, this.ship.job]" />
+				<set_value name="$failreason2"
+					exact="'Macro: %1, Job: %2'.[this.ship.macro.name, this.ship.job]" />
 				<resume label="finish" />
 			</do_if>
 			<do_if value="not $basketoverride">
 				<do_if value="this.ship.warebasket.count" exact="0">
-					<debug_text text="'mining without warebasket defined in jobs not supported!'" chance="$debugchance" />
+					<debug_text
+						text="'mining without warebasket defined in jobs not supported!'"
+						chance="$debugchance" />
 					<set_value name="$failreason" exact="'ERR_NO_WAREBASKET'" />
 					<set_value name="$failreason2" exact="'Job: ' + this.ship.job" />
 					<resume label="finish" />
@@ -52,90 +61,120 @@
 			</do_else>
 
 			<!-- find mineable wares within the cluster -->
-			<create_list name="$availablewares" exact="0"/>
-			<debug_text text="player.age + ' searching for wares...'" chance="$debugchance"/>
+			<create_list name="$availablewares" exact="0" />
+			<debug_text text="player.age + ' searching for wares...'"
+				chance="$debugchance" />
 			<do_all exact="$warebasket.count" counter="$i">
-				<set_value name="$ware" exact="$warebasket.{$i}"/>
-				<find_resource ware="$ware" refobject="this.ship" region="$region" zone="$zone" wares="$secwares"/>
+				<set_value name="$ware" exact="$warebasket.{$i}" />
+				<find_resource ware="$ware" refobject="this.ship"
+					region="$region" zone="$zone" wares="$secwares" />
 				<do_if value="$region.exists">
 					<do_if value="this.ship.cluster" exact="$zone.cluster">
-						<append_to_list name="$availablewares" exact="$ware"/>
-						<debug_text text="player.age + ' there is %1 in this cluster'.[$ware]" chance="$debugchance"/>
+						<append_to_list name="$availablewares" exact="$ware" />
+						<debug_text text="player.age + ' there is %1 in this cluster'.[$ware]"
+							chance="$debugchance" />
 					</do_if>
 				</do_if>
 			</do_all>
 			<do_if value="$availablewares.count" exact="0">
-				<debug_text text="'unable to find any ware that can be collected by this ship in this cluster!'" chance="$debugchance"/>
-				<write_to_logbook category="squad" text="{8570, 10000}.[this.ship.knownname, this.knownname]"/>
-				<set_value name="$failreason" exact="'ERR_NO_WARES'"/>
-				<resume label="finish"/>
+				<debug_text
+					text="'unable to find any ware that can be collected by this ship in this cluster!'"
+					chance="$debugchance" />
+				<write_to_logbook category="squad"
+					text="{8570, 10000}.[this.ship.knownname, this.knownname]" />
+				<set_value name="$failreason" exact="'ERR_NO_WARES'" />
+				<resume label="finish" />
 			</do_if>
 
 			<!-- sell wares first if less than 50% free cargo -->
-			<do_if value="(this.ship.cargo.free)f / this.ship.cargo.capacity" max="0.5">
+			<do_if value="(this.ship.cargo.free)f / this.ship.cargo.capacity"
+				max="0.5"
+			>
 				<resume label="sellwares" />
 			</do_if>
 			<do_else>
-				<debug_text text="player.age + ' looking good, starting new mining run'" chance="$debugchance" />
+				<debug_text text="player.age + ' looking good, starting new mining run'"
+					chance="$debugchance" />
 			</do_else>
 
 			<!-- primary loop start -->
 			<label name="loop" />
 			<do_if value="this.$jlpUniMiningRun" exact="true" negate="true">
-				<return />				
+				<return />
 			</do_if>
 
-			<!-- find a buyoffer for the mineable wares in this cluster, split into sector searches to keep the spikes lower 
-      go to a random sector in the cluster and look for offers there, then a random matching offer is chosen -->
-			<find_sector space="this.ship.cluster" multiple="true" name="$sectors" />
+			<!-- find a buyoffer for the mineable wares in this cluster, split into 
+				sector searches to keep the spikes lower
+				go to a random sector in the cluster and look for offers there, then 
+				a random matching offer is chosen -->
+			<find_sector space="this.ship.cluster" multiple="true"
+				name="$sectors" />
 			<do_while value="$sectors.count gt 0">
 				<set_value name="$s" min="1" max="$sectors.count" />
-				<find_buy_offer tradepartner="this.ship" space="$sectors.{$s}" result="$buyoffer" wares="$availablewares">
-					<offeramount min="this.ship.cargo.capacity / 20" entity="this" />
-					<!-- NOTE: relevant ware volumes are range from 14 to 18 so this fills at least 70% of our cargo -->
+				<find_buy_offer tradepartner="this.ship" space="$sectors.{$s}"
+					result="$buyoffer" wares="$availablewares"
+				>
+					<offeramount min="this.ship.cargo.capacity / 20"
+						entity="this" />
+					<!-- NOTE: relevant ware volumes are range from 14 to 18 so this fills 
+						at least 70% of our cargo -->
 				</find_buy_offer>
 				<do_if value="$buyoffer.available">
 					<break />
 				</do_if>
 				<remove_value name="$sectors.{$s}" />
-				<wait min="2s" max="5s" />
+				<wait min="2s" max="5s" sinceversion="1"/>
 			</do_while>
 			<do_if value="$buyoffer.exists">
-				<set_value name="$ware" exact="$buyoffer.ware"/>
-				<create_list name="$shoppinglist" exact="0"/>
+				<set_value name="$ware" exact="$buyoffer.ware" />
+				<create_list name="$shoppinglist" exact="0" />
 				<!-- TODO: add other mineable wares that the station needs to the shoppinglist -->
-				<append_to_list name="$shoppinglist" exact="$buyoffer.ware"/>
-				<debug_text text="player.age + ' %1 in zone %2 wants %3 units of %4'.[$buyoffer.buyer.knownname, $buyoffer.buyer.zone.knownname, $buyoffer.amount, $buyoffer.ware.name]" chance="$debugchance" />
+				<append_to_list name="$shoppinglist" exact="$buyoffer.ware" />
+				<debug_text
+					text="player.age + ' %1 in zone %2 wants %3 units of %4'.[$buyoffer.buyer.knownname, $buyoffer.buyer.zone.knownname, $buyoffer.amount, $buyoffer.ware.name]"
+					chance="$debugchance" />
 			</do_if>
 			<do_else>
-				<debug_text text="player.age + ' could not find any buyoffer, waiting...'" chance="$debugchance" />
-				<wait min="50s" max="70s"/>
-				<resume label="loop"/>
+				<debug_text
+					text="player.age + ' could not find any buyoffer, waiting...'"
+					chance="$debugchance" />
+				<wait min="50s" max="70s" sinceversion="1"/>
+				<resume label="loop" />
 			</do_else>
 
 			<label name="findware" />
 			<!-- now check if we can find a deposit of the needed resource nearby -->
-			<debug_text text="player.age + ' now looking for %1...'.[$ware]" chance="$debugchance" />
-			<find_resource ware="$ware" refobject="this.ship" region="$region" zone="$zone" wares="$secwares" minamount="this.ship.cargo.{$ware}.free" />
+			<debug_text text="player.age + ' now looking for %1...'.[$ware]"
+				chance="$debugchance" />
+			<find_resource ware="$ware" refobject="this.ship"
+				region="$region" zone="$zone" wares="$secwares" minamount="this.ship.cargo.{$ware}.free" />
 			<do_if value="not $region.exists">
-				<debug_text text="player.age + ' failed finding %1!'.[$ware]" chance="$debugchance" />
+				<debug_text text="player.age + ' failed finding %1!'.[$ware]"
+					chance="$debugchance" />
 				<set_value name="$failreason" exact="'ERR_FIND_WARE'" />
 				<resume label="finish" />
 			</do_if>
-			<debug_text text="player.age + ' there is %1 in zone %2'.[$ware, $zone.knownname]" chance="$debugchance" />
+			<debug_text
+				text="player.age + ' there is %1 in zone %2'.[$ware, $zone.knownname]"
+				chance="$debugchance" />
 
 			<label name="movetocollect" />
-			<!-- TODO: pre-flight check, calculate jump energy for trip to resource and back home, ensure we have enough fuel -->
-			<!-- TODO: don't just go to the zone center, find an asteroid/gas cloud... and go there -->
+			<!-- TODO: pre-flight check, calculate jump energy for trip to resource 
+				and back home, ensure we have enough fuel -->
+			<!-- TODO: don't just go to the zone center, find an asteroid/gas cloud... 
+				and go there -->
 			<create_position name="$startpos" min="2km" max="35km" />
 			<run_script name="'move.generic'" sinceversion="1">
 				<param name="destination" value="$zone" />
 				<param name="position" value="$startpos" />
 				<param name="debugchance" value="$debugchance" />
 			</run_script>
-			<wait min="1s" max="3s" />
-			<do_if value="(this.zone == $zone) or (this.ship.distanceto.[$zone, $startpos] lt (this.ship.size * 2f))" >
-				<debug_text text="player.age + ' destination reached'" chance="$debugchance" />
+			<wait min="1s" max="3s" sinceversion="1"/>
+			<do_if
+				value="(this.zone == $zone) or (this.ship.distanceto.[$zone, $startpos] lt (this.ship.size * 2f))"
+			>
+				<debug_text text="player.age + ' destination reached'"
+					chance="$debugchance" />
 			</do_if>
 			<do_else>
 				<set_value name="$failreason" exact="'ERR_MOVE_FAIL'" />
@@ -146,53 +185,69 @@
 				<resume label="findware" />
 			</do_if>
 
-			<label name="collect"/>
+			<label name="collect" />
 			<!-- collecting is done in an external script -->
-			<run_script name="'jlp.unitrader.mining.ship.collect'" sinceversion="1">
-				<param name="region" value="$region"/>
-				<param name="zone" value="$zone"/>
-				<param name="ware" value="$ware"/>
-				<param name="secwares" value="$secwares"/>
-				<param name="shoppinglist" value="$shoppinglist"/>
-				<param name="debugchance" value="$debugchance"/>
+			<run_script name="'jlp.unitrader.mining.ship.collect'"
+				sinceversion="1"
+			>
+				<param name="region" value="$region" />
+				<param name="zone" value="$zone" />
+				<param name="ware" value="$ware" />
+				<param name="secwares" value="$secwares" />
+				<param name="shoppinglist" value="$shoppinglist" />
+				<param name="debugchance" value="$debugchance" />
 			</run_script>
 
 			<label name="sellwares" />
-			<debug_text text="player.age + ' trying to sell wares...'" chance="$debugchance" />
-			<!-- find a buyoffer for the mineable wares in this cluster, split into sector searches to keep the spikes lower -->
-			<find_sector space="this.ship.cluster" multiple="true" name="$sectors" />
+			<debug_text text="player.age + ' trying to sell wares...'"
+				chance="$debugchance" />
+			<!-- find a buyoffer for the mineable wares in this cluster, split into 
+				sector searches to keep the spikes lower -->
+			<find_sector space="this.ship.cluster" multiple="true"
+				name="$sectors" />
 			<do_while value="$sectors.count gt 0">
 				<set_value name="$s" min="1" max="$sectors.count" />
 
-				<find_buy_offer tradepartner="this.ship" space="$sectors.{$s}" result="$buyoffer" wares="this.ship.cargo.list">
+				<find_buy_offer tradepartner="this.ship" space="$sectors.{$s}"
+					result="$buyoffer" wares="this.ship.cargo.list"
+				>
 					<!-- ############### BUG with scaldis. Multicargo -->
-					<offeramount min="this.ship.cargo.capacity / 20" entity="this"/>
+					<offeramount min="this.ship.cargo.capacity / 20"
+						entity="this" />
 				</find_buy_offer>
 				<do_if value="$buyoffer.available">
 					<break />
 				</do_if>
 				<remove_value name="$sectors.{$s}" />
-				<wait min="2s" max="5s" />
+				<wait min="2s" max="5s" sinceversion="1"/>
 			</do_while>
 			<do_if value="$buyoffer.exists">
-				<set_value name="$ware" exact="$buyoffer.ware"/>
-				<debug_text text="player.age + ' %1 in zone %2 wants %3 units of %4'.[$buyoffer.buyer.knownname, $buyoffer.buyer.zone.knownname, $buyoffer.amount, $buyoffer.ware.name]" chance="$debugchance" />
+				<set_value name="$ware" exact="$buyoffer.ware" />
+				<debug_text
+					text="player.age + ' %1 in zone %2 wants %3 units of %4'.[$buyoffer.buyer.knownname, $buyoffer.buyer.zone.knownname, $buyoffer.amount, $buyoffer.ware.name]"
+					chance="$debugchance" />
 			</do_if>
 			<do_else>
-				<debug_text text="player.age + ' could not find any buyoffer, waiting...'" chance="$debugchance" />
-				<wait min="50s" max="70s"/>
-				<resume label="sellwares"/>
+				<debug_text
+					text="player.age + ' could not find any buyoffer, waiting...'"
+					chance="$debugchance" />
+				<wait min="50s" max="70s" sinceversion="1"/>
+				<resume label="sellwares" />
 			</do_else>
 
-			<!-- TODO: pre-flight check, calculate jump energy for trip to resource and back home, ensure we have enough fuel -->
+			<!-- TODO: pre-flight check, calculate jump energy for trip to resource 
+				and back home, ensure we have enough fuel -->
 			<run_script name="'move.generic'" sinceversion="1">
 				<param name="destination" value="$buyoffer.buyer" />
 				<param name="debugchance" value="$debugchance" />
 			</run_script>
-			<wait min="1s" max="3s" />
+			<wait min="1s" max="3s" sinceversion="1"/>
 			<do_if value="@$buyoffer.buyer.exists">
-				<do_if value="(this.zone == $buyoffer.buyer.zone) or (this.ship.distanceto.{$buyoffer.buyer} lt ($buyoffer.buyer.size * 2f))" >
-					<debug_text text="player.age + ' destination reached'" chance="$debugchance" />
+				<do_if
+					value="(this.zone == $buyoffer.buyer.zone) or (this.ship.distanceto.{$buyoffer.buyer} lt ($buyoffer.buyer.size * 2f))"
+				>
+					<debug_text text="player.age + ' destination reached'"
+						chance="$debugchance" />
 				</do_if>
 				<do_else>
 					<set_value name="$failreason" exact="'ERR_MOVE_FAIL'" />
@@ -207,98 +262,136 @@
 			<do_if value="this.ship.isclass.ship_xl or this.ship.isclass.ship_l">
 				<!-- big ships park -->
 				<do_if value="not $buyoffer.available">
-					<resume label="sellwares"/>
+					<resume label="sellwares" />
 				</do_if>
-				<debug_text text="player.age + ' moving to park at ' + $targetobject.knownname" chance="$debugchance" />
-				<run_script name="'move.park'" result="$parkresult" sinceversion="1">
+				<debug_text
+					text="player.age + ' moving to park at ' + $targetobject.knownname"
+					chance="$debugchance" />
+				<run_script name="'move.park'" result="$parkresult"
+					sinceversion="1"
+				>
 					<param name="destination" value="$buyoffer.buyer" />
 					<param name="tradeoffer" value="$buyoffer" />
 				</run_script>
 				<do_if value="$parkresult">
-					<debug_text text="player.age + ' now parked at ' + $targetobject.knownname" chance="$debugchance" />
+					<debug_text
+						text="player.age + ' now parked at ' + $targetobject.knownname"
+						chance="$debugchance" />
 				</do_if>
 				<do_elseif value="this.$reevaluate_parking?">
 					<remove_value name="this.$reevaluate_parking" />
-					<debug_text text="player.age + ' need to re-evaluate our reason for parking at' + $targetobject.knownname" chance="$debugchance" />
+					<debug_text
+						text="player.age + ' need to re-evaluate our reason for parking at' + $targetobject.knownname"
+						chance="$debugchance" />
 					<resume label="sellwares" />
 				</do_elseif>
 				<do_else>
-					<debug_text text="player.age + ' critical parking error!'" chance="$debugchance" />
+					<debug_text text="player.age + ' critical parking error!'"
+						chance="$debugchance" />
 					<resume label="loop" />
 				</do_else>
 			</do_if>
 			<do_else>
 				<!-- small ships dock -->
-				<debug_text text="player.age + ' moving to dock...'" chance="$debugchance" />
-				<run_script name="'move.dockat'" result="$dockresult" sinceversion="1">
+				<debug_text text="player.age + ' moving to dock...'"
+					chance="$debugchance" />
+				<run_script name="'move.dockat'" result="$dockresult"
+					sinceversion="1"
+				>
 					<param name="destination" value="$buyoffer.buyer" />
 				</run_script>
 				<do_if value="not $dockresult">
-					<wait min="50s" max="70s"/>
-					<resume label="sellwares"/>
+					<wait min="50s" max="70s" sinceversion="1"/>
+					<resume label="sellwares" />
 				</do_if>
-				<debug_text text="player.age + ' successfully docked'" chance="$debugchance" />
+				<debug_text text="player.age + ' successfully docked'"
+					chance="$debugchance" />
 			</do_else>
 
 			<label name="unload" />
 			<!-- unload our ware and any other ware that station can use -->
 			<do_while value="$buyoffer.buyer.exists">
 				<do_while value="not $buyoffer.buyer.isoperational">
-					<wait min="50s" max="70s" />
+					<wait min="50s" max="70s" sinceversion="1"/>
 				</do_while>
 				<set_value name="$leftover" exact="0" />
 				<set_value name="$cargolist" exact="this.ship.cargo.list" />
 				<do_all counter="$c" exact="$cargolist.count">
 					<set_value name="$currentware" exact="$cargolist.{$c}" />
-					<!-- TODO: change to check resources instead of cargo, so we can deal with count = 0 cases; needs adding of KW_RESOURCES -->
-					<do_if value="@$buyoffer.buyer.cargo.{$currentware}.count" min="1">
+					<!-- TODO: change to check resources instead of cargo, so we can deal 
+						with count = 0 cases; needs adding of KW_RESOURCES -->
+					<do_if value="@$buyoffer.buyer.cargo.{$currentware}.count"
+						min="1"
+					>
 						<set_value name="$amount" exact="this.ship.cargo.{$currentware}.count" />
 						<do_if value="$buyoffer.buyer.cargo.{$currentware}.free lt $amount">
-							<set_value name="$amount" exact="$buyoffer.buyer.cargo.{$currentware}.free" />
+							<set_value name="$amount"
+								exact="$buyoffer.buyer.cargo.{$currentware}.free" />
 						</do_if>
 						<do_if value="$amount" min="1">
-							<debug_text text="player.age + ' unloading %1 units of %2 to %3...'.[$amount, $currentware, $buyoffer.buyer.knownname]" chance="$debugchance" />
-							<execute_trade tradeoffer="$buyoffer" tradepartner="this.ship" amount="$amount" result="$traderesult" >
+							<debug_text
+								text="player.age + ' unloading %1 units of %2 to %3...'.[$amount, $currentware, $buyoffer.buyer.knownname]"
+								chance="$debugchance" />
+							<execute_trade tradeoffer="$buyoffer" tradepartner="this.ship"
+								amount="$amount" result="$traderesult"
+							>
 								<interrupt_after_time time="121min" />
 							</execute_trade>
-							<debug_text text="player.age + ' %1(job: \'%5\') unloaded %2 units of \'%3\' at \'%4\''.[this.ship.knownname, $amount, $currentware, $homebase.knownname, this.ship.job]" chance="$debugchance2" />
-							<set_value name="$leftover" exact="$leftover + this.ship.cargo.{$currentware}.count" />
-							<detach_from_masstraffic object="this.ship" wait="true">
+							<debug_text
+								text="player.age + ' %1(job: \'%5\') unloaded %2 units of \'%3\' at \'%4\''.[this.ship.knownname, $amount, $currentware, $homebase.knownname, this.ship.job]"
+								chance="$debugchance2" />
+							<set_value name="$leftover"
+								exact="$leftover + this.ship.cargo.{$currentware}.count" />
+							<detach_from_masstraffic object="this.ship"
+								wait="true"
+							>
 								<interrupt_after_time time="5min" />
 							</detach_from_masstraffic>
 						</do_if>
 					</do_if>
 				</do_all>
-				<do_if value="$leftover" exact="0" >
-					<detach_from_masstraffic object="this.ship" wait="true">
+				<do_if value="$leftover" exact="0">
+					<detach_from_masstraffic object="this.ship"
+						wait="true"
+					>
 						<interrupt_after_time time="5min" />
 					</detach_from_masstraffic>
 					<break />
 				</do_if>
-				<wait min="5s" max="10s" />
+				<wait min="5s" max="10s" sinceversion="1"/>
 			</do_while>
 
 			<!-- ok, resource gathering run complete, start the next run -->
-			<debug_text text="player.age + ' unloading complete, clearing parking area.'" chance="$debugchance" />
+			<debug_text
+				text="player.age + ' unloading complete, clearing parking area.'"
+				chance="$debugchance" />
 			<do_if value="this.ship.isclass.ship_xl or this.ship.isclass.ship_l">
 				<debug_text text="player.age + ' un-parking...'" chance="$debugchance" />
-				<run_script name="'move.unpark'" sinceversion="1"/>
+				<run_script name="'move.unpark'" sinceversion="1" />
 			</do_if>
-			<wait min="20s" max="40s" />
-			<debug_text text="player.age + ' starting new mining run'" chance="$debugchance" />
+			<wait min="20s" max="40s" sinceversion="1" />
+			
+			<run_script name="'jlp.unitrader.skills'" sinceversion="1">
+				<param name="Mode" value="'learn'" />
+				<param name="debugchance" value="$debugchance" />
+			</run_script>
 
-			<return value="true"/>
-		
+			<debug_text text="player.age + ' starting new mining run'"
+				chance="$debugchance" />
+
+			<return value="true" />
+
 
 			<label name="finish" />
-			
-			<debug_text text="'script ends with reason %1. This ship in %2 (%3), destination %4'.[$failreason, this.ship.zone.knownname, this.ship.position, $zone.knownname]" />
+
+			<debug_text
+				text="'script ends with reason %1. This ship in %2 (%3), destination %4'.[$failreason, this.ship.zone.knownname, this.ship.position, $zone.knownname]" />
 			<do_if value="$failreason2?">
 				<debug_text text="$failreason2" />
 			</do_if>
 			<do_if value="this.ship.isclass.ship_xl or this.ship.isclass.ship_l">
 				<debug_text text="player.age + ' un-parking...'" chance="$debugchance" />
-				<run_script name="'move.unpark'" sinceversion="1"/>
+				<run_script name="'move.unpark'" sinceversion="1" />
 			</do_if>
 			<return />
 

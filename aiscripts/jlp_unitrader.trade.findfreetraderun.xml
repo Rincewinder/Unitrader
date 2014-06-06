@@ -190,7 +190,7 @@
 						chance="$debugchance" />
 					<find_buy_offer tradepartner="this.ship" space="$checkrange"
 						result="$buyoffer" wares="$currentcargo" knowntoplayer="$onlyKnownBuy"
-						usereservations="false"
+						usereservations="true"
 					>
 						<match_buyer>
 							<match negate="true" class="class.ship_xl" />
@@ -409,18 +409,21 @@
 							exact="0.5*$minvolume*(1.0f-((this.$jlp_unitrader_efficiency + this.$jlp_unitrader_courage)/200))" />
 						<set_value name="$searchMinVolume"
 							exact="$minvolume - $minVolumeRange*(@this.$trade_failedfindruns+1)" />
-						<set_value name="$relPrice"
-							exact="1.2499999f - 0.25f * (((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)/200))" />
+						<set_value name="$relPriceMax"
+							exact="2.0f - 1.0f * (1-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)/200))" />
+						<set_value name="$relPriceMin"
+							exact="0.0f + 0.99999999f * (1-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)/200))" />
 						<debug_text
 							text="player.age + '%1:%2Look for Buy: relPrice: %3\nVolume: %4\nwith my skills:'.[this.ship.knownname, this.knownname, $relPrice, $searchMinVolume ]"
 							chance="$debugchance" />
 
 						<find_sell_offer tradepartner="this.ship" space="$checkrange"
 							result="$selloffers" wares="$filteredwarelist" multiple="true"
-							knowntoplayer="$onlyKnownSell" usereservations="false"
+							knowntoplayer="$onlyKnownSell" usereservations="true"
 						>
 							<totalvolume min="$searchMinVolume" />
-							<relativeprice max="$relPrice" />
+							<relativeprice max="$relPriceMax" min="$relPriceMin" />
+							
 							<match_seller>
 								<match_any>
 									<match_any>
@@ -464,7 +467,7 @@
 									multiple="1" usehighways="true"
 								>
 									<start object="this.ship" />
-									<end object="$selloffer.seller" />
+									<end object="$selloffers.{$Counter}.seller" />
 								</get_global_path>
 							</do_else>
 							<set_value name="$offerAdd" exact="true" />
@@ -489,7 +492,7 @@
 							</do_all>
 
 							<do_if value="$offerAdd" exact="true">
-								<do_if negate="true"
+								<do_if 
 									value="$selloffers.{$Counter}.ware.illegalto.{$selloffers.{$Counter}.seller.owner}.{this.ship.owner}"
 								>
 
@@ -508,8 +511,10 @@
 						exact="0.5*$minvolume*(((this.$jlp_unitrader_efficiency + this.$jlp_unitrader_courage)/200))" />
 					<set_value name="$searchMinVolume"
 						exact="$minvolume - $minVolumeRange*(@this.$trade_failedfindruns+1)" />
-					<set_value name="$relPrice"
-						exact="1.2499999f - 0.25f * (1-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)/200))" />
+					<set_value name="$relPriceMax"
+						exact="2f - 1f * (1-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)/200))" />
+					<set_value name="$relPriceMin"
+						exact="0.0f + 0.9999999f * (1-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)/200))" />
 					<debug_text
 						text="player.age + '%1:%2Look for Sell: relPrice %3\nVolume %4\nwith my skills:'.[this.ship.knownname, this.knownname, $relPrice, $searchMinVolume ]"
 						chance="$debugchance" />
@@ -522,10 +527,10 @@
 						<do_all exact="$sellclusters.count" counter="$Counter">
 							<find_buy_offer tradepartner="this.ship" wares="$soldwares"
 								space="$sellclusters.{$Counter}" result="$buyoffers" multiple="true"
-								knowntoplayer="$onlyKnownBuy" usereservations="false"
+								knowntoplayer="$onlyKnownBuy" usereservations="true"
 							>
 								<totalvolume min="$searchMinVolume" />
-								<relativeprice max="$relPrice" />
+								<relativeprice max="$relPriceMax" min="$relPriceMin"/>
 								<match_buyer>
 									<match_any>
 										<match_relation faction="faction.player"
@@ -560,7 +565,7 @@
 											multiple="1" usehighways="true"
 										>
 											<start object="this.ship" />
-											<end object="$buyoffers.buyer" />
+											<end object="$buyoffers.{$Counter2}.buyer" />
 										</get_global_path>
 									</do_else>
 									<set_value name="$offerAdd" exact="true" />
@@ -610,10 +615,10 @@
 							chance="$debugchance2" />
 						<find_buy_offer tradepartner="this.ship" wares="$soldwares"
 							space="$range" result="$buyoffers" multiple="true" knowntoplayer="$onlyKnownBuy"
-							usereservations="false"
+							usereservations="true"
 						>
 							<totalvolume min="$searchMinVolume" />
-							<relativeprice max="$relPrice" />
+							<relativeprice max="$relPriceMax"  min="$relPriceMin"/>
 							<match_buyer>
 								<match_any>
 									<match_relation faction="faction.player"

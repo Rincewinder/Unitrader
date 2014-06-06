@@ -19,7 +19,7 @@
 		<param name="debugchance" />
 	</params>
 	<init>
-		<set_command command="command.mining" param="'%1 / %2'.[$region,$zone]"  />
+		<set_command command="command.mining" param="$zone"  />
 	</init>
 	<attention min="visible">
 		<actions>

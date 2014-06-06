@@ -45,7 +45,7 @@
 			<t id="50323">à un prix moyen</t>
 			<t id="50324">à un prix faible</t>			
 			
-			<t id="50400">$SHIP$\n J\'ai conclu une transaction.\n Ware: $WARE$ Amount: $AMOUNT$\n Buy price: $PRICEBUY$ Sell price: $PRICESELL$ \n Profit: $PROFIT$</t>
+			<t id="50400">$SHIP$\n J\'ai conclu une transaction.\n marchandises: $WARE$ Quantité: $AMOUNT$\n Prix d\'achat: $PRICEBUY$ Cr Prix de vente: $PRICESELL$ Cr \n Profit: $PROFIT$ Cr</t>
 			
 
         </page>

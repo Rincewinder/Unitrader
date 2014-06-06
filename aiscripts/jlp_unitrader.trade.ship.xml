@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 <aiscript name="jlp.unitrader.trade.ship" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="2"
+	xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="1"
 >
 	<params>
 		<param name="PageId" default="8570" />
@@ -8,11 +8,14 @@
 		<param name="range" default="null" />
 		<!--if $range == 'ranged' then $additionalparams defines min and max jumps
 			for the buy and sell ranges [$minbuy, $maxbuy, $minsell, $maxsell] -->
-		<param name="additionalparams" default="null" />
+		<param name="additionalparams" default="[0,0,1,1]" />
 
 		<param name="debugchance" default="0" />
 		<param name="debugchance2" default="0" />
 	</params>
+	<init>
+		<set_command command="command.freetrade" />
+	</init>
 	<attention min="unknown">
 		<actions>
 			<!-- set up initial state for trade runs -->
@@ -27,9 +30,9 @@
 			<set_value name="$buyoffer" exact="null" />
 			<set_value name="$selloffer" exact="null" />
 
-			<set_value name="$idletime" min="10s" max="30s" />
+			<set_value name="$idletime" exact="this.$jlp_unitrader_waittime" />
 
-			<run_script name="'move.idle'" sinceversion="2">
+			<run_script name="'move.idle'" sinceversion="1">
 				<param name="TimeOut" value="$idletime" />
 			</run_script>
 
@@ -70,43 +73,27 @@
 				</do_else>
 			</do_if>
 
-			<!-- TODO use ware basket unless it has been overridden by parameter -->
+			<!-- TODO use default ware list unless it has been overridden by parameter -->
 			<do_if value="$warelist == null">
-				<set_value name="$warelist" exact="this.ship.warebasket.list" />
+
 			</do_if>
 
-			<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 800">
-				<set_value name="$ActualZone" exact="this.zone" />
-				<run_script name="'move.refuel'" sinceversion="2" />
-				<do_if value="this.zone != $ActualZone">
-					<run_script name="'move.generic'" sinceversion="2">
-						<param name="destination" value="$ActualZone" />
-					</run_script>
-				</do_if>
-			</do_if>
 
 			<label name="find trade run" />
 
-			<wait exact="this.$jlp_unitrader_searchtime" />
+
 
 			<do_if value="@this.ship.dockslot.component.external">
 				<!-- make sure we clear the docking area asap -->
-				<run_script name="'move.undock'" sinceversion="2" />
+				<run_script name="'move.undock'" sinceversion="1" />
 				<set_value name="$idletime" min="10s" max="30s" />
-				<run_script name="'move.idle'" sinceversion="2">
+				<run_script name="'move.idle'" sinceversion="1">
 					<param name="TimeOut" value="$idletime" />
 				</run_script>
 			</do_if>
 
-			<!--Patch in $debugchance2, $sellrange and $buyrange -->
-			<do_if value="not $sellrange?">
-				<set_value name="$debugchance2" exact="0" />
-				<set_value name="$sellrange" exact="null" />
-				<set_value name="$buyrange" exact="null" />
-			</do_if>
-
 			<run_script name="'jlp.unitrader.trade.findfreetraderun'"
-				sinceversion="2"
+				sinceversion="1"
 			>
 				<param name="warelist" value="$warelist" />
 				<param name="range" value="$range" />
@@ -120,42 +107,49 @@
 
 			<!--If no trade was found then at least fly back to the closest area before
 				checking again -->
-			<do_if value="not $selloffer.available and not $buyoffer.available">
-				<set_value name="this.$trade_failedfindruns" operation="add" />
-
-				<find_sector name="$closestRegions" known="true"
-					multiple="true"
-				>
-					<match_distance object="this.ship" min="$buyrange.{2}/2"
-						max="$buyrange.{2}" />
-					<match_selloffer wares="$warelist" />
-				</find_sector>
-				<do_if value="$closestRegions.count">
-					<set_value name="$moveto" exact="false" />
-
-					<!--Check if we are already in the buy area -->
-					<do_all exact="$closestRegions.count" counter="$Counter">
-						<do_if value="this.ship.hascontext.{$closestRegions.{$Counter}}"
-							negate="true"
-						>
-							<set_value name="$moveto" exact="true" />
-							<break />
-						</do_if>
-					</do_all>
-					<do_if value="$moveto">
-						<debug_text
-							text="'No trade was found and we are outside of the buy range. Flying back to buy range.'" />
-						<run_script name="'move.generic'" sinceversion="2">
-							<param name="destination" value="$closestRegions.random" />
-						</run_script>
-					</do_if>
-					<remove_value name="$moveto" />
+			<do_if value="this.$trade_failedfindruns" min="4">
+				<set_value name="$onlyKnown" exact="true"
+					chance="100-this.$jlp_unitrader_courage" />
+				<!-- TODO search for tradeoffer with warelist -->
+				<do_if value="$onlyKnown">
+					<find_sector name="$closestRegions" multiple="true"
+						known="true"
+					>
+						<match_distance object="this.ship">
+							<min exact="1" />
+							<max exact="2" />
+						</match_distance>
+						
+					</find_sector>
 				</do_if>
+				<do_else>
+					<find_sector name="$closestRegions" multiple="true"
+						known="false"
+					>
+						<match_distance object="this.ship" >
+							<min exact="1" />
+							<max exact="2" />
+						</match_distance>
+					</find_sector>
+				</do_else>
+
+				<debug_text
+					text="'No trade was found. Flying to other regions.'" />
+				<set_value name="this.$trade_failedfindruns" exact="0" />
+				<run_script name="'move.generic'" sinceversion="1">
+					<param name="destination" value="$closestRegions.random" />
+				</run_script>
+			</do_if>
+			<do_if value="not $selloffer.available or not $buyoffer.available">
+				<set_value name="this.$trade_failedfindruns" operation="add"
+					exact="1" />
+				<wait exact="this.$jlp_unitrader_searchtime" sinceversion="1" />
 				<resume label="find trade run" />
 			</do_if>
 
 			<label name="perform trade run" />
 
+			<wait exact="this.$jlp_unitrader_searchtime" sinceversion="1" />
 			<set_value name="this.$trade_failedfindruns" exact="0" />
 
 			<!-- remember for notification -->
@@ -180,8 +174,25 @@
 			<set_value name="$profit" exact="0" />
 			<set_value name="$success" exact="false" />
 			<do_while value="$selloffer.available or $buyoffer.available">
+				<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl">
+					<do_if value="@$buyoffer.available">
+						<get_jump_cost ship="this.ship" start="this.ship.sector"
+							end="$buyoffer.buyer.sector" result="$trip" />
+						<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 1">
+							<run_script name="'move.refuel'" sinceversion="1" />
+						</do_if>
+					</do_if>
+					<do_if value="not @$buyoffer.available and  @$selloffer.available">
+						<get_jump_cost ship="this.ship" start="this.ship.sector"
+							end="$selloffer.seller.sector" result="$trip" />
+						<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 1">
+							<run_script name="'move.refuel'" sinceversion="1" />
+						</do_if>
+					</do_if>
+				</do_if>
+
 				<run_script name="'jlp.unitrader.trade.performtraderun'"
-					sinceversion="2"
+					sinceversion="1"
 				>
 					<param name="selloffer" value="$selloffer" />
 					<param name="buyoffer" value="$buyoffer" />
@@ -190,9 +201,6 @@
 					<save_retval name="traderesult" variable="$traderesult" />
 				</run_script>
 
-				<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 800">
-					<run_script name="'move.refuel'" sinceversion="2" />
-				</do_if>
 				<do_if value="not $success">
 					<set_value name="$selloffer" exact="null" />
 					<set_value name="$buyoffer" exact="null" />
@@ -212,7 +220,7 @@
 						<set_value name="$priceSell" exact="$traderesult.{4}" />
 					</do_if>
 				</do_if>
-
+				<wait min="500ms" max="1s" sinceversion="1" />
 			</do_while>
 
 			<do_if value="$success">
@@ -258,17 +266,12 @@
 								known="true" />
 							<wait min="4s" max="9s" />
 							<add_faction_relation faction="faction.player"
-								otherfaction="$Buyer.owner" value="this.$jlp_unitrader_extrafaction/1000000" />
+								otherfaction="$Buyer.owner" value="this.$jlp_unitrader_extrafaction/100000" />
 							<wait min="4s" max="9s" />
-							<add_player_discount name="$notiDearsPilot"
+							<add_player_discount name="$notiDearsShip"
 								amount="$CommissionAmount" entity="$BuyerEntity" time="$CommissionTime" />
-							<!-- <find_buy_offer result="$StationOffers" buyer="$Buyer"
-								tradepartner="this.ship" usereservations="false" multiple="true"
-								knowntoplayer="false"/>
-								<do_all exact="$StationOffers.count" counter="$Counter">
-								<set_known object="$StationOffers.{$Counter}" known="true"/>
-								</do_all>
-							-->
+							<set_value name="$Buyer.$jlp_unitrader_lastDiscount"
+								exact="player.age" />
 						</do_if>
 					</do_if>
 				</do_if>
@@ -282,17 +285,10 @@
 								known="true" />
 							<wait min="4s" max="9s" />
 							<add_faction_relation faction="faction.player"
-								otherfaction="$Seller.owner" value="this.$jlp_unitrader_extrafaction/1000000" />
+								otherfaction="$Seller.owner" value="this.$jlp_unitrader_extrafaction/100000" />
 							<wait min="4s" max="9s" />
-							<add_player_commission name="$notiDearsPilot"
+							<add_player_commission name="$notiDearsShip"
 								amount="$CommissionAmount" entity="$SellerEntity" time="$CommissionTime" />
-							<!-- <find_sell_offer result="$StationOffers" seller="$Seller"
-								tradepartner="this.ship" usereservations="false" multiple="true"
-								knowntoplayer="false"/>
-								<do_all exact="$StationOffers.count" counter="$Counter">
-								<set_known object="$StationOffers.{$Counter}" known="true"/>
-								</do_all>
-							-->
 						</do_if>
 					</do_if>
 				</do_if>
@@ -300,7 +296,7 @@
 					<!-- is success when offer is gone and trade is succesfull -->
 					<do_if value="@$Buyer.exists and @$Seller.exists">
 						<substitute_text text="$detail1" source="{8570,50400}">
-							<replace string="'$SHIP$'" with="$notiDearsPilot" />
+							<replace string="'$SHIP$'" with="$notiDearsShip" />
 							<replace string="'$PROFIT$'" with="$profit" />
 							<replace string="'$WARE$'" with="$traderesult.{3}" />
 							<replace string="'$AMOUNT$'" with="$traderesult.{2}" />
@@ -312,7 +308,7 @@
 						<wait min="4s" max="9s" />
 						<write_to_logbook category="squad" text="$detail1" />
 
-						<run_script name="'jlp.unitrader.skills'" sinceversion="2">
+						<run_script name="'jlp.unitrader.skills'" sinceversion="1">
 							<param name="Mode" value="'learn'" />
 							<param name="debugchance" value="$debugchance" />
 						</run_script>

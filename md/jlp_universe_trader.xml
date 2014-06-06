@@ -10,7 +10,7 @@
 						section="gOrders_advanced" />
 					<event_conversation_returned_to_section
 						sectionprefix="gOrders_advanced" />
-					<!-- <event_cue_completed cue="md.BKCommMenu.Setup" /> <!- TODO need 
+					<!-- <event_cue_completed cue="md.BKCommMenu.Setup" /> <!- TODO need
 						this?? -->
 					<check_all>
 						<event_player_created />
@@ -31,12 +31,11 @@
 							<add_conversation_view view="facenormal" />
 						</do_if>
 
-						<add_player_choice_sub text="{8570,1000}"
-							position="right" section="JLPUniTrade_autotrade_select"
-							baseparam="event.param2" />
-						<set_conversation_return_section
-								section="gOrders_advanced" />
-
+						<add_player_choice text="{8570,1000}" position="right"
+							section="JLPUniTrade_autotrade_select" />
+						<!-- <set_conversation_return_section
+							section="gOrders_advanced" />
+						-->
 					</do_if>
 				</do_if>
 			</actions>
@@ -208,22 +207,15 @@
 				<set_value name="$Captain" exact="event.object" />
 				<set_value name="$Captain.$jlpUniTraderRun" exact="true" />
 				<set_value name="$Captain.$jlpUniMiningRun" exact="false" />
-				<!-- genreal config ###not used yet###, can't read from 't' after PageId
+				<!-- TODO general config ###not used yet###, can't read from 't' after 
+					PageId
 					is used in Parameter of other script and i call {$..,$..} -->
 				<set_value name="$PageId" exact="8570i" />
 				<!-- MaxBudget in ct -->
 				<set_value name="$maxBudget" exact="100000000ct" />
 				<!-- MinBudget in ct -->
 				<set_value name="$minBudget" exact="10000000ct" />
-				<!--Trade config -->
-				<!--minBuy Jumps -->
-				<set_value name="$minbuy" exact="0i" />
-				<!--maxBuy Jumps -->
-				<set_value name="$maxbuy" exact="25i" />
-				<!--minSell Jumps -->
-				<set_value name="$minsell" exact="0i" />
-				<!--maxSell Jumps -->
-				<set_value name="$maxsell" exact="25i" />
+
 
 				<set_value name="$capship"
 					exact="$Captain.ship.isclass.ship_l or $Captain.ship.isclass.ship_xl" />
@@ -252,20 +244,11 @@
 
 				<start_script object="$Captain" name="'jlp.unitrader.trading'">
 					<param name="PageId" value="8570i" />
-					<param name="maxBudget" value="$maxBudget" />
-					<param name="minbuy" value="$minbuy" />
-					<param name="maxbuy" value="$maxbuy" />
-					<param name="minsell" value="$minsell" />
-					<param name="maxsell" value="$maxsell" />
 				</start_script>
 				<remove_value name="$Captain" />
 				<remove_value name="$PageId" />
 				<remove_value name="$maxBudget" />
 				<remove_value name="$minBudget" />
-				<remove_value name="$minbuy" />
-				<remove_value name="$maxbuy" />
-				<remove_value name="$minsell" />
-				<remove_value name="$maxsell" />
 			</actions>
 		</cue>
 

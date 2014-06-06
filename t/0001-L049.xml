@@ -31,10 +31,10 @@
 			<t id="10000">%1: '%2' Ich konnte keine Ware in diesen Cluster zum Schürfen finden!</t>
 			
 			<t id="50000">%1: '%2' Verkaufte '%3' von '%4' vorhandene Lagermenge %5 für %6 %7Cr Stückpreis. Verkaufte an '%8' gewünschte Lagermenge%9 für %10Cr %11Cr Stückpreis.</t>
-            <t id="50100">%1: '%2' Ich überweise den Rest meines Budget über %3Cr.</t>
+            <t id="50100">%1: '%2' Ich überweise den Rest meines Budget über %3 Cr.</t>
             <t id="50200">%1: '%2' Ich habe beim %3 Skill um 1 Stern dazugelernt \(%4 Sterne\).</t>
             <t id="50210">Meine Skills sind:\n Organisationtalent:     '$WAITTIME$s'\n Technisches Talent:'  '$SEARCHTIME$s'\n Austrahlungsbonus:  '$EXTRAFACTION$%'\n Mut:                              '$COURAGE$%'\n Effektivität:                     '$EFFICIENCY$%'.</t>
-			<t id="50300">Ich habe ein Handel gefunden.\n Ware: '$TRADEWARE$  \('$WAREPRICEMIN$.$WAREPRICEMINCT$Cr' - '$WAREPRICEMAX$.$WAREPRICEMINCT$Cr'\)'    Volumen: '$TRADEWAREVOLUME$'.\n Kaufpreis: '$WAREPRICESELLOFFER$.$WAREPRICESELLOFFERCT$Cr' Verkaufspreis: '$WAREPRICEBUYOFFER$.$WAREPRICEBUYOFFERCT$Cr'</t>
+			<t id="50300">Ich habe ein Handel gefunden.\n Ware: '$TRADEWARE$  \('$WAREPRICEMIN$.$WAREPRICEMINCT$ Cr' - '$WAREPRICEMAX$.$WAREPRICEMINCT$ Cr'\)'    Volumen: '$TRADEWAREVOLUME$'.\n Kaufpreis: '$WAREPRICESELLOFFER$.$WAREPRICESELLOFFERCT$ Cr' Verkaufspreis: '$WAREPRICEBUYOFFER$.$WAREPRICEBUYOFFERCT$ Cr'</t>
 			<t id="50301">'$TRADESOURCE$ \(max: $TRADESOURCEAMOUNT$\)' mit\n '$TRADEDESTINATION$  \(max: '$TRADEDESTAMOUNT$'\)'</t>
 			<t id="50310">Ich konnte $AMOUNTKAT$ von '$AMOUNT$' \(max: '$SHIPAMOUNTMAX$'\) aushandeln.</t>
 			<t id="50320">eine große Menge</t>
@@ -43,7 +43,7 @@
 			<t id="50323">eine unterdurschnittliche Menge</t>
 			<t id="50324">eine schlechte Menge</t>
 			
-			<t id="50400">$SHIP$\n Ich habe erfolgreich ein Handel getätigt.\n Ware: $WARE$ verk. Menge: $AMOUNT$\n Einkaufspreis: $PRICEBUY$ Verkaufspreis: $PRICESELL$ \n Profit: $PROFIT$ </t>
+			<t id="50400">$SHIP$\n Ich habe erfolgreich ein Handel getätigt.\n Ware: $WARE$ verk. Menge: $AMOUNT$\n Einkaufspreis: $PRICEBUY$ Cr Verkaufspreis: $PRICESELL$ Cr\n Profit: $PROFIT$ Cr</t>
            
 
 			

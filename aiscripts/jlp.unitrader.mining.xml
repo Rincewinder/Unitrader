@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 <aiscript name="jlp.unitrader.mining" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="1"
+	xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="2"
 >
 	<params>
 		<param name="PageId" default="8570" />
@@ -9,7 +9,7 @@
 	</params>
 
 	<interrupts>
-		<handler ref="JLPUnnitraderShipOwnedAttackedHandler" />
+		<handler ref="JLPUnitraderShipOwnedAttackedHandler" />
 		<handler ref="JLPUnitraderScannedHandler" />
 <!--
  		<handler>
@@ -45,14 +45,13 @@
 		</handler>
 	-->
 		</interrupts>
-	<init>
-		<set_command command="command.wait" />
-	</init>
+
 	<attention min="unknown">
 		<actions>
 
 			<!-- trade loop start -->
 			<label name="start" />
+			<set_command_action commandaction="commandaction.standingby" />
 			<wait chance="0" /> <!-- Reset script if new -->
 			<!-- initial -->
 			<set_actor_account actor="this" min="0ct" max="$maxBudget*10" />

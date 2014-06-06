@@ -4,38 +4,35 @@
 >
 	<params>
 		<param name="PageId" default="8570" />
-		<param name="maxBudget" default="500000000ct" />
-		<param name="minbuy" default="0" />
-		<param name="maxbuy" default="25" />
-		<param name="minsell" default="0" />
-		<param name="maxsell" default="25" />
+
 		<param name="debugchance" default="0" />
 	</params>
 	<interrupts>
-		<handler ref="JLPUnnitraderShipOwnedAttackedHandler" />
+		<handler ref="JLPUnitraderShipOwnedAttackedHandler" />
 		<handler ref="JLPUnitraderScannedHandler" />
 		<!-- Stop ORDERS -->
-<!-- TODO: I send a signal from md script, but this wont call
-		<handler>
+		<!-- TODO: I send a signal from md script, but this wont call
+			<handler>
 			<conditions>
-				<event_object_signalled object="this.ship"
-					param="'stop order'" />
-				<check_value value="this.command.value != command.follow" />
-				<check_value
-					value="(not @this.$shiptrader_docking) and (not @this.$ship_parking) and (not this.ship.dockslot) and (not this.ship.docklink)" />
+			<event_object_signalled object="this.ship"
+			param="'stop order'" />
+			<check_value value="this.command.value != command.follow" />
+			<check_value
+			value="(not @this.$shiptrader_docking) and (not @this.$ship_parking) and 
+			(not this.ship.dockslot) and (not this.ship.docklink)" />
 			</conditions>
 			<actions>
-				<set_value name="$command" exact="this.command.value" />
-				<run_interrupt_script name="'jlp.interrupt.stoporder'"
-					abortscripts="true"
-				>
-					<param name="prevcommand" value="$command" />
-				</run_interrupt_script>
+			<set_value name="$command" exact="this.command.value" />
+			<run_interrupt_script name="'jlp.interrupt.stoporder'"
+			abortscripts="true"
+			>
+			<param name="prevcommand" value="$command" />
+			</run_interrupt_script>
 
 			</actions>
-		</handler>
+			</handler>
 
-		
+
 			<handler>
 			<conditions>
 			<event_object_money_updated object="this" />
@@ -53,20 +50,28 @@
 			</handler>
 		-->
 	</interrupts>
-	<init>
-		<set_command command="command.wait"/>
-	</init>
 	<attention min="unknown">
 		<actions>
 
 			<!-- trade loop start -->
 			<label name="start" />
-			<wait chance="0" /> <!-- Reset script if new -->
-			<!-- initial -->
-			<set_actor_account actor="this" min="0ct" max="$maxBudget*10" />
-
-
+			<wait chance="0" exact="0s" /> <!-- Reset script if new -->
 			<do_if value="this.$jlpUniTraderRun" exact="true">
+
+				<!-- initial -->
+				<!-- TODO read from config -->
+				<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl">
+					<set_value name="$maxBudget" exact="1000000000ct" />
+				</do_if>
+				<do_else>
+					<set_value name="$maxBudget" exact="100000000ct" />
+				</do_else>
+				<set_value name="$minbuy" exact="0" />
+				<set_value name="$maxbuy" exact="25" />
+				<set_value name="$minsell" exact="0" />
+				<set_value name="$maxsell" exact="25" />
+				<set_actor_min_budget actor="this" amount="0ct" />
+				<set_actor_max_budget actor="this" amount="$maxBudget*10ct" />
 
 				<!--<set_actor_max_budget actor="this" amount="$MaxBudget"/> -->
 				<!-- check maxbudget and give the rest to player -->
@@ -85,7 +90,7 @@
 					<param name="Mode" value="'init'" />
 					<param name="debugchance" value="$debugchance" />
 				</run_script>
-				<wait min="4s" max="9s" />
+				<wait min="4s" max="9s" sinceversion="1"/>
 				<run_script name="'jlp.unitrader.trade.ship.ranged'"
 					sinceversion="1"
 				>
@@ -96,8 +101,7 @@
 					<param name="maxsell" value="$maxsell" />
 					<param name="debugchance" value="$debugchance" />
 				</run_script>
-            <!-- Take a break -->
-				<wait exact="this.$jlp_unitrader_waittime" sinceversion="1"/>
+
 
 				<resume label="start" />
 			</do_if>

@@ -81,6 +81,7 @@
 
       <!-- Remove blackboard variable to check if is in the middle of parking -->
       <remove_value name="this.$ship_parking" />
+      <set_value name="this.$trade_failedfindruns" exact="0"  />
 
     </actions>
   </attention>

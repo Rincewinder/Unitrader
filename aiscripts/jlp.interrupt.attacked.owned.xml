@@ -10,7 +10,7 @@
   </params>
   <interrupts>
     <library>
-      <handler name="JLPUnnitraderShipOwnedAttackedHandler">
+      <handler name="JLPUnitraderShipOwnedAttackedHandler">
         <conditions>
           <event_object_signalled object="this.defensible" param="'ShipOwnedAttacked'" />
           <!-- <check_value value="this.defensible.attention" max="attention.inzone" /> -->

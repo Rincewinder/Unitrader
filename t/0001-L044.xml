@@ -32,10 +32,10 @@
 			<t id="10000">%1: '%2' unable to find any ware that can be collected by this ship in this cluster!</t>
 			
 			<t id="50000">%1: '%2' Trade '%3'  from '%4' \(available amount: %5 \) for '%6'\(%7Cr price per unit\).  Sell to '%8' \(wanted amount %9\) for '%10' \(%11Cr price per unit\)</t>
-            <t id="50100">%1: '%2' Transfer the differences from my max Budget by %3Cr.</t>
+            <t id="50100">%1: '%2' Transfer the differences from my max Budget by %3 Cr.</t>
             <t id="50200">%1: '%2' I trained following skills %3 \(Stars:%4\).</t>
 			<t id="50210">My skills are:\n arrangement talent:    '$WAITTIME$s'\n technical understand: '$SEARCHTIME$s'\n Charisma:                '$EXTRAFACTION$%'\n Courage:                      '$COURAGE$%'\n Efficiency:                       '$EFFICIENCY$'.</t>
-			<t id="50300">I found a deal. I want buy ware '$TRADEWARE$  \($WAREPRICEMIN$.$WAREPRICEMINCT$Cr - $WAREPRICEMAX$.$WAREPRICEMAXCT$Cr\)'    Volume: '$TRADEWAREVOLUME$'.\n Buy price '$WAREPRICESELLOFFER$.$WAREPRICESELLOFFERCT$Cr' Sell Price '$WAREPRICEBUYOFFER$.$WAREPRICEBUYOFFERCT$Cr'</t>
+			<t id="50300">I found a deal. I want buy ware '$TRADEWARE$  \($WAREPRICEMIN$.$WAREPRICEMINCT$ Cr - $WAREPRICEMAX$.$WAREPRICEMAXCT$ Cr\)'    Volume: '$TRADEWAREVOLUME$'.\n Buy price '$WAREPRICESELLOFFER$.$WAREPRICESELLOFFERCT$ Cr' Sell Price '$WAREPRICEBUYOFFER$.$WAREPRICEBUYOFFERCT$ Cr'</t>
 			<t id="50301">'$TRADESOURCE$ \(max: $TRADESOURCEAMOUNT$\)' with\n '$TRADEDESTINATION$  \(max: '$TRADEDESTAMOUNT$'\)</t>
 			<t id="50310">I negotiate $AMOUNTKAT$ of '$AMOUNT$' \(max offer: '$SHIPAMOUNTMAX$'\).</t>
 			
@@ -45,7 +45,7 @@
 			<t id="50323">little amount</t>
 			<t id="50324">poor amount</t>			
 			
-			<t id="50400">$SHIP$\n I'm successfully make a Deal.\n Ware: $WARE$ Amount: $AMOUNT$\n Buy price: $PRICEBUY$ Sell price: $PRICESELL$ \n Profit: $PROFIT$</t>
+			<t id="50400">$SHIP$\n I'm successfully make a Deal.\n Ware: $WARE$ Amount: $AMOUNT$\n Buy price: $PRICEBUY$ Cr Sell price: $PRICESELL$ Cr \n Profit: $PROFIT$ Cr</t>
 			
 
         </page>
