@@ -115,21 +115,14 @@
 					<find_sector name="$closestRegions" multiple="true"
 						known="true"
 					>
-						<match_distance object="this.ship">
-							<min exact="1" />
-							<max exact="2" />
-						</match_distance>
-						
+						<match_distance object="this.ship" space="player.galaxy" min="1000km"/>
 					</find_sector>
 				</do_if>
 				<do_else>
 					<find_sector name="$closestRegions" multiple="true"
 						known="false"
 					>
-						<match_distance object="this.ship" >
-							<min exact="1" />
-							<max exact="2" />
-						</match_distance>
+						<match_distance object="this.ship" space="player.galaxy" min="1000km" />
 					</find_sector>
 				</do_else>
 
