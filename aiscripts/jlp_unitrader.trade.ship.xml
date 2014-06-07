@@ -136,7 +136,7 @@
 
 				<wait min="200ms" max="800ms" sinceversion="1" />
 				<create_list name="$tradeoffers" />
-				<write_to_logbook category="squad"
+				<debug_text chance="$debugchance2"
 					text="player.age + ': '  + this.ship.name + ': ' + this.name + ' sectors %1'.[$sectors.count]" />
 				<do_all exact="$sectors.count" counter="$Counter">
 					<wait min="20ms" max="80ms" />
@@ -164,7 +164,7 @@
 						</do_if>
 					</do_all>
 				</do_all>
-				<write_to_logbook category="squad"
+				<debug_text chance="$debugchance2"
 						text="player.age + ': '  + this.ship.name + ': ' + this.name + ' Found tradeoffers %1'.[$tradeoffers.count]" />
 				
 				<do_if value="$tradeoffers.count" min="1">
@@ -179,7 +179,7 @@
 						reverse="true"
 					>
 						<do_if value="$tradeoffersSort.{$Counter}.available">
-							<write_to_logbook category="squad"
+							<debug_text chance="$debugchance2"
 								text="player.age + ': ' + this.ship.name + ': ' + this.name + ' fly to %1 / %2 / %3 '.[$tradeoffersSort.{$Counter}.seller.sector.knownname, $tradeoffersSort.{$Counter}.seller.zone.knownname, $tradeoffersSort.{$Counter}.seller.knownname]" />
 							<get_jump_cost ship="this.ship" start="this.ship.sector"
 								end="$tradeoffersSort.{$Counter}.seller.sector" result="$trip" />
