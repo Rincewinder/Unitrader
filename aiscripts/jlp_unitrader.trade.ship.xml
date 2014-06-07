@@ -111,7 +111,7 @@
 			<do_if value="this.$trade_failedfindruns" min="4">
 				<debug_text
 					text="'No trade was found. Flying to other regions. %1'.[this.$trade_failedfindruns]" />
-				<write_to_logbook category="squad"
+				<debug_text chance="$debugchance2"
 					text="player.age + ': '  + this.ship.name + ': ' + this.name + ' No trade was found. Flying to other regions.'" />
 
 				<set_value name="$onlyKnown" exact="true"
