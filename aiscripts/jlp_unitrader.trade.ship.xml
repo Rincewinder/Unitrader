@@ -105,33 +105,99 @@
 				<save_retval name="buyoffer" variable="$buyoffer" />
 			</run_script>
 
-			<!--If no trade was found then at least fly back to the closest area before
+			<!--If no trade was found then at least fly to the closest area where
+				can buy before
 				checking again -->
 			<do_if value="this.$trade_failedfindruns" min="4">
+				<debug_text
+					text="'No trade was found. Flying to other regions. %1'.[this.$trade_failedfindruns]" />
+				<write_to_logbook category="squad"
+					text="player.age + ': '  + this.ship.name + ': ' + this.name + ' No trade was found. Flying to other regions.'" />
+
 				<set_value name="$onlyKnown" exact="true"
 					chance="100-this.$jlp_unitrader_courage" />
-				<!-- TODO search for tradeoffer with warelist -->
-				<do_if value="$onlyKnown">
-					<find_sector name="$closestRegions" multiple="true"
-						known="true"
+				<!--search for tradeoffer with warelist in Galaxy sort by distance -->
+				<set_command_action commandaction="commandaction.standingby" />
+				<wait exact="this.$jlp_unitrader_searchtime" sinceversion="1" />
+
+				<do_if value="$buyrange">
+					<find_sector space="player.galaxy" multiple="true"
+						name="$sectors" known="true"
 					>
-						<match_distance object="this.ship" space="player.galaxy" min="1000km"/>
+						<match_gate_distance object="this.ship">
+							<max min="$buyrange.{1}]" max="$buyrange.{2}" />
+						</match_gate_distance>
 					</find_sector>
 				</do_if>
 				<do_else>
-					<find_sector name="$closestRegions" multiple="true"
-						known="false"
-					>
-						<match_distance object="this.ship" space="player.galaxy" min="1000km" />
-					</find_sector>
+					<find_sector space="$range" multiple="true" name="$sectors"
+						known="true" />
 				</do_else>
 
-				<debug_text
-					text="'No trade was found. Flying to other regions.'" />
+				<wait min="200ms" max="800ms" sinceversion="1" />
+				<create_list name="$tradeoffers" />
+				<write_to_logbook category="squad"
+					text="player.age + ': '  + this.ship.name + ': ' + this.name + ' sectors %1'.[$sectors.count]" />
+				<do_all exact="$sectors.count" counter="$Counter">
+					<wait min="20ms" max="80ms" />
+					<do_if value="$sectors.{$Counter} == this.ship.sector">
+						<continue />
+					</do_if>
+					<find_sell_offer tradepartner="this.ship" result="$tradeoffer"
+						multiple="true" space="$sectors.{$Counter}" wares="$warelist"
+						knowntoplayer="$onlyKnown"
+					>
+						<relativeprice min="0.7" />
+						<match_seller >
+							<match_any>
+								<match_relation faction="faction.player"
+									comparison="exact" relation="friend" />
+								<match_relation faction="faction.player"
+									comparison="exact" relation="neutral" />
+							</match_any>
+						</match_seller>
+						<offeramount entity="this" min="1" />
+					</find_sell_offer>
+					<do_all exact="$tradeoffer.count" counter="$Counter2">
+						<do_if value="this.ship.cargo.{$tradeoffer.{$Counter2}.ware}.max" min="1">
+							<append_to_list name="$tradeoffers" exact="$tradeoffer.{$Counter2}" />
+						</do_if>
+					</do_all>
+				</do_all>
+				<write_to_logbook category="squad"
+						text="player.age + ': '  + this.ship.name + ': ' + this.name + ' Found tradeoffers %1'.[$tradeoffers.count]" />
+				
+				<do_if value="$tradeoffers.count" min="1">
+					<wait min="200ms" max="800ms" sinceversion="1" />
+					<create_list name="$tradeoffersSort" />
+
+					<sort_trades name="$tradeoffersSort" tradelist="$tradeoffers.clone"
+						sorter="relativeprice"  />
+					<wait min="200ms" max="800ms" sinceversion="1" />
+					<remove_value name="$tradeoffers" />
+					<do_all exact="$tradeoffersSort.count" counter="$Counter"
+						reverse="true"
+					>
+						<do_if value="$tradeoffersSort.{$Counter}.available">
+							<write_to_logbook category="squad"
+								text="player.age + ': ' + this.ship.name + ': ' + this.name + ' fly to %1 / %2 / %3 '.[$tradeoffersSort.{$Counter}.seller.sector.knownname, $tradeoffersSort.{$Counter}.seller.zone.knownname, $tradeoffersSort.{$Counter}.seller.knownname]" />
+							<get_jump_cost ship="this.ship" start="this.ship.sector"
+								end="$tradeoffersSort.{$Counter}.seller.sector" result="$trip" />
+							<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 200">
+								<run_script name="'move.refuel'" sinceversion="1" />
+							</do_if>
+
+							<wait min="20ms" max="80ms" />
+							<run_script name="'move.generic'" sinceversion="1">
+								<param name="destination" value="$tradeoffersSort.{$Counter}.seller" />
+							</run_script>
+							<break />
+						</do_if>
+					</do_all>
+					<remove_value name="$tradeofferSort" />
+				</do_if>
 				<set_value name="this.$trade_failedfindruns" exact="0" />
-				<run_script name="'move.generic'" sinceversion="1">
-					<param name="destination" value="$closestRegions.random" />
-				</run_script>
+				<resume label="find trade run" />
 			</do_if>
 			<do_if value="not $selloffer.available or not $buyoffer.available">
 				<set_value name="this.$trade_failedfindruns" operation="add"
@@ -204,13 +270,13 @@
 				<do_if value="$success">
 					<do_if value="@$selloffer.available" negate="true">
 						<set_value name="$profit" exact="$traderesult.{4}"
-							operation="subtract" />
-						<set_value name="$priceBuy" exact="$traderesult.{4}" />
+							operation="add" />
+						<set_value name="$priceSell" exact="$traderesult.{4}" />
 					</do_if>
 					<do_if value="@$buyoffer.available" negate="true">
 						<set_value name="$profit" exact="$traderesult.{4}"
-							operation="add" />
-						<set_value name="$priceSell" exact="$traderesult.{4}" />
+							operation="subtract" />
+						<set_value name="$priceBuy" exact="$traderesult.{4}" />
 					</do_if>
 				</do_if>
 				<wait min="500ms" max="1s" sinceversion="1" />
@@ -263,8 +329,6 @@
 							<wait min="4s" max="9s" />
 							<add_player_discount name="$notiDearsShip"
 								amount="$CommissionAmount" entity="$BuyerEntity" time="$CommissionTime" />
-							<set_value name="$Buyer.$jlp_unitrader_lastDiscount"
-								exact="player.age" />
 						</do_if>
 					</do_if>
 				</do_if>

@@ -97,7 +97,7 @@
 					<remove_ware_reservation object="$targetobject"
 						entity="this" />
 				</do_if>
-				
+
 				<return>
 					<retval name="traderesult" value="0" />
 					<retval name="success" value="false" />
@@ -274,7 +274,7 @@
 									text="player.age + 'Choose this Trade for my skills:\n %1\n %2\n %3 \n %4'.[$notiDears, $detail1, $detail2, $detail3]"
 									chance="$debugchance" />
 
-								<wait min="3s" max="9s" sinceversion="1"/>
+								<wait min="3s" max="9s" sinceversion="1" />
 								<write_to_logbook category="squad"
 									text="'%1\n %2\n %3 \n %4'.[$notiDears, $detail1, $detail2, $detail3]" />
 								<resume label="move to target object" />
@@ -522,45 +522,44 @@
 
 
 					<!-- now execute the trade -->
-					<wait min="1s" max="3s" sinceversion="1"/>
+					<wait min="1s" max="3s" sinceversion="1" />
 					<execute_trade tradeoffer="$tradeoffer" tradepartner="this.ship"
 						amount="$amount" result="$traderesult" unbundle="@$tradeoffer.unbundle"
 					>
 						<interrupt_after_time time="121min" />
 					</execute_trade>
-
-					<!-- keep this block for savegame compatibility for now -->
-					<do_if value="$tradeoffer.exists">
-						<!-- prepare texts for notifcation since the actual trade can be deleted
-							by the time this is displayed! -->
-						<set_value name="$price"
-							exact="($tradeoffer.transferredamount + $tradeoffer.destroyedamount) * $tradeoffer.unitprice" />
-						<set_value name="$PRICE" exact="$price / 100" />
-						<set_value name="$WARE" exact="$tradeoffer.ware.name" />
-						<set_value name="$AMOUNT" exact="0" />
-						<do_if value="@$tradeoffer.seller">
-							<set_value name="$AMOUNT" exact="$tradeoffer.transferredamount" />
-						</do_if>
-						<do_elseif value="@$tradeoffer.buyer">
-							<set_value name="$AMOUNT"
-								exact="$tradeoffer.transferredamount + $tradeoffer.destroyedamount" />
-						</do_elseif>
-						<set_value name="$tradedetails"
-							exact="[$targetobject, $AMOUNT, $WARE, $PRICE]" />
-					</do_if>
-
-
 					<do_if value="@$isbuyoffer">
 						<!-- buyoffers remove their reservation directly after the trade -->
 						<remove_ware_reservation object="$targetobject"
 							entity="this" ware="$tradeware" virtual="@$tradeoffer.unbundle" />
 					</do_if>
-					<wait min="3s" max="9s" sinceversion="1"/>
+
+					<!-- keep this block for savegame compatibility for now -->
+					<do_if value="$tradeoffer.exists">
+						<!-- prepare texts for notifcation since the actual trade can be deleted
+							by the time this is displayed! -->
+						<set_value name="$WARE" exact="$tradeoffer.ware.name" />
+						<set_value name="$AMOUNT" exact="0" />
+						<do_if value="@$tradeoffer.seller">
+							<set_value name="$AMOUNT" exact="$tradeoffer.transferredamount + $tradeoffer.destroyedamount" />
+						</do_if>
+						<do_elseif value="@$tradeoffer.buyer">
+							<set_value name="$AMOUNT"
+								exact="$tradeoffer.transferredamount + $tradeoffer.destroyedamount" />
+						</do_elseif>
+						<set_value name="$price" exact="$AMOUNT * $tradeoffer.unitprice" />
+						<set_value name="$PRICE" exact="$price / 100" />
+						<set_value name="$tradedetails"
+							exact="[$targetobject, $AMOUNT, $WARE, $PRICE]" />
+					</do_if>
+
+
+					<wait min="3s" max="9s" sinceversion="1" />
 					<do_if value="@$tradeoffer.unbundle">
 						<!-- $tradeoffer.unbundle = true! in case we failed to buy ammo, trigger
 							an update for our ammo offers -->
 						<signal_objects object="$targetobject" param="'update_ammo_offers'" />
-						<wait min="1s" max="3s" sinceversion="1"/>
+						<wait min="1s" max="3s" sinceversion="1" />
 					</do_if>
 					<detach_from_masstraffic object="this.ship"
 						wait="true"
@@ -590,7 +589,7 @@
 				<resume label="finish" />
 			</do_else>
 
-			<wait min="1s" max="3s" sinceversion="1"/>
+			<wait min="1s" max="3s" sinceversion="1" />
 			<resume label="check trade offers" />
 
 			<label name="finish" />

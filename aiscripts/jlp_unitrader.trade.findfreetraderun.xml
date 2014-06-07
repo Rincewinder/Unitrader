@@ -178,11 +178,11 @@
 					<do_if value="@this.$trade_failedfindruns" min="3">
 						<set_value name="$sellvolume" exact="0" />
 					</do_if>
-					<do_elseif value="this.ship.cargo.free" max="this.ship.cargo.capacity/4">
+					<do_elseif value="this.ship.cargo.free" max="this.ship.cargo.capacity/2">
 						<!-- if we have <= 50% free cargospace, also accept buyoffers for less
 							to increase the chance of selling off cargo
 							TODO: what we do with scaldis multi cargo transportable for exampl -->
-						<set_value name="$sellvolume" exact="$minvolume/30" />
+						<set_value name="$sellvolume" exact="$minvolume/2" />
 					</do_elseif>
 
 					<debug_text
@@ -390,14 +390,7 @@
 							knowntoplayer="$onlyKnownSell"
 						>
 							<totalvolume min="1" />
-							<match_seller class="class.ship_xl">
-								<match_any>
-									<match_relation faction="faction.player"
-										comparison="exact" relation="friend" />
-									<match_relation faction="faction.player"
-										comparison="exact" relation="neutral" />
-								</match_any>
-							</match_seller>
+							<match_seller class="class.ship_xl" />
 						</find_sell_offer>
 						<debug_text
 							text="player.age + ' found %1 selloffers for buildership check'.[$selloffers.count]"
@@ -423,15 +416,13 @@
 						>
 							<totalvolume min="$searchMinVolume" />
 							<relativeprice max="$relPriceMax" min="$relPriceMin" />
-							
+
 							<match_seller>
 								<match_any>
-									<match_any>
-										<match_relation faction="faction.player"
-											comparison="exact" relation="friend" />
-										<match_relation faction="faction.player"
-											comparison="exact" relation="neutral" />
-									</match_any>
+									<match_relation faction="faction.player"
+										comparison="exact" relation="friend" />
+									<match_relation faction="faction.player"
+										comparison="exact" relation="neutral" />
 								</match_any>
 							</match_seller>
 							<!--<relativeprice max="0.999999f" comment="this effectively means
@@ -492,18 +483,23 @@
 							</do_all>
 
 							<do_if value="$offerAdd" exact="true">
-								<do_if 
-									value="$selloffers.{$Counter}.ware.illegalto.{$selloffers.{$Counter}.seller.owner}.{this.ship.owner}"
+								<do_if value="this.ship.cargo.{$selloffers.{$Counter}.ware}.max"
+									min="1"
 								>
+									<do_if
+										value="$selloffers.{$Counter}.ware.illegalto.{$selloffers.{$Counter}.seller.owner}.{this.ship.owner}"
+									>
 
-									<append_to_list name="$soldwares"
-										exact="$selloffers.{$Counter}.ware" chance="this.$jlp_unitrader_courage" />
+										<append_to_list name="$soldwares"
+											exact="$selloffers.{$Counter}.ware" chance="this.$jlp_unitrader_courage" />
+									</do_if>
+									<do_else>
+										<append_to_list name="$soldwares"
+											exact="$selloffers.{$Counter}.ware" />
+									</do_else>
 								</do_if>
-								<do_else>
-									<append_to_list name="$soldwares"
-										exact="$selloffers.{$Counter}.ware" />
-								</do_else>
 							</do_if>
+
 						</do_if>
 					</do_all>
 
@@ -530,7 +526,7 @@
 								knowntoplayer="$onlyKnownBuy" usereservations="true"
 							>
 								<totalvolume min="$searchMinVolume" />
-								<relativeprice max="$relPriceMax" min="$relPriceMin"/>
+								<relativeprice max="$relPriceMax" min="$relPriceMin" />
 								<match_buyer>
 									<match_any>
 										<match_relation faction="faction.player"
@@ -618,7 +614,7 @@
 							usereservations="true"
 						>
 							<totalvolume min="$searchMinVolume" />
-							<relativeprice max="$relPriceMax"  min="$relPriceMin"/>
+							<relativeprice max="$relPriceMax" min="$relPriceMin" />
 							<match_buyer>
 								<match_any>
 									<match_relation faction="faction.player"

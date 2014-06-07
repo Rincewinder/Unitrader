@@ -19,18 +19,18 @@
 
 			<create_list name="$basket" />
 
-			<!-- <find groupname="$wares" class="class.object" tag="economy"
+<!-- 			<find_object groupname="$wares" class="class.container" tag="tag.economy"
 				space="player.galaxy" multiple="true" />
-				<do_all exact="$wares.count" counter="$Counter">
+			<do_all exact="$wares.count" counter="$Counter">
 				<do_if value="@this.ship.cargo.{$wares.{$Counter}}.max" min="1">
-				<append_to_list name="$basket" exact="$wares.{$Counter}" />
-				<write_to_logbook category="squad"
-				text="Player.age + 'have space for
+					<append_to_list name="$basket" exact="$wares.{$Counter}" />
+					<write_to_logbook category="squad"
+						text="Player.age + 'have space for
 				' + $wares.{$Counter}.name" />
 				</do_if>
-				</do_all>
+			</do_all>
+ -->
 
-			-->
 			<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 1200">
 				<run_script name="'move.refuel'" sinceversion="1" />
 			</do_if>
