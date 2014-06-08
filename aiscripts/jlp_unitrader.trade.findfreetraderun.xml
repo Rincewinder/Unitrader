@@ -194,8 +194,8 @@
 					<set_value name="$relPriceMin"
 						exact="0.0f + 0.9999999f * (1-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)/200))" />
 					<find_buy_offer tradepartner="this.ship" space="$checkrange"
-						result="$buyoffer" wares="$currentcargo" knowntoplayer="$onlyKnownBuy"
-						usereservations="true"
+						result="$buyoffers" wares="$currentcargo" knowntoplayer="$onlyKnownBuy"
+						usereservations="true" multiple="true"
 					>
 						<relativeprice max="$relPriceMax" min="$relPriceMin" />
 						<match_buyer>
