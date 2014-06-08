@@ -78,7 +78,9 @@
 
 			</do_if>
 
-
+			
+			<set_value name="this.$trade_failedfindruns" exact="0" />
+			
 			<label name="find trade run" />
 
 
@@ -119,13 +121,13 @@
 				<!--search for tradeoffer with warelist in Galaxy sort by distance -->
 				<set_command_action commandaction="commandaction.standingby" />
 				<wait exact="this.$jlp_unitrader_searchtime" sinceversion="1" />
-
-				<do_if value="$buyrange">
+				<!-- TODO check if $sellrange is  the gate distance? -->
+				<do_if value="$sellrange">
 					<find_sector space="player.galaxy" multiple="true"
-						name="$sectors" known="true"
+						name="$sectors" known="true"  
 					>
 						<match_gate_distance object="this.ship">
-							<max min="$buyrange.{1}" max="$buyrange.{2}" />
+							<max min="$sellrange.{1}" max="$sellrange.{2}" />
 						</match_gate_distance>
 					</find_sector>
 				</do_if>
@@ -201,7 +203,7 @@
 				<set_value name="this.$trade_failedfindruns" exact="0" />
 				<resume label="find trade run" />
 			</do_if>
-			<do_if value="not $selloffer.available or not $buyoffer.available">
+			<do_if value="(not $selloffer.exists and not $buyoffer.exists) or (not $buyoffer.exists)">
 				<set_value name="this.$trade_failedfindruns" operation="add"
 					exact="1" />
 				<wait exact="this.$jlp_unitrader_waittime" sinceversion="1" />
