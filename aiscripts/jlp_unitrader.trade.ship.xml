@@ -113,7 +113,7 @@
 					text="'No trade was found. Flying to other regions. %1'.[this.$trade_failedfindruns]" />
 				<debug_text chance="$debugchance2"
 					text="player.age + ': '  + this.ship.name + ': ' + this.name + ' No trade was found. Flying to other regions.'" />
-
+				<set_value name="$onlyKnown" exact="false" />
 				<set_value name="$onlyKnown" exact="true"
 					chance="100-this.$jlp_unitrader_courage" />
 				<!--search for tradeoffer with warelist in Galaxy sort by distance -->
@@ -125,7 +125,7 @@
 						name="$sectors" known="true"
 					>
 						<match_gate_distance object="this.ship">
-							<max min="$buyrange.{1}]" max="$buyrange.{2}" />
+							<max min="$buyrange.{1}" max="$buyrange.{2}" />
 						</match_gate_distance>
 					</find_sector>
 				</do_if>
@@ -136,9 +136,9 @@
 
 				<wait min="200ms" max="800ms" sinceversion="1" />
 				<create_list name="$tradeoffers" />
-				<debug_text chance="$debugchance2"
-					text="player.age + ': '  + this.ship.name + ': ' + this.name + ' sectors %1'.[$sectors.count]" />
 				<do_all exact="$sectors.count" counter="$Counter">
+					<debug_text chance="$debugchance2"
+						text="player.age + ': '  + this.ship.name + ': ' + this.name + ' sectors %1'.[$sectors.count]" />
 					<wait min="20ms" max="80ms" />
 					<do_if value="$sectors.{$Counter} == this.ship.sector">
 						<continue />
@@ -148,7 +148,7 @@
 						knowntoplayer="$onlyKnown"
 					>
 						<relativeprice min="0.7" />
-						<match_seller >
+						<match_seller>
 							<match_any>
 								<match_relation faction="faction.player"
 									comparison="exact" relation="friend" />
@@ -159,20 +159,22 @@
 						<offeramount entity="this" min="1" />
 					</find_sell_offer>
 					<do_all exact="$tradeoffer.count" counter="$Counter2">
-						<do_if value="this.ship.cargo.{$tradeoffer.{$Counter2}.ware}.max" min="1">
+						<do_if value="this.ship.cargo.{$tradeoffer.{$Counter2}.ware}.max"
+							min="1"
+						>
 							<append_to_list name="$tradeoffers" exact="$tradeoffer.{$Counter2}" />
 						</do_if>
 					</do_all>
 				</do_all>
 				<debug_text chance="$debugchance2"
-						text="player.age + ': '  + this.ship.name + ': ' + this.name + ' Found tradeoffers %1'.[$tradeoffers.count]" />
-				
+					text="player.age + ': '  + this.ship.name + ': ' + this.name + ' Found tradeoffers %1'.[$tradeoffers.count]" />
+
 				<do_if value="$tradeoffers.count" min="1">
 					<wait min="200ms" max="800ms" sinceversion="1" />
 					<create_list name="$tradeoffersSort" />
 
 					<sort_trades name="$tradeoffersSort" tradelist="$tradeoffers.clone"
-						sorter="relativeprice"  />
+						sorter="relativeprice" />
 					<wait min="200ms" max="800ms" sinceversion="1" />
 					<remove_value name="$tradeoffers" />
 					<do_all exact="$tradeoffersSort.count" counter="$Counter"

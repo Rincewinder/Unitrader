@@ -182,16 +182,22 @@
 						<!-- if we have <= 50% free cargospace, also accept buyoffers for less
 							to increase the chance of selling off cargo
 							TODO: what we do with scaldis multi cargo transportable for exampl -->
-						<set_value name="$sellvolume" exact="$minvolume/2" />
+						<set_value name="$sellvolume"
+							exact="$minvolume/(2 + @this.$trade_failedfindruns)" />
 					</do_elseif>
 
 					<debug_text
 						text="player.age + ' checking if we can sell cargo in ' + $checkrange.knownname"
 						chance="$debugchance" />
+					<set_value name="$relPriceMax"
+						exact="2f - 1f * (1-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)/200))" />
+					<set_value name="$relPriceMin"
+						exact="0.0f + 0.9999999f * (1-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)/200))" />
 					<find_buy_offer tradepartner="this.ship" space="$checkrange"
 						result="$buyoffer" wares="$currentcargo" knowntoplayer="$onlyKnownBuy"
 						usereservations="true"
 					>
+						<relativeprice max="$relPriceMax" min="$relPriceMin" />
 						<match_buyer>
 							<match negate="true" class="class.ship_xl" />
 							<match_any>
@@ -205,8 +211,54 @@
 					</find_buy_offer>
 					<remove_value name="$sellvolume" />
 
-					<!--TODO: Filter the found trades. Pick the best one based on price
+					<!--Filter the found trades. Pick the best one based on price
 						or cargo space to be gained -->
+					<!-- I hope the sort algorythm doesnt change the position, like bubblesort -->
+					<sort_trades name="$buyoffers" tradelist="$buyoffers"
+						sorter="relativeprice" />
+					<do_all exact="$buyoffers.count" counter="$Counter2"
+						reverse="true"
+					>
+						<set_value name="$destination" exact="$buyoffers.{$Counter2}.buyer" />
+						<do_if value="$capship">
+							<get_global_path component="$pathcomponents"
+								multiple="1" usehighways="false"
+							>
+								<start object="this.ship" />
+								<end object="$destination" />
+							</get_global_path>
+						</do_if>
+						<do_else>
+							<get_global_path component="$pathcomponents"
+								multiple="1" usehighways="true"
+							>
+								<start object="this.ship" />
+								<end object="$buyoffers.{$Counter2}.buyer" />
+							</get_global_path>
+						</do_else>
+						<set_value name="$offerAdd" exact="true" />
+						<do_all exact="$pathcomponents.count" counter="$Counter3">
+							<do_if value="$pathcomponents.{$Counter3}.hascontext.{$destination}">
+								<do_if
+									value="$pathcomponents.{$Counter3}.isclass.zone and @$pathcomponents.{$Counter3}.haspriority"
+								>
+									<set_value name="$targetzoneOwner" exact="$pathcomponents.{$Counter3}.owner" />
+								</do_if>
+								<do_elseif value="$pathcomponents.{$Counter3}.isclass.object">
+									<set_value name="$targetzoneOwner"
+										exact="$pathcomponents.{$Counter3}.zone.owner" />
+								</do_elseif>
+								<get_factions_by_relation result="$EnemyFactions"
+									faction="faction.player" relation="enemy" />
+								<do_if value="$EnemyFactions.indexof.{$targetzoneOwner}">
+									<!-- Take the best offer -->
+									<set_value name="$buyoffer" exact="$buyoffers.{$Counter2}" />
+									<break />
+								</do_if>
+							</do_if>
+						</do_all>
+					</do_all>
+
 					<do_if value="$buyoffer.available">
 						<debug_text text="player.age + ' buy offer found!'"
 							chance="$debugchance" />
@@ -268,8 +320,7 @@
 
 					<!--Check if the current $checkrange (the ships current zone) is within
 						the buy range. If so, look for offers, otherwise it will check again
-						from
-						$range -->
+						from $range -->
 					<debug_text text="'$range is ' + $range.knownname"
 						chance="$debugchance2" comment="temp" />
 					<set_value name="$GateDistance" exact="$checkrange.gatedistance.{$range}" />
@@ -538,7 +589,7 @@
 							</find_buy_offer>
 							<!-- I hope the sort algorythm doesnt change the position, like bubblesort -->
 							<sort_trades name="$buyoffers" tradelist="$buyoffers"
-								sorter="volume" />
+								sorter="totalvolume" />
 							<sort_trades name="$buyoffers" tradelist="$buyoffers"
 								sorter="relativeprice" />
 							<do_all exact="$buyoffers.count" counter="$Counter2"
@@ -626,7 +677,7 @@
 						</find_buy_offer>
 						<!-- I hope the sort algorythm doesnt change the position, like bubblesort -->
 						<sort_trades name="$buyoffers" tradelist="$buyoffers"
-							sorter="volume" />
+							sorter="totalvolume" />
 						<sort_trades name="$buyoffers" tradelist="$buyoffers"
 							sorter="relativeprice" />
 						<do_all exact="$buyoffers.count" counter="$Counter"
