@@ -16,7 +16,7 @@
 		<param name="debugchance" default="0" />
 	</params>
 	<init>
-		<set_command command="command.freemining" />
+		<set_command command="command.wait" />
 	</init>
 	<attention min="unknown">
 		<actions>
@@ -25,10 +25,14 @@
 
 			<!-- basic checks first -->
 			<label name="init" />
-			<wait min="5s" max="15s" sinceversion="1"/>
+			
+			
+
 			<do_if value="this.$jlpUniMiningRun" exact="true" negate="true">
 				<return />
 			</do_if>
+			<!-- Take a break -->
+			<wait exact="this.$jlp_unitrader_waittime"  sinceversion="1"/>	
 			<do_if value="this.ship.cargo.capacity" max="0">
 				<debug_text
 					text="'%1 has cargo capacity of %2!'.[this.ship.knownname, this.ship.cargo.capacity]"

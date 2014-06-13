@@ -29,7 +29,6 @@
 				<set_value name="$reservetrades" exact="true" />
 				<!-- higher skill -> more minvolume to can sell or buy more -->
 				<set_value name="$minvolume" exact="this.ship.cargo.capacity/20 " />
-
 			</do_if>
 			<debug_text
 				text="'min trade volume for ' + this.ship.knownname + ': ' + $minvolume"

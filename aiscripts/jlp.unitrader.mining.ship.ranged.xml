@@ -7,9 +7,8 @@
         <param name="debugchance" default="0"/>
     </params>
 	<init>
-		<set_command command="command.wait" />
+		<set_command command="command.freemining" />
 	</init>
-
     <attention min="unknown">
         <actions>
 

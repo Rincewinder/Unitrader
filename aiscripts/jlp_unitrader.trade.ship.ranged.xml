@@ -4,6 +4,8 @@
 >
 	<params>
 		<param name="PageId" default="8570" />
+		<param name="range" default="'ranged'"/>
+		<param name="home" default="this.ship.cluster"/>
 		<param name="minbuy" default="0" />
 		<param name="maxbuy" default="25" />
 		<param name="minsell" default="0" />
@@ -11,9 +13,8 @@
 		<param name="debugchance" default="0" />
 	</params>
 	<init>
-		<set_command command="command.wait" />
+		<set_command command="command.freetrade" />
 	</init>
-
 	<attention min="unknown">
 		<actions>
 
@@ -40,14 +41,13 @@
 			>
 				<param name="PageId" value="$PageId" />
 				<param name="warelist" value="$basket" />
-				<param name="range" value="'ranged'" />
+				<param name="range" value="$range" />
+				<param name="home" value="$home"/>
 				<param name="additionalparams"
 					value="[$minsell, $maxsell*this.$jlp_unitrader_courage/100i, $minbuy, $maxbuy*this.$jlp_unitrader_courage/100]" />
 				<param name="debugchance" value="$debugchance" />
 			</run_script>
 
-			<!-- Take a break -->
-			<wait exact="this.$jlp_unitrader_waittime" sinceversion="1" />
 		</actions>
 	</attention>
 </aiscript>
