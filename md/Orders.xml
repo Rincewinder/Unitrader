@@ -3,6 +3,13 @@
 <!--
 	This file is part of the Universe trader.
 
+	Prevent trigger from Orders.xml. while Universe Trader is running.
+
+	It would be incompatible with any other Order.xml diff, that change the 
+	condition.
+	It would be better <condition> begin with <check_all><check_any>...</check_any></check_all>.
+	So can change <replace> with <add> for better compatibility.
+
 	Author: JohnLukePicard
 
 -->
@@ -18,10 +25,10 @@
 						sectionprefix="gOrders_" />
 				</check_any>
 				<check_all>
-						<check_value value="@event.object.$jlpUniTraderRun"
-							negate="true" />
-						<check_value value="@event.object.$jlpUniMiningRun"
-							negate="true" />
+					<check_value value="@event.object.$jlpUniTraderRun"
+						negate="true" />
+					<check_value value="@event.object.$jlpUniMiningRun"
+						negate="true" />
 				</check_all>
 			</check_all>
 		</conditions>

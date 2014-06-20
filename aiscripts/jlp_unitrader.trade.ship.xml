@@ -8,9 +8,9 @@
 		<param name="range" default="null" />
 		<!--if $range == 'ranged' then $additionalparams defines min and max jumps
 			for the buy and sell ranges [$minbuy, $maxbuy, $minsell, $maxsell] -->
-		<param name="additionalparams" default="[0,0,1,1]" />
+		<param name="additionalparams" default="[0,24,0,24]" />
 
-		<param name="home" default="this.ship.cluster"/>
+		<param name="home" default="this.ship.cluster" />
 		<param name="debugchance" default="0" />
 		<param name="debugchance2" default="0" />
 	</params>
@@ -44,22 +44,22 @@
 
 			<set_value name="$sellrange" exact="null" />
 			<set_value name="$buyrange" exact="null" />
+	
 			<do_if value="not @$range.isclass.space">
+				<set_value name="$rangeMode" exact="$range"/>
 				<do_if value="$range" exact="'zone'">
 					<set_value name="$range" exact="$home" />
 				</do_if>
 				<do_elseif value="$range" exact="'sector'">
-					<set_value name="$range" exact="$home" />
+					<set_value name="$range" exact="$home.sector" />
 				</do_elseif>
 				<do_elseif value="$range" exact="'cluster'">
-					<set_value name="$range" exact="$home" />
+					<set_value name="$range" exact="$home.cluster" />
 				</do_elseif>
 				<do_elseif value="$range" exact="'ranged'">
 					<set_value name="$range" exact="$home" />
-					<set_value name="$sellrange"
-						exact="[$additionalparams.{1}, $additionalparams.{2}]" />
-					<set_value name="$buyrange"
-						exact="[$additionalparams.{3}, $additionalparams.{4}]" />
+					<set_value name="$sellrange" exact="[$additionalparams.{1}, $additionalparams.{2}]" />
+					<set_value name="$buyrange" exact="[$additionalparams.{3}, $additionalparams.{4}]" />
 
 					<do_if value="this.$traderange_sellclusters?">
 						<remove_value name="this.$traderange_nexttime" />
@@ -67,12 +67,7 @@
 					</do_if>
 				</do_elseif>
 				<do_else>
-					<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl">
-						<set_value name="$range" exact="this.ship.cluster" />
-					</do_if>
-					<do_else>
-						<set_value name="$range" exact="this.ship.sector" />
-					</do_else>
+					<set_value name="$range" exact="this.ship.sector" />
 				</do_else>
 			</do_if>
 
@@ -81,9 +76,9 @@
 
 			</do_if>
 
-			
+
 			<set_value name="this.$trade_failedfindruns" exact="0" />
-			
+
 			<label name="find trade run" />
 
 			<do_if value="@this.ship.dockslot.component.external">
@@ -95,11 +90,11 @@
 				</run_script>
 			</do_if>
 
-			<run_script name="'jlp.unitrader.trade.findfreetraderun'"
-				sinceversion="1"
-			>
+			<run_script name="'jlp.unitrader.trade.findfreetraderun'" sinceversion="1">
 				<param name="warelist" value="$warelist" />
 				<param name="range" value="$range" />
+				<param name="rangeMode" value="$rangeMode"/>
+				<param name="home" value="$home"/>
 				<param name="sellrange" value="$sellrange" />
 				<param name="buyrange" value="$buyrange" />
 				<param name="debugchance" value="$debugchance" />
@@ -112,30 +107,44 @@
 				can buy before
 				checking again -->
 			<do_if value="this.$trade_failedfindruns" min="4">
+			
+				<!-- can't find anything good at the moment... wait a while, then check
+				again -->
 				<debug_text
-					text="'No trade was found. Flying to other regions. %1'.[this.$trade_failedfindruns]" />
+					text="player.age + ' no good trade offer found, waiting for a while before checking again'"
+					chance="$debugchance" />
+					<set_value name="$idletime" exact="this.$jlp_unitrader_waittime" />
+				<run_script name="'move.idle'" sinceversion="1">
+					<param name="TimeOut" value="$idletime" />
+				</run_script>
+			
 				<debug_text chance="$debugchance2"
 					text="player.age + ': '  + this.ship.name + ': ' + this.name + ' No trade was found. Flying to other regions.'" />
-				<set_value name="$onlyKnown" exact="false" />
-				<set_value name="$onlyKnown" exact="true"
-					chance="100-this.$jlp_unitrader_courage" />
-					
+				<!-- Skills -->
+				<set_value name="$onlyKnownBuy" exact="false" />
+				<set_value name="$onlyTraderBuy" exact="false" />
+				<set_value name="$tradeRestrictionBuy" exact="this.$jlp_unitrader_trade_stations_buy" />
+
+				<do_if value="$tradeRestrictionBuy == 'onlyKnownBuy'">
+					<set_value name="$onlyKnownBuy" exact="true" />
+				</do_if>
+				<do_if value="$tradeRestrictionBuy == 'onlyTraderBuy'">
+					<set_value name="$onlyTraderBuy" exact="true" />
+				</do_if>
+
 				<!--search for tradeoffer with warelist in Galaxy sort by distance -->
 				<set_command_action commandaction="commandaction.standingby" />
 				<wait exact="this.$jlp_unitrader_searchtime" sinceversion="1" />
-				<!-- TODO check if $sellrange is  the gate distance? -->
-				<do_if value="$sellrange">
-					<find_sector space="player.galaxy" multiple="true"
-						name="$sectors" known="true"  
-					>
+				<!-- TODO check if $sellrange is the gate distance? -->
+				<do_if value="$buyrange">
+					<find_sector space="player.galaxy" multiple="true" name="$sectors" known="true">
 						<match_gate_distance object="this.ship">
-							<max min="$sellrange.{1}" max="$sellrange.{2}" />
+							<max min="$buyrange.{1}" max="$buyrange.{2}" />
 						</match_gate_distance>
 					</find_sector>
 				</do_if>
 				<do_else>
-					<find_sector space="$range" multiple="true" name="$sectors"
-						known="true" />
+					<find_sector space="$range" multiple="true" name="$sectors" known="true" />
 				</do_else>
 
 				<wait min="200ms" max="800ms" sinceversion="1" />
@@ -143,30 +152,32 @@
 				<do_all exact="$sectors.count" counter="$Counter">
 					<debug_text chance="$debugchance2"
 						text="player.age + ': '  + this.ship.name + ': ' + this.name + ' sectors %1'.[$sectors.count]" />
-					<wait min="20ms" max="80ms" />
+					<wait min="20ms" max="80ms" sinceversion="1"/>
 					<do_if value="$sectors.{$Counter} == this.ship.sector">
 						<continue />
 					</do_if>
-					<find_sell_offer tradepartner="this.ship" result="$tradeoffer"
-						multiple="true" space="$sectors.{$Counter}" wares="$warelist"
-						knowntoplayer="$onlyKnown"
+					<find_sell_offer tradepartner="this.ship" result="$tradeoffer" multiple="true"
+						space="$sectors.{$Counter}" wares="$warelist" knowntoplayer="$onlyKnownBuy"
 					>
 						<!-- TODO realtiveprice use with skill maybe -->
-						<relativeprice min="0.9999999f" />
+						<relativeprice max="0.9999999f" />
 						<match_seller>
 							<match_any>
-								<match_relation faction="faction.player"
-									comparison="exact" relation="friend" />
-								<match_relation faction="faction.player"
-									comparison="exact" relation="neutral" />
+								<match_relation faction="faction.player" comparison="exact" relation="friend" />
+								<match_relation faction="faction.player" comparison="exact" relation="neutral" />
 							</match_any>
 						</match_seller>
-						<offeramount entity="this" min="1" />
+						<totalvolume  min="1" />
 					</find_sell_offer>
 					<do_all exact="$tradeoffer.count" counter="$Counter2">
-						<do_if value="this.ship.cargo.{$tradeoffer.{$Counter2}.ware}.max"
-							min="1"
-						>
+						<do_if value="this.ship.cargo.{$tradeoffer.{$Counter2}.ware}.max" min="1">
+							<set_value name="$destination" exact="$tradeoffer.{$Counter2}.seller" />
+							<do_if value="$destination.isclass.ship_xl" negate="true">
+								<do_if value="(not $destination.tradenpc.container.hastradesubscription) and $onlyTraderBuy">
+									<continue />
+								</do_if>
+							</do_if>
+
 							<append_to_list name="$tradeoffers" exact="$tradeoffer.{$Counter2}" />
 						</do_if>
 					</do_all>
@@ -178,23 +189,20 @@
 					<wait min="200ms" max="800ms" sinceversion="1" />
 					<create_list name="$tradeoffersSort" />
 
-					<sort_trades name="$tradeoffersSort" tradelist="$tradeoffers.clone"
-						sorter="relativeprice" />
+					<sort_trades name="$tradeoffersSort" tradelist="$tradeoffers" sorter="relativeprice" />
 					<wait min="200ms" max="800ms" sinceversion="1" />
 					<remove_value name="$tradeoffers" />
-					<do_all exact="$tradeoffersSort.count" counter="$Counter"
-						reverse="true"
-					>
+					<do_all exact="$tradeoffersSort.count" counter="$Counter">
 						<do_if value="$tradeoffersSort.{$Counter}.available">
 							<debug_text chance="$debugchance2"
 								text="player.age + ': ' + this.ship.name + ': ' + this.name + ' fly to %1 / %2 / %3 '.[$tradeoffersSort.{$Counter}.seller.sector.knownname, $tradeoffersSort.{$Counter}.seller.zone.knownname, $tradeoffersSort.{$Counter}.seller.knownname]" />
 							<get_jump_cost ship="this.ship" start="this.ship.sector"
 								end="$tradeoffersSort.{$Counter}.seller.sector" result="$trip" />
-							<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 200">
+							<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 100">
 								<run_script name="'move.refuel'" sinceversion="1" />
 							</do_if>
 
-							<wait min="20ms" max="80ms" />
+							<wait min="20ms" max="80ms" sinceversion="1" />
 							<run_script name="'move.generic'" sinceversion="1">
 								<param name="destination" value="$tradeoffersSort.{$Counter}.seller" />
 							</run_script>
@@ -204,11 +212,10 @@
 					<remove_value name="$tradeofferSort" />
 				</do_if>
 				<set_value name="this.$trade_failedfindruns" exact="0" />
-				<resume label="find trade run" />
+				<return />
 			</do_if>
 			<do_if value="(not $selloffer.exists and not $buyoffer.exists) or (not $buyoffer.exists)">
-				<set_value name="this.$trade_failedfindruns" operation="add"
-					exact="1" />
+				<set_value name="this.$trade_failedfindruns" operation="add" exact="1" />
 				<wait exact="this.$jlp_unitrader_waittime" sinceversion="1" />
 				<resume label="find trade run" />
 			</do_if>
@@ -242,24 +249,22 @@
 			<do_while value="$selloffer.available or $buyoffer.available">
 				<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl">
 					<do_if value="@$buyoffer.available">
-						<get_jump_cost ship="this.ship" start="this.ship.sector"
-							end="$buyoffer.buyer.sector" result="$trip" />
-						<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 200">
+						<get_jump_cost ship="this.ship" start="this.ship.sector" end="$buyoffer.buyer.sector"
+							result="$trip" />
+						<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 100">
 							<run_script name="'move.refuel'" sinceversion="1" />
 						</do_if>
 					</do_if>
 					<do_if value="not @$buyoffer.available and  @$selloffer.available">
-						<get_jump_cost ship="this.ship" start="this.ship.sector"
-							end="$selloffer.seller.sector" result="$trip" />
-						<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 200">
+						<get_jump_cost ship="this.ship" start="this.ship.sector" end="$selloffer.seller.sector"
+							result="$trip" />
+						<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 100">
 							<run_script name="'move.refuel'" sinceversion="1" />
 						</do_if>
 					</do_if>
 				</do_if>
 
-				<run_script name="'jlp.unitrader.trade.performtraderun'"
-					sinceversion="1"
-				>
+				<run_script name="'jlp.unitrader.trade.performtraderun'" sinceversion="1">
 					<param name="selloffer" value="$selloffer" />
 					<param name="buyoffer" value="$buyoffer" />
 					<param name="debugchance" value="$debugchance" />
@@ -276,13 +281,11 @@
 				</do_if>
 				<do_if value="$success">
 					<do_if value="@$selloffer.available" negate="true">
-						<set_value name="$profit" exact="$traderesult.{4}"
-							operation="add" />
+						<set_value name="$profit" exact="$traderesult.{4}" operation="add" />
 						<set_value name="$priceSell" exact="$traderesult.{4}" />
 					</do_if>
 					<do_if value="@$buyoffer.available" negate="true">
-						<set_value name="$profit" exact="$traderesult.{4}"
-							operation="subtract" />
+						<set_value name="$profit" exact="$traderesult.{4}" operation="subtract" />
 						<set_value name="$priceBuy" exact="$traderesult.{4}" />
 					</do_if>
 				</do_if>
@@ -293,9 +296,7 @@
 				<set_known object="this.ship.cluster" known="true" />
 				<set_known object="this.ship.sector" known="true" />
 				<set_known object="this.ship.zone" known="true" />
-				<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl"
-					negate="true"
-				>
+				<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl" negate="true">
 					<set_value name="$CommissionAmount"
 						exact="4*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
 					<set_value name="$CommissionTime"
@@ -328,14 +329,13 @@
 						<do_if value="$Buyer.owner != faction.player">
 							<set_known object="$Buyer" known="true" />
 							<wait min="4s" max="9s" />
-							<set_faction_known faction="$Buyer.owner"
-								known="true" />
+							<set_faction_known faction="$Buyer.owner" known="true" />
 							<wait min="4s" max="9s" />
-							<add_faction_relation faction="faction.player"
-								otherfaction="$Buyer.owner" value="this.$jlp_unitrader_extrafaction/100000" />
+							<add_faction_relation faction="faction.player" otherfaction="$Buyer.owner"
+								value="this.$jlp_unitrader_extrafaction/100000" />
 							<wait min="4s" max="9s" />
-							<add_player_discount name="$notiDearsShip"
-								amount="$CommissionAmount" entity="$BuyerEntity" time="$CommissionTime" />
+							<add_player_discount name="$notiDearsShip" amount="$CommissionAmount"
+								entity="$BuyerEntity" time="$CommissionTime" />
 						</do_if>
 					</do_if>
 				</do_if>
@@ -345,33 +345,33 @@
 						<do_if value="$Seller.owner != faction.player">
 							<set_known object="$Seller" known="true" />
 							<wait min="4s" max="9s" />
-							<set_faction_known faction="$Seller.owner"
-								known="true" />
+							<set_faction_known faction="$Seller.owner" known="true" />
 							<wait min="4s" max="9s" />
-							<add_faction_relation faction="faction.player"
-								otherfaction="$Seller.owner" value="this.$jlp_unitrader_extrafaction/100000" />
+							<add_faction_relation faction="faction.player" otherfaction="$Seller.owner"
+								value="this.$jlp_unitrader_extrafaction/100000" />
 							<wait min="4s" max="9s" />
-							<add_player_commission name="$notiDearsShip"
-								amount="$CommissionAmount" entity="$SellerEntity" time="$CommissionTime" />
+							<add_player_commission name="$notiDearsShip" amount="$CommissionAmount"
+								entity="$SellerEntity" time="$CommissionTime" />
 						</do_if>
 					</do_if>
 				</do_if>
 				<do_if value="$buyoffer.exists and $selloffer.exists" negate="true">
 					<!-- is success when offer is gone and trade is succesfull -->
 					<do_if value="@$Buyer.exists and @$Seller.exists">
-						<substitute_text text="$detail1" source="{8570,50400}">
-							<replace string="'$SHIP$'" with="$notiDearsShip" />
-							<replace string="'$PROFIT$'" with="$profit" />
-							<replace string="'$WARE$'" with="$traderesult.{3}" />
-							<replace string="'$AMOUNT$'" with="$traderesult.{2}" />
-							<replace string="'$PRICEBUY$'" with="$priceBuy" />
-							<replace string="'$PRICESELL$'" with="$priceSell" />
-							<replace string="'$STATION$'" with="$traderesult.{1}" />
-						</substitute_text>
+						<do_if value="this.$jlp_unitrader_show_extendedlogbook">
+							<substitute_text text="$detail1" source="{8570,50400}">
+								<replace string="'$SHIP$'" with="$notiDearsShip" />
+								<replace string="'$PROFIT$'" with="$profit" />
+								<replace string="'$WARE$'" with="$traderesult.{3}" />
+								<replace string="'$AMOUNT$'" with="$traderesult.{2}" />
+								<replace string="'$PRICEBUY$'" with="$priceBuy" />
+								<replace string="'$PRICESELL$'" with="$priceSell" />
+								<replace string="'$STATION$'" with="$traderesult.{1}" />
+							</substitute_text>
 
-						<wait min="4s" max="9s" />
-						<write_to_logbook category="squad" text="$detail1" />
-
+							<wait min="4s" max="9s" />
+							<write_to_logbook category="squad" text="$detail1" />
+						</do_if>
 						<run_script name="'jlp.unitrader.skills'" sinceversion="1">
 							<param name="Mode" value="'learn'" />
 							<param name="debugchance" value="$debugchance" />
@@ -387,12 +387,10 @@
 	</attention>
 	<on_abort>
 		<do_if value="@$buyoffer.available">
-			<remove_ware_reservation object="$buyoffer.buyer"
-				entity="this" />
+			<remove_ware_reservation object="$buyoffer.buyer" entity="this" />
 		</do_if>
 		<do_if value="@$selloffer.available">
-			<remove_ware_reservation object="$selloffer.seller"
-				entity="this" />
+			<remove_ware_reservation object="$selloffer.seller" entity="this" />
 		</do_if>
 	</on_abort>
 </aiscript>

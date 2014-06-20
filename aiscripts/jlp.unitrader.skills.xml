@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
-<aiscript name="jlp.unitrader.skills" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd"  version="1">
+<aiscript name="jlp.unitrader.skills" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="1"
+>
 	<params>
 		<param name="Mode" />
 		<param name="Entity" default="this" />
-		<param name="debugchance" default="0"/>
+		<param name="debugchance" default="0" />
 	</params>
 	<attention min="unknown">
 		<actions>
@@ -11,188 +13,229 @@
 
 			<set_value name="$combat" exact="@$Entity.$jlp_skill_combat/1.0f" />
 			<set_value name="$morale" exact="@$Entity.$jlp_skill_morale/1.0f" />
-<!--			<set_value name="$boarding" exact="@$Entity.$jlp_skill_boarding/1.0f" />-->
+			<!-- <set_value name="$boarding" exact="@$Entity.$jlp_skill_boarding/1.0f"
+				/> -->
 			<set_value name="$engineering" exact="@$Entity.$jlp_skill_engineering/1.0f" />
 			<set_value name="$leadership" exact="@$Entity.$jlp_skill_leadership/1.0f" />
 			<set_value name="$management" exact="@$Entity.$jlp_skill_management/1.0f" />
 			<set_value name="$navigation" exact="@$Entity.$jlp_skill_navigation/1.0f" />
 			<set_value name="$science" exact="@$Entity.$jlp_skill_science/1.0f" />
 
-			<do_if value="$combat == null" >
+			<do_if value="$combat == null">
 				<set_value name="$combat" exact="$Entity.skill.combat" />
-				<set_value name="$Entity.$jlp_skill_combat"  exact="$combat/1.0f" />
+				<set_value name="$Entity.$jlp_skill_combat" exact="$combat/1.0f" />
 			</do_if>
-			<do_if value="$morale == null" >
+			<do_if value="$morale == null">
 				<set_value name="$morale" exact="$Entity.skill.morale" />
-				<set_value name="$Entity.$jlp_skill_morale"  exact="$morale/1.0f" />
+				<set_value name="$Entity.$jlp_skill_morale" exact="$morale/1.0f" />
 			</do_if>
-<!--
-			<do_if value="$boarding == null" >
+			<!--
+				<do_if value="$boarding == null" >
 				<set_value name="$boarding" exact="$Entity.skill.boarding" />
-				<set_value name="$Entity.$jlp_skill_boarding"  exact="$boarding/1.0f" />
-			</do_if>
--->
-			<do_if value="$engineering == null" >
+				<set_value name="$Entity.$jlp_skill_boarding" exact="$boarding/1.0f"
+				/>
+				</do_if>
+			-->
+			<do_if value="$engineering == null">
 				<set_value name="$engineering" exact="$Entity.skill.engineering" />
-				<set_value name="$Entity.$jlp_skill_engineering"  exact="$engineering/1.0f" />
+				<set_value name="$Entity.$jlp_skill_engineering" exact="$engineering/1.0f" />
 			</do_if>
 			<do_if value="$leadership == null">
 				<set_value name="$leadership" exact="$Entity.skill.leadership" />
-				<set_value name="$Entity.$jlp_skill_leadership"  exact="$leadership/1.0f" />
+				<set_value name="$Entity.$jlp_skill_leadership" exact="$leadership/1.0f" />
 			</do_if>
 			<do_if value="$management == null">
 				<set_value name="$management" exact="$Entity.skill.management" />
-				<set_value name="$Entity.$jlp_skill_management"  exact="$management/1.0f" />
+				<set_value name="$Entity.$jlp_skill_management" exact="$management/1.0f" />
 			</do_if>
 			<do_if value="$navigation == null">
 				<set_value name="$navigation" exact="$Entity.skill.navigation" />
-				<set_value name="$Entity.$jlp_skill_navigation"  exact="$navigation/1.0f" />
+				<set_value name="$Entity.$jlp_skill_navigation" exact="$navigation/1.0f" />
 			</do_if>
-			<do_if value="$science == null" >
+			<do_if value="$science == null">
 				<set_value name="$science" exact="$Entity.skill.science" />
-				<set_value name="$Entity.$jlp_skill_science"  exact="$science/1.0f" />
+				<set_value name="$Entity.$jlp_skill_science" exact="$science/1.0f" />
 			</do_if>
 
 
 			<do_if value="$Mode" exact="'init'">
-				<!-- ##########################################################  Init  ########################################################### -->
-				<!-- Defaults with skill 0-->
+				<!-- ########################################################## Init
+					########################################################### -->
+				<!-- Defaults with skill 0 -->
 
-				<!--Skills config-->
-				<!-- max Waittime in s-->
+				<!--Skills config -->
+				<!-- max Waittime in s -->
 				<set_value name="$waittimeC" exact="100s" />
 
-				<!-- max searchtimeC in s-->
+				<!-- max searchtimeC in s -->
 				<set_value name="$searchtimeC" exact="20s" />
-				<!-- max extrafaction-->
+				<!-- max extrafaction -->
 				<set_value name="$extrafactionC" exact="100f" />
-				<!-- max efficiency in %  -->
+				<!-- max efficiency in % -->
 				<set_value name="$efficiencyC" exact="100f" />
-				<!-- max courage in %-->
+				<!-- max courage in % -->
 				<set_value name="$courageC" exact="100f" />
-				<!-- true for testing-->
+				<!-- true for testing -->
 				<do_if value="false">
 					<set_value name="$combat" exact="5" />
 					<set_value name="$morale" exact="5" />
-<!--					<set_value name="$boarding" exact="2" />-->
+					<!-- <set_value name="$boarding" exact="2" /> -->
 					<set_value name="$engineering" exact="5" />
 					<set_value name="$leadership" exact="5" />
 					<set_value name="$management" exact="5" />
 					<set_value name="$navigation" exact="5" />
 					<set_value name="$science" exact="5" />
 				</do_if>
-				<!-- calculate the modifier-->
-				<set_value name="$waittime"  exact="30s + $waittimeC - $waittimeC * ($combat*0.4/$maxSkillValue + $morale*1.0/$maxSkillValue + $engineering*1.0/$maxSkillValue + $leadership*0.8/$maxSkillValue + $management*0.8/$maxSkillValue + $navigation*0.8/$maxSkillValue + $science*0.4/$maxSkillValue)/(0.4+1+1+0.8+0.8+0.8+0.4)" />
-				<set_value name="$Entity.$jlp_unitrader_waittime" exact="$waittime" />
-				<debug_text chance="$debugchance" text="'%1: %2\n modifier wait %3'.[$Entity.ship.knownname, $Entity.knownname, $Entity.$jlp_unitrader_waittime]"/>
+				<!-- calculate the modifier -->
+				<set_value name="$waittime"
+					exact="30s + $waittimeC - $waittimeC * ($combat*0.4/$maxSkillValue + $morale*1.0/$maxSkillValue + $engineering*1.0/$maxSkillValue + $leadership*0.8/$maxSkillValue + $management*0.8/$maxSkillValue + $navigation*0.8/$maxSkillValue + $science*0.4/$maxSkillValue)/(0.4+1+1+0.8+0.8+0.8+0.4)" />
+				<set_value name="$Entity.$jlp_unitrader_waittime" exact="($waittime)s" />
+				<debug_text chance="$debugchance"
+					text="'%1: %2\n modifier wait %3'.[$Entity.ship.knownname, $Entity.knownname, $Entity.$jlp_unitrader_waittime]" />
 
-				<set_value name="$searchtime" exact="5s + $searchtimeC - $searchtimeC * ($combat*0.4/$maxSkillValue + $morale*0.6/$maxSkillValue + $engineering*1.0/$maxSkillValue + $leadership*1.0/$maxSkillValue + $management*0.8/$maxSkillValue + $navigation*1.0/$maxSkillValue + $science*0.8/$maxSkillValue)/(0.4+0.6+1+1+0.8+1+0.8)" />
-				<set_value name="$Entity.$jlp_unitrader_searchtime" exact="$searchtime"/>
-				<debug_text chance="$debugchance" text="'%1: %2\n modifier searchtime %3'.[$Entity.ship.knownname, $Entity.knownname, $Entity.$jlp_unitrader_searchtime]"/>
+				<set_value name="$searchtime"
+					exact="5s + $searchtimeC - $searchtimeC * ($combat*0.4/$maxSkillValue + $morale*0.6/$maxSkillValue + $engineering*1.0/$maxSkillValue + $leadership*1.0/$maxSkillValue + $management*0.8/$maxSkillValue + $navigation*1.0/$maxSkillValue + $science*0.8/$maxSkillValue)/(0.4+0.6+1+1+0.8+1+0.8)" />
+				<set_value name="$Entity.$jlp_unitrader_searchtime" exact="($searchtime)s" />
+				<debug_text chance="$debugchance"
+					text="'%1: %2\n modifier searchtime %3'.[$Entity.ship.knownname, $Entity.knownname, $Entity.$jlp_unitrader_searchtime]" />
 
-				<set_value name="$extrafaction" exact="$extrafactionC * ($combat*1.0/$maxSkillValue + $morale*0.2/$maxSkillValue + $engineering*0.1/$maxSkillValue + $leadership*0.8/$maxSkillValue + $management*1.0/$maxSkillValue + $navigation*0.5/$maxSkillValue + $science*1.0/$maxSkillValue)/(1+0.2+0.1+0.8+1+0.5+1)" />
-				<set_value name="$Entity.$jlp_unitrader_extrafaction" exact="$extrafaction"/>
-				<debug_text chance="$debugchance" text="'%1: %2\n modifier extrafaction %3'.[$Entity.ship.knownname, $Entity.knownname, $Entity.$jlp_unitrader_extrafaction]"/>
+				<set_value name="$extrafaction"
+					exact="$extrafactionC * ($combat*1.0/$maxSkillValue + $morale*0.2/$maxSkillValue + $engineering*0.1/$maxSkillValue + $leadership*0.8/$maxSkillValue + $management*1.0/$maxSkillValue + $navigation*0.5/$maxSkillValue + $science*1.0/$maxSkillValue)/(1+0.2+0.1+0.8+1+0.5+1)" />
+				<set_value name="$Entity.$jlp_unitrader_extrafaction" exact="($extrafaction)i" />
+				<debug_text chance="$debugchance"
+					text="'%1: %2\n modifier extrafaction %3'.[$Entity.ship.knownname, $Entity.knownname, $Entity.$jlp_unitrader_extrafaction]" />
 
-				<set_value name="$courage" exact="$courageC * ($combat*1.0/$maxSkillValue + $morale*1.0/$maxSkillValue + $engineering*0.2/$maxSkillValue + $leadership*0.8/$maxSkillValue + $management*0.2/$maxSkillValue + $navigation*1/$maxSkillValue + $science*1/$maxSkillValue)/(1+1+0.2+0.8+0.2+1+1)" />
-				<set_value name="$Entity.$jlp_unitrader_courage" exact="$courage"/>
-				<debug_text chance="$debugchance" text="'%1: %2\n modifier Courage %3'.[$Entity.ship.knownname, $Entity.knownname, $Entity.$jlp_unitrader_courage]"/>
+				<set_value name="$courage"
+					exact="$courageC * ($combat*1.0/$maxSkillValue + $morale*1.0/$maxSkillValue + $engineering*0.2/$maxSkillValue + $leadership*0.8/$maxSkillValue + $management*0.2/$maxSkillValue + $navigation*1/$maxSkillValue + $science*1/$maxSkillValue)/(1+1+0.2+0.8+0.2+1+1)" />
+				<set_value name="$Entity.$jlp_unitrader_courage" exact="($courage)i" />
+				<debug_text chance="$debugchance"
+					text="'%1: %2\n modifier Courage %3'.[$Entity.ship.knownname, $Entity.knownname, $Entity.$jlp_unitrader_courage]" />
 				<!--TODO Why is with '/1' instead 0.99 result = 0 -->
-				<set_value name="$efficiency" exact="$efficiencyC * ($combat*0.99/$maxSkillValue + $morale*0.99/$maxSkillValue + $engineering*0.99/$maxSkillValue + $leadership*0.99/$maxSkillValue + $management*0.99/$maxSkillValue + $navigation*0.99/$maxSkillValue + $science*0.99/$maxSkillValue )/6.93" />
-				<set_value name="$Entity.$jlp_unitrader_efficiency" exact="$efficiency"/>
-				<debug_text chance="$debugchance" text="'%1: %2\n modifier efficiency %3'.[$Entity.ship.knownname, $Entity.knownname,$Entity.$jlp_unitrader_efficiency]"/>
+				<set_value name="$efficiency"
+					exact="$efficiencyC * ($combat*0.99/$maxSkillValue + $morale*0.99/$maxSkillValue + $engineering*0.99/$maxSkillValue + $leadership*0.99/$maxSkillValue + $management*0.99/$maxSkillValue + $navigation*0.99/$maxSkillValue + $science*0.99/$maxSkillValue )/6.93" />
+				<set_value name="$Entity.$jlp_unitrader_efficiency" exact="($efficiency)i" />
+				<debug_text chance="$debugchance"
+					text="'%1: %2\n modifier efficiency %3'.[$Entity.ship.knownname, $Entity.knownname,$Entity.$jlp_unitrader_efficiency]" />
 
 			</do_if>
 			<do_elseif value="$Mode" exact="'learn'">
-				<!-- ##########################################################  Learning  ########################################################### -->
-				<!-- Skill add factor-->
+				<!-- ########################################################## Learning
+					########################################################### -->
+				<!-- Skill add factor -->
 				<set_value name="$Entity.$jlpUniTraderLastLearn" exact="player.age" />
 				<set_value name="$skillFactor" exact="0.01f*$Entity.$jlp_unitrader_efficiency" />
 				<do_if value="$morale" max="0">
-					<set_value name="$morale" exact="$skillFactor"/>
+					<set_value name="$morale" exact="$skillFactor" />
 				</do_if>
 				<do_if value="$engineering" max="0">
-					<set_value name="$engineering" exact="$skillFactor"/>
+					<set_value name="$engineering" exact="$skillFactor" />
 				</do_if>
 				<do_if value="$leadership" max="0">
-					<set_value name="$leadership" exact="$skillFactor"/>
+					<set_value name="$leadership" exact="$skillFactor" />
 				</do_if>
 				<do_if value="$management" max="0">
-					<set_value name="$management" exact="$skillFactor"/>
+					<set_value name="$management" exact="$skillFactor" />
 				</do_if>
 				<do_if value="$navigation" max="0">
-					<set_value name="$navigation" exact="$skillFactor"/>
+					<set_value name="$navigation" exact="$skillFactor" />
 				</do_if>
 				<do_if value="$science" max="0">
-					<set_value name="$science" exact="$skillFactor"/>
+					<set_value name="$science" exact="$skillFactor" />
 				</do_if>
 
 
 				<do_all chance="100 - $morale*100/$maxSkillValue ">
-						<do_if value="$Entity.skill.morale" max="$maxSkillValue-1" >
-							<set_value name="$Entity.$jlp_skill_morale"  operation="add" exact="$skillFactor/$morale" />
-							<wait min="4s" max="9s"/>
-							<do_if value="$Entity.$jlp_skill_morale"  min="$Entity.skill.morale + 1">
-								<add_skill entity="$Entity" type="morale" exact="1" />
-								<write_to_logbook category="squad" text="{8570,50200}.[$Entity.ship.knownname, $Entity.knownname, {1013,601}, $Entity.skill.morale]"/>
-							</do_if>
+					<do_if value="$Entity.skill.morale" max="$maxSkillValue-1">
+						<set_value name="$Entity.$jlp_skill_morale" operation="add" exact="$skillFactor/$morale" />
+						<wait min="4s" max="9s" />
+						<do_if value="$Entity.$jlp_skill_morale" min="$Entity.skill.morale + 1">
+							<add_skill entity="$Entity" type="morale" exact="1" />
+							<write_to_logbook category="squad"
+								text="{8570,50200}.[$Entity.ship.knownname, $Entity.knownname, {1013,601}, $Entity.skill.morale]" />
 						</do_if>
+					</do_if>
 				</do_all>
 				<do_all chance="100 - $engineering*100/$maxSkillValue">
-						<do_if value="$Entity.skill.engineering" max="$maxSkillValue-1">
-							<set_value name="$Entity.$jlp_skill_engineering"  operation="add" exact="$skillFactor/$engineering" />
-							<wait min="4s" max="9s"/>
-							<do_if value="$Entity.$jlp_skill_engineering" min="$Entity.skill.engineering + 1">
-								<add_skill entity="$Entity" type="engineering" exact="1" />
-								<write_to_logbook category="squad" text="{8570,50200}.[$Entity.ship.knownname, $Entity.knownname, {1013,301}, $Entity.skill.engineering]"/>
-							</do_if>
+					<do_if value="$Entity.skill.engineering" max="$maxSkillValue-1">
+						<set_value name="$Entity.$jlp_skill_engineering" operation="add"
+							exact="$skillFactor/$engineering" />
+						<wait min="4s" max="9s" />
+						<do_if value="$Entity.$jlp_skill_engineering" min="$Entity.skill.engineering + 1">
+							<add_skill entity="$Entity" type="engineering" exact="1" />
+							<write_to_logbook category="squad"
+								text="{8570,50200}.[$Entity.ship.knownname, $Entity.knownname, {1013,301}, $Entity.skill.engineering]" />
 						</do_if>
+					</do_if>
 				</do_all>
 				<do_all chance="100 - $leadership*100/$maxSkillValue ">
-						<do_if value="$Entity.skill.leadership" max="$maxSkillValue-1">
-							<set_value name="$Entity.$jlp_skill_leadership"  operation="add" exact="$skillFactor/$leadership" />
-							<wait min="4s" max="9s"/>
-							<do_if value="$Entity.$jlp_skill_leadership" min="$Entity.skill.leadership + 1">
-								<add_skill entity="$Entity" type="leadership" exact="1" />
-								<write_to_logbook category="squad" text="{8570,50200}.[$Entity.ship.knownname, $Entity.knownname, {1013,401}, $Entity.skill.leadership]"/>
-							</do_if>
+					<do_if value="$Entity.skill.leadership" max="$maxSkillValue-1">
+						<set_value name="$Entity.$jlp_skill_leadership" operation="add" exact="$skillFactor/$leadership" />
+						<wait min="4s" max="9s" />
+						<do_if value="$Entity.$jlp_skill_leadership" min="$Entity.skill.leadership + 1">
+							<add_skill entity="$Entity" type="leadership" exact="1" />
+							<write_to_logbook category="squad"
+								text="{8570,50200}.[$Entity.ship.knownname, $Entity.knownname, {1013,401}, $Entity.skill.leadership]" />
 						</do_if>
+					</do_if>
 				</do_all>
 				<do_all chance="100 - $management*100/$maxSkillValue ">
-						<do_if value="$Entity.skill.management" max="$maxSkillValue-1">
-							<set_value name="$Entity.$jlp_skill_management"  operation="add" exact="$skillFactor/$management" />
-							<wait min="4s" max="9s"/>
-							<do_if value="$Entity.$jlp_skill_management" min="$Entity.skill.management + 1">
-								<add_skill entity="$Entity" type="management" exact="1" />
-								<write_to_logbook category="squad" text="{8570,50200}.[$Entity.ship.knownname, $Entity.knownname, {1013,501}, $Entity.skill.management]"/>
-							</do_if>
+					<do_if value="$Entity.skill.management" max="$maxSkillValue-1">
+						<set_value name="$Entity.$jlp_skill_management" operation="add" exact="$skillFactor/$management" />
+						<wait min="4s" max="9s" />
+						<do_if value="$Entity.$jlp_skill_management" min="$Entity.skill.management + 1">
+							<add_skill entity="$Entity" type="management" exact="1" />
+							<write_to_logbook category="squad"
+								text="{8570,50200}.[$Entity.ship.knownname, $Entity.knownname, {1013,501}, $Entity.skill.management]" />
 						</do_if>
+					</do_if>
 				</do_all>
 				<do_all chance="100 - $navigation*100/$maxSkillValue ">
-						<do_if value="$Entity.skill.navigation" max="$maxSkillValue-1">
-							<set_value name="$Entity.$jlp_skill_navigation"  operation="add" exact="$skillFactor/$navigation" />
-							<wait min="4s" max="9s"/>
-							<do_if value="$Entity.$jlp_skill_navigation" min="$Entity.skill.navigation + 1" >
-								<add_skill entity="$Entity" type="navigation" exact="1" />
-								<write_to_logbook category="squad" text="{8570,50200}.[$Entity.ship.knownname, $Entity.knownname, {1013,701}, $Entity.skill.navigation]"/>
-							</do_if>
+					<do_if value="$Entity.skill.navigation" max="$maxSkillValue-1">
+						<set_value name="$Entity.$jlp_skill_navigation" operation="add" exact="$skillFactor/$navigation" />
+						<wait min="4s" max="9s" />
+						<do_if value="$Entity.$jlp_skill_navigation" min="$Entity.skill.navigation + 1">
+							<add_skill entity="$Entity" type="navigation" exact="1" />
+							<write_to_logbook category="squad"
+								text="{8570,50200}.[$Entity.ship.knownname, $Entity.knownname, {1013,701}, $Entity.skill.navigation]" />
 						</do_if>
+					</do_if>
 				</do_all>
 				<do_all chance="100 - $science*100/$maxSkillValue ">
-						<do_if value="$Entity.skill.science" max="$maxSkillValue-1">
-							<set_value name="$Entity.$jlp_skill_science"  operation="add" exact="$skillFactor/$science" />
-							<wait min="4s" max="9s"/>
-							<do_if value="$Entity.$jlp_skill_science" min="$Entity.skill.science + 1">
-								<add_skill entity="$Entity" type="science" exact="1" />
-								<write_to_logbook category="squad" text="{8570,50200}.[$Entity.ship.knownname, $Entity.knownname, {1013,801}, $Entity.skill.science]"/>
-							</do_if>
+					<do_if value="$Entity.skill.science" max="$maxSkillValue-1">
+						<set_value name="$Entity.$jlp_skill_science" operation="add" exact="$skillFactor/$science" />
+						<wait min="4s" max="9s" />
+						<do_if value="$Entity.$jlp_skill_science" min="$Entity.skill.science + 1">
+							<add_skill entity="$Entity" type="science" exact="1" />
+							<write_to_logbook category="squad"
+								text="{8570,50200}.[$Entity.ship.knownname, $Entity.knownname, {1013,801}, $Entity.skill.science]" />
 						</do_if>
+					</do_if>
 				</do_all>
 
 
 			</do_elseif>
 			<do_elseif value="$Mode" exact="'show'">
-				<!-- ##########################################################  Show Skills with Notifcation and logbook  ########################################################### -->
+				<!-- ################ Show Skills with Notifcation and logbook ################################## -->
+				<do_if value="@$Entity.$jlp_unitrader_range == 'ranged'">
+					<set_value name="$home"
+						exact="$Entity.$jlp_unitrader_home.cluster.knownname + ' / ' + $Entity.$jlp_unitrader_home.sector.knownname + ' / ' + $Entity.$jlp_unitrader_home.knownname" />
+					<set_value name="$RangeText"
+						exact="'Buy -%5- ( %1 - %2) Sell -%6- ( %3 - %4)\n'.[($Entity.$jlp_unitrader_jump_buy_min)i, ($Entity.$jlp_unitrader_jump_buy_max)i, ($Entity.$jlp_unitrader_jump_sell_min)i, ($Entity.$jlp_unitrader_jump_sell_max)i, $Entity.$jlp_unitrader_trade_stations_buy, $Entity.$jlp_unitrader_trade_stations_sell]" />
+				</do_if>
+				<do_elseif value="@$Entity.$jlp_unitrader_range == 'cluster'">
+					<set_value name="$home" exact="$Entity.$jlp_unitrader_home.cluster.knownname" />
+					<set_value name="$RangeText" exact="readtext.{20001}.{101}" />
+				</do_elseif>
+				<do_elseif value="@$Entity.$jlp_unitrader_range == 'sector'">
+					<set_value name="$home"
+						exact="$Entity.$jlp_unitrader_home.cluster.knownname + ' / ' + $Entity.$jlp_unitrader_home.sector.knownname" />
+					<set_value name="$RangeText" exact="readtext.{20001}.{201}" />
+				</do_elseif>
+				<do_elseif value="@$Entity.$jlp_unitrader_range == 'zone'">
+					<set_value name="$home"
+						exact="$Entity.$jlp_unitrader_home.cluster.knownname + ' / ' + $Entity.$jlp_unitrader_home.sector.knownname + ' / ' + $Entity.$jlp_unitrader_home.knownname" />
+					<set_value name="$RangeText" exact="readtext.{20001}.{301}" />
+				</do_elseif>
 
 				<substitute_text text="$notiDears" source="{8570,10}">
 					<replace string="'$ENTITYTYPE$'" with="$Entity.typename" />
@@ -206,12 +249,16 @@
 					<replace string="'$EXTRAFACTION$'" with="$Entity.$jlp_unitrader_extrafaction" />
 					<replace string="'$COURAGE$'" with="$Entity.$jlp_unitrader_courage" />
 					<replace string="'$EFFICIENCY$'" with="$Entity.$jlp_unitrader_efficiency" />
-					<replace string="'$RANGE$'" with="$Entity.$jlp_unitrader_range" />
+					<replace string="'$RANGE$'" with="$RangeText" />
 					<replace string="'$HOME$'" with="$Entity.$jlp_unitrader_home.knownname" />
 					<replace string="'$MAXBUDGET$'" with="$Entity.$jlp_unitrader_budgetmax/1Cr" />
 				</substitute_text>
-				<show_notification  timeout="10s" relationeffect="true" object="$Entity" caption="{8570,1000}" icon="achievement_capitalshipkill_1" queued="true" sound="notification_generic"  details="$detail1"/>
-				<write_to_logbook   object="$Entity" category="squad" text="'%1\n %2'.[$notiDears, $detail1]"/>
+				<show_notification timeout="10s" relationeffect="true" object="$Entity"
+					caption="{8570,1000}" icon="achievement_capitalshipkill_1" queued="false" sound="notification_generic"
+					details="$detail1" />
+				<do_if value="@$Entity.$jlp_unitrader_show_extendedlogbook">
+					<write_to_logbook object="$Entity" category="squad" text="'%1\n %2'.[$notiDears, $detail1]" />
+				</do_if>
 			</do_elseif>
 		</actions>
 	</attention>

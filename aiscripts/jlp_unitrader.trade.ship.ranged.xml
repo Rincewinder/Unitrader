@@ -4,12 +4,12 @@
 >
 	<params>
 		<param name="PageId" default="8570" />
-		<param name="range" default="'ranged'"/>
-		<param name="home" default="this.ship.cluster"/>
+		<param name="range" default="'ranged'" />
+		<param name="home" default="this.ship.cluster" />
 		<param name="minbuy" default="0" />
-		<param name="maxbuy" default="25" />
+		<param name="maxbuy" default="24" />
 		<param name="minsell" default="0" />
-		<param name="maxsell" default="25" />
+		<param name="maxsell" default="24" />
 		<param name="debugchance" default="0" />
 	</params>
 	<init>
@@ -18,35 +18,45 @@
 	<attention min="unknown">
 		<actions>
 
-			<create_list name="$basket" />
 
-<!-- 			<find_object groupname="$wares" class="class.container" tag="tag.economy"
+
+			<!--
+				<create_list name="$basket" />
+				<find_object groupname="$wares" class="class.container" tag="tag.economy"
 				space="player.galaxy" multiple="true" />
-			<do_all exact="$wares.count" counter="$Counter">
+				<do_all exact="$wares.count" counter="$Counter">
 				<do_if value="@this.ship.cargo.{$wares.{$Counter}}.max" min="1">
-					<append_to_list name="$basket" exact="$wares.{$Counter}" />
-					<write_to_logbook category="squad"
-						text="Player.age + 'have space for
+				<append_to_list name="$basket" exact="$wares.{$Counter}" />
+				<write_to_logbook category="squad"
+				text="Player.age + 'have space for
 				' + $wares.{$Counter}.name" />
 				</do_if>
-			</do_all>
- -->
+				</do_all>
+			-->
 
 			<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 1200">
 				<run_script name="'move.refuel'" sinceversion="1" />
 			</do_if>
+			<do_if value="$range" exact="'ranged'">
+				<run_script name="'jlp.unitrader.trade.ship'" sinceversion="1">
+					<param name="PageId" value="$PageId" />
+					
+					<param name="range" value="$range" />
+					<param name="home" value="$home" />
+					<param name="additionalparams" value="[$minsell, $maxsell, $minbuy, $maxbuy]" />
+					<param name="debugchance" value="$debugchance" />
+				</run_script>
+			</do_if>
+			<do_else>
+				<run_script name="'jlp.unitrader.trade.ship'" sinceversion="1">
+					<param name="PageId" value="$PageId" />
+				
+					<param name="range" value="$range" />
+					<param name="home" value="$home" />
+					<param name="debugchance" value="$debugchance" />
+				</run_script>
 
-			<run_script name="'jlp.unitrader.trade.ship'"
-				sinceversion="1"
-			>
-				<param name="PageId" value="$PageId" />
-				<param name="warelist" value="$basket" />
-				<param name="range" value="$range" />
-				<param name="home" value="$home"/>
-				<param name="additionalparams"
-					value="[$minsell, $maxsell*this.$jlp_unitrader_courage/100i, $minbuy, $maxbuy*this.$jlp_unitrader_courage/100]" />
-				<param name="debugchance" value="$debugchance" />
-			</run_script>
+			</do_else>
 
 		</actions>
 	</attention>

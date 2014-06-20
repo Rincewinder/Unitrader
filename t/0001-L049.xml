@@ -25,13 +25,21 @@
 			<t id="2010">Schürfer starten</t>
 			<t id="2011">Schürfer stoppen</t>
 			<t id="3010">Talente anzeigen</t>
-			<t id="4010">erw. Logbuch on</t>
-			<t id="4011">erw. Logbuch off</t>
+			<t id="4010">Nachrichten on</t>
+			<t id="4011">Nachrichten off</t>
+
+			<t id="4110">Handel</t>
+			<t id="4111">Kaufstation</t>
+			<t id="4112">Verkaufstation</t>
+			<t id="4121">nur {20204, 10027} (Stationtrader)</t>
+			<t id="4122">nur Bekannte</t>
+			<t id="4123">alle</t>
 			
 			<t id="5000">Einstellungen</t>
 			<t id="5100">Konto</t>
 			<t id="5111">Maximal</t>
 			<t id="5112">Minimal</t>
+			<t id="5120">0 Cr</t>
 			<t id="5121">100 Million</t>
 			<t id="5122">50 Million</t>
 			<t id="5123">10 Million</t>
@@ -40,6 +48,17 @@
 			<t id="5126">500 Tausend</t>
 			
 			<t id="5200">Reichweite</t>
+			<t id="5210">Reichweite ändern</t>
+			<t id="5211">Max Kaufreichweite</t>
+			<t id="5212">Min Kaufreichweite</t>
+			<t id="5213">Max Verkaufsreichweite</t>
+			<t id="5214">Min Verkaufsreichweite</t>
+			<t id="5220">0 {20001,102}</t>
+			<t id="5221">2 {20001,101}</t>
+			<t id="5222">4 {20001,102}</t>
+			<t id="5223">8 {20001,102}</t>
+			<t id="5224">16 {20001,102}</t>
+			<t id="5225">24 {20001,102}</t>
 
 			<t id="5300">Verhalten</t>
 
@@ -48,7 +67,7 @@
 			<t id="50000">%1: '%2' Verkaufte '%3' von '%4' vorhandene Lagermenge %5 für %6 %7Cr Stückpreis. Verkaufte an '%8' gewünschte Lagermenge%9 für %10Cr %11Cr Stückpreis.</t>
             <t id="50100">%1: '%2' Ich überweise den Rest meines Budget über %3 Cr.</t>
             <t id="50200">%1: '%2' Ich habe beim %3 Skill um 1 Stern dazugelernt \(%4 Sterne\).</t>
-            <t id="50210">Meine Skills sind:\n Organisationtalent:     '$WAITTIME$s'\n Technisches Talent:'  '$SEARCHTIME$s'\n Austrahlungsbonus:  '$EXTRAFACTION$%'\n Mut:                              '$COURAGE$%'\n Effektivität:                     '$EFFICIENCY$%'.\n {8570,50211}</t>
+            <t id="50210">Organisationtalent:     '$WAITTIME$s'\n Technisches Talent:'  '$SEARCHTIME$s'\n Austrahlungsbonus:  '$EXTRAFACTION$%'\n Mut:                              '$COURAGE$%'\n Effektivität:                     '$EFFICIENCY$%'.\n {8570,50211}</t>
 			<t id="50211">Reichweite: $RANGE$ \('$HOME$'\) \n Max Budget: $MAXBUDGET$ Cr</t>
 			<t id="50300">Ich habe ein Handel gefunden.\n Ware: '$TRADEWARE$  \('$WAREPRICEMIN$.$WAREPRICEMINCT$ Cr' - '$WAREPRICEMAX$.$WAREPRICEMINCT$ Cr'\)'    Volumen: '$TRADEWAREVOLUME$'.\n Kaufpreis: '$WAREPRICESELLOFFER$.$WAREPRICESELLOFFERCT$ Cr' Verkaufspreis: '$WAREPRICEBUYOFFER$.$WAREPRICEBUYOFFERCT$ Cr'</t>
 			<t id="50301">'$TRADESOURCE$ \(max: $TRADESOURCEAMOUNT$\)' mit\n '$TRADEDESTINATION$  \(max: '$TRADEDESTAMOUNT$'\)'</t>
@@ -60,9 +79,6 @@
 			<t id="50324">eine schlechte Menge</t>
 			
 			<t id="50400">$SHIP$\n Ich habe erfolgreich ein Handel getätigt.\n Ware: $WARE$ verk. Menge: $AMOUNT$\n Einkaufspreis: $PRICEBUY$ Cr Verkaufspreis: $PRICESELL$ Cr\n Profit: $PROFIT$ Cr</t>
-           
-
-			
 
 		</page>
     </add>

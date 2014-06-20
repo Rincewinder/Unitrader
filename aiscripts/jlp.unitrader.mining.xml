@@ -58,8 +58,12 @@
 
 
 			<do_if value="this.$jlpUniMiningRun" exact="true">
+				<!-- Init -->
+				<run_script name="'jlp.unitrader.skills'" sinceversion="1">
+					<param name="Mode" value="'init'" />
+					<param name="debugchance" value="$debugchance" />
+				</run_script>
 
-				<!--<set_actor_max_budget actor="this" amount="$MaxBudget"/> -->
 				<!-- check maxbudget and give the rest to player -->
 				<do_if value="this.money" min="$maxBudget">
 					<set_value name="$transferMoney" exact="this.money - $maxBudget" />
@@ -72,10 +76,6 @@
 						<wait min="4s" max="9s" />
 					</do_if>
 				</do_if>
-				<run_script name="'jlp.unitrader.skills'" sinceversion="1">
-					<param name="Mode" value="'init'" />
-					<param name="debugchance" value="$debugchance" />
-				</run_script>
 
 				<!-- TODO: change to check ship tags instead of cargo, so we can deal 
 					with count = 0 cases; needs adding of ?? -->
