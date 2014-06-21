@@ -220,9 +220,10 @@
 								exact="0.0f + 0.9999999f * (1f-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)/200f)f)f" />
 							<set_value name="$relPriceMax" exact="$relPriceMax * (@this.$trade_failedfindruns+1f)f" />
 							<set_value name="$relPriceMin" exact="$relPriceMin / (@this.$trade_failedfindruns+1f)f" />
-							<set_value name="$sellvolume" exact="$currentWare.volume * this.ship.cargo.{$currentWare}.count/(1 + @this.$trade_failedfindruns)" />
+							<set_value name="$sellvolume"
+								exact="$currentWare.volume * this.ship.cargo.{$currentWare}.count/(1 + @this.$trade_failedfindruns)" />
 							<do_if value="this.ship.cargo.{$currentWare}.free" max="this.ship.cargo.{$currentWare}.max/2">
-								<!-- if we have <= 50% free cargospace, also accept buyoffers for less-->
+								<!-- if we have <= 50% free cargospace, also accept buyoffers for less -->
 								<set_value name="$sellvolume"
 									exact="($currentWare.volume * this.ship.cargo.{$currentWare}.count)/(1 + @this.$trade_failedfindruns)" />
 							</do_if>
@@ -237,8 +238,8 @@
 							wares="$currentWare" knowntoplayer="$onlyKnownSell" usereservations="true" multiple="true"
 						>
 
-						
-							<relativeprice max="$relPriceMax" min="$relPriceMin" /> 
+
+							<relativeprice max="$relPriceMax" min="$relPriceMin" />
 
 							<totalvolume min="$sellvolume" />
 							<match_buyer>
@@ -905,21 +906,17 @@
 										<do_if value="$checkamount gt $checkoffer.offeramount.{this}">
 											<set_value name="$checkamount" exact="$checkoffer.offeramount.{this}" />
 										</do_if>
-										<do_if value="$capship">
-											<get_jump_cost ship="this.ship" start="this.sector" end="$selloffer.seller.sector"
-												result="$trip1" />
-											<get_jump_cost ship="this.ship" start="$selloffer.seller.sector" end="$checkoffer.buyer.sector"
-												result="$trip2" />
-											<set_value name="$fuelcost" exact="($trip1 + $trip2) * ware.fuelcells.averageprice" />
-										</do_if>
-										<do_else>
-											<set_value name="$fuelcost" exact="0" />
-										</do_else>
+										<get_jump_cost ship="this.ship" start="this.sector" end="$selloffer.seller.sector"
+											result="$trip1" />
+										<get_jump_cost ship="this.ship" start="$selloffer.seller.sector" end="$checkoffer.buyer.sector"
+											result="$trip2" />
+										<set_value name="$fuelcost" exact="($trip1 + $trip2) * ware.fuelcells.averageprice" />
 										<set_value name="$profit" exact="($checkoffer.unitprice - $selloffer.unitprice) * $checkamount" />
 										<debug_text
 											text="'trip to buy %1 %2 at %3(%4) and sell to %5(%6) has potential profit of %7 Cr and costs %8 Cr. real profit: %9 Cr.'.[$checkamount, $checkoffer.ware, $selloffer.seller.knownname, $selloffer.seller, $checkoffer.buyer.knownname, $checkoffer.buyer, $profit/1Cr, $fuelcost/1Cr, ($profit - $fuelcost)/1Cr]"
 											chance="$debugchance" />
-										<do_if value="$fuelcost ge ($profit - ($selloffer.unitprice * $checkamount * 0.02f))">
+										<!-- <do_if value="$fuelcost ge ($profit - ($selloffer.unitprice * $checkamount * 0.02f))"> -->
+											<do_if value="$fuelcost ge $profit">
 											<!-- if we don't make at least 2% of the ware price after expenses,
 												this isn't worth our time -->
 											<debug_text
@@ -944,7 +941,7 @@
 				</do_if>
 			</do_if>
 			<!-- No trade found, try next buy cluster to find a new trade -->
-			<do_if value="@$sellrange and $buyclusters.count">
+			<do_if value="@$sellrange">
 				<set_value name="$checkrange" exact="null" />
 				<write_to_logbook text="this.ship.name + ' no trade found!. Check next Cluster'"
 					category="squad" chance="$debugchance2" />

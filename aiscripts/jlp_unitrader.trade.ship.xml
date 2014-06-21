@@ -195,7 +195,7 @@
 							<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 100">
 								<run_script name="'move.refuel'" sinceversion="1" />
 							</do_if>
-							<set_command command="command.movetozone"  param="$tradeoffersSort.{$Counter}.seller.zone"/>
+							
 							<wait min="20ms" max="80ms" sinceversion="1" />
 							<run_script name="'move.generic'" sinceversion="1">
 								<param name="destination" value="$tradeoffersSort.{$Counter}.seller" />
@@ -326,7 +326,7 @@
 							<set_faction_known faction="$Buyer.owner" known="true" />
 							<wait min="4s" max="9s" />
 							<add_faction_relation faction="faction.player" otherfaction="$Buyer.owner"
-								value="this.$jlp_unitrader_extrafaction/100000" />
+								value="this.$jlp_unitrader_extrafaction/100000f" />
 							<wait min="4s" max="9s" />
 							<add_player_discount name="$notiDearsShip" amount="$CommissionAmount"
 								entity="$BuyerEntity" time="$CommissionTime" />
@@ -342,7 +342,7 @@
 							<set_faction_known faction="$Seller.owner" known="true" />
 							<wait min="4s" max="9s" />
 							<add_faction_relation faction="faction.player" otherfaction="$Seller.owner"
-								value="this.$jlp_unitrader_extrafaction/100000" />
+								value="this.$jlp_unitrader_extrafaction/100000f" />
 							<wait min="4s" max="9s" />
 							<add_player_commission name="$notiDearsShip" amount="$CommissionAmount"
 								entity="$SellerEntity" time="$CommissionTime" />
