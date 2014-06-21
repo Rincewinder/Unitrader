@@ -60,11 +60,6 @@
 					<set_value name="$range" exact="$home" />
 					<set_value name="$sellrange" exact="[$additionalparams.{1}, $additionalparams.{2}]" />
 					<set_value name="$buyrange" exact="[$additionalparams.{3}, $additionalparams.{4}]" />
-
-					<do_if value="this.$traderange_sellclusters?">
-						<remove_value name="this.$traderange_nexttime" />
-						<remove_value name="this.$traderange_sellclusters" />
-					</do_if>
 				</do_elseif>
 				<do_else>
 					<set_value name="$range" exact="this.ship.sector" />
@@ -94,7 +89,6 @@
 				<param name="warelist" value="$warelist" />
 				<param name="range" value="$range" />
 				<param name="rangeMode" value="$rangeMode"/>
-				<param name="home" value="$home"/>
 				<param name="sellrange" value="$sellrange" />
 				<param name="buyrange" value="$buyrange" />
 				<param name="debugchance" value="$debugchance" />
@@ -133,12 +127,12 @@
 				</do_if>
 
 				<!--search for tradeoffer with warelist in Galaxy sort by distance -->
-				<set_command_action commandaction="commandaction.standingby" />
+				<set_command command="command.move" />
 				<wait exact="this.$jlp_unitrader_searchtime" sinceversion="1" />
 				<!-- TODO check if $sellrange is the gate distance? -->
 				<do_if value="$buyrange">
-					<find_sector space="player.galaxy" multiple="true" name="$sectors" known="true">
-						<match_gate_distance object="this.ship">
+					<find_sector space="player.galaxy" multiple="true" name="$sectors">
+						<match_gate_distance object="$home">
 							<max min="$buyrange.{1}" max="$buyrange.{2}" />
 						</match_gate_distance>
 					</find_sector>
@@ -160,14 +154,14 @@
 						space="$sectors.{$Counter}" wares="$warelist" knowntoplayer="$onlyKnownBuy"
 					>
 						<!-- TODO realtiveprice use with skill maybe -->
-						<relativeprice max="0.9999999f" />
+						<totalvolume min="1"/>
 						<match_seller>
 							<match_any>
 								<match_relation faction="faction.player" comparison="exact" relation="friend" />
 								<match_relation faction="faction.player" comparison="exact" relation="neutral" />
 							</match_any>
 						</match_seller>
-						<totalvolume  min="1" />
+						
 					</find_sell_offer>
 					<do_all exact="$tradeoffer.count" counter="$Counter2">
 						<do_if value="this.ship.cargo.{$tradeoffer.{$Counter2}.ware}.max" min="1">

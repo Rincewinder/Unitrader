@@ -81,7 +81,14 @@
 
       <!-- Remove blackboard variable to check if is in the middle of parking -->
       <remove_value name="this.$ship_parking" />
-      <set_value name="this.$trade_failedfindruns" exact="0"  />
+      <remove_value name="this.$trade_failedfindruns" />
+      <remove_value name="this.$jlp_unitrader_waittime" />
+      <remove_value name="this.$jlp_unitrader_searchtime" />
+      <remove_value name="this.$jlp_unitrader_extrafaction" />
+      <remove_value name="this.$jlp_unitrader_courage" />
+      <remove_value name="this.$jlp_unitrader_efficiency" />
+      <remove_value name="this.$traderange_buyclusters" />
+      <remove_value name="this.$traderange_sellclusters" />
 
     </actions>
   </attention>

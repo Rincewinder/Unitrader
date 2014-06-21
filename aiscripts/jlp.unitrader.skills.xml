@@ -217,22 +217,22 @@
 			<do_elseif value="$Mode" exact="'show'">
 				<!-- ################ Show Skills with Notifcation and logbook ################################## -->
 				<do_if value="@$Entity.$jlp_unitrader_range == 'ranged'">
-					<set_value name="$home"
+					<set_value name="$HomeText"
 						exact="$Entity.$jlp_unitrader_home.cluster.knownname + ' / ' + $Entity.$jlp_unitrader_home.sector.knownname + ' / ' + $Entity.$jlp_unitrader_home.knownname" />
 					<set_value name="$RangeText"
 						exact="'Buy -%5- ( %1 - %2) Sell -%6- ( %3 - %4)\n'.[($Entity.$jlp_unitrader_jump_buy_min)i, ($Entity.$jlp_unitrader_jump_buy_max)i, ($Entity.$jlp_unitrader_jump_sell_min)i, ($Entity.$jlp_unitrader_jump_sell_max)i, $Entity.$jlp_unitrader_trade_stations_buy, $Entity.$jlp_unitrader_trade_stations_sell]" />
 				</do_if>
 				<do_elseif value="@$Entity.$jlp_unitrader_range == 'cluster'">
-					<set_value name="$home" exact="$Entity.$jlp_unitrader_home.cluster.knownname" />
+					<set_value name="$HomeText" exact="$Entity.$jlp_unitrader_home.cluster.knownname" />
 					<set_value name="$RangeText" exact="readtext.{20001}.{101}" />
 				</do_elseif>
 				<do_elseif value="@$Entity.$jlp_unitrader_range == 'sector'">
-					<set_value name="$home"
+					<set_value name="$HomeText"
 						exact="$Entity.$jlp_unitrader_home.cluster.knownname + ' / ' + $Entity.$jlp_unitrader_home.sector.knownname" />
 					<set_value name="$RangeText" exact="readtext.{20001}.{201}" />
 				</do_elseif>
 				<do_elseif value="@$Entity.$jlp_unitrader_range == 'zone'">
-					<set_value name="$home"
+					<set_value name="$HomeText"
 						exact="$Entity.$jlp_unitrader_home.cluster.knownname + ' / ' + $Entity.$jlp_unitrader_home.sector.knownname + ' / ' + $Entity.$jlp_unitrader_home.knownname" />
 					<set_value name="$RangeText" exact="readtext.{20001}.{301}" />
 				</do_elseif>
@@ -250,7 +250,7 @@
 					<replace string="'$COURAGE$'" with="$Entity.$jlp_unitrader_courage" />
 					<replace string="'$EFFICIENCY$'" with="$Entity.$jlp_unitrader_efficiency" />
 					<replace string="'$RANGE$'" with="$RangeText" />
-					<replace string="'$HOME$'" with="$Entity.$jlp_unitrader_home.knownname" />
+					<replace string="'$HOME$'" with="$HomeText" />
 					<replace string="'$MAXBUDGET$'" with="$Entity.$jlp_unitrader_budgetmax/1Cr" />
 				</substitute_text>
 				<show_notification timeout="10s" relationeffect="true" object="$Entity"

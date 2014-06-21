@@ -19,9 +19,9 @@
 		<actions>
 
 
-
+			<create_list name="$basket" />
 			<!--
-				<create_list name="$basket" />
+				
 				<find_object groupname="$wares" class="class.container" tag="tag.economy"
 				space="player.galaxy" multiple="true" />
 				<do_all exact="$wares.count" counter="$Counter">

@@ -7,7 +7,7 @@
 		<param name="maxBudget" default="100000000ct" />
 		<param name="range" default="'ranged'" />
 		<param name="homeStart" default="this.ship.cluster" />
-		<param name="debugchance" default="0" />
+		
 	</params>
 	<interrupts>
 		<handler ref="JLPUnitraderShipOwnedAttackedHandler" />
@@ -134,10 +134,15 @@
 						<set_value name="$maxsell" exact="this.$jlp_unitrader_jump_sell_max * this.$jlp_unitrader_courage/100i" />
 					</do_else>
 				</do_if>
+				<do_else>
+						<remove_value name="this.$jlp_unitrader_jump_sell_max" />
+						<remove_value name="this.$jlp_unitrader_jump_sell_min" />
+						<remove_value name="this.$jlp_unitrader_jump_buy_max" />
+						<remove_value name="this.$jlp_unitrader_jump_buy_min"/>
+				</do_else>
 				<!-- Set parameters -->
 				<set_actor_min_budget actor="this" amount="0ct" />
 				<set_actor_max_budget actor="this" amount="$maxBudget*10ct" />
-				<set_value name="this.$traderange_nexttime" exact="player.age"/>
 				
 
 				<!--<set_actor_max_budget actor="this" amount="$MaxBudget"/> -->
@@ -162,7 +167,7 @@
 					<param name="maxbuy" value="$maxbuy" />
 					<param name="minsell" value="$minsell" />
 					<param name="maxsell" value="$maxsell" />
-					<param name="debugchance" value="$debugchance" />
+					<param name="debugchance" value="0" />
 				</run_script>
 
 
