@@ -127,7 +127,7 @@
 				</do_if>
 
 				<!--search for tradeoffer with warelist in Galaxy sort by distance -->
-				<set_command command="command.move" />
+				
 				<wait exact="this.$jlp_unitrader_searchtime" sinceversion="1" />
 				<!-- TODO check if $sellrange is the gate distance? -->
 				<do_if value="$buyrange">
@@ -195,7 +195,7 @@
 							<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 100">
 								<run_script name="'move.refuel'" sinceversion="1" />
 							</do_if>
-
+							<set_command command="command.movetozone"  param="$tradeoffersSort.{$Counter}.seller.zone"/>
 							<wait min="20ms" max="80ms" sinceversion="1" />
 							<run_script name="'move.generic'" sinceversion="1">
 								<param name="destination" value="$tradeoffersSort.{$Counter}.seller" />
