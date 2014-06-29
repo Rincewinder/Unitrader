@@ -40,7 +40,6 @@
 			<do_if value="$range" exact="'ranged'">
 				<run_script name="'jlp.unitrader.trade.ship'" sinceversion="1">
 					<param name="PageId" value="$PageId" />
-					
 					<param name="range" value="$range" />
 					<param name="home" value="$home" />
 					<param name="additionalparams" value="[$minsell, $maxsell, $minbuy, $maxbuy]" />
@@ -50,7 +49,6 @@
 			<do_else>
 				<run_script name="'jlp.unitrader.trade.ship'" sinceversion="1">
 					<param name="PageId" value="$PageId" />
-				
 					<param name="range" value="$range" />
 					<param name="home" value="$home" />
 					<param name="debugchance" value="$debugchance" />

@@ -56,7 +56,7 @@
 	</interrupts>
 	<attention min="unknown">
 		<actions>
-
+			<set_value name="debugchance" exact="0" />
 			<!-- trade loop start -->
 			<label name="start" />
 			<wait chance="0" exact="0s" /> <!-- Reset script if new -->
@@ -158,18 +158,26 @@
 						<wait min="4s" max="9s" />
 					</do_if>
 				</do_if>
-
-				<run_script name="'jlp.unitrader.trade.ship.ranged'" sinceversion="1">
-					<param name="range" value="$range" />
-					<param name="home" value="$homeStart" />
-					<param name="PageId" value="$PageId" />
-					<param name="minbuy" value="$minbuy" />
-					<param name="maxbuy" value="$maxbuy" />
-					<param name="minsell" value="$minsell" />
-					<param name="maxsell" value="$maxsell" />
-					<param name="debugchance" value="0" />
-				</run_script>
-
+				<do_if value="$range == 'ranged'">
+					<run_script name="'jlp.unitrader.trade.ship.ranged'" sinceversion="1">
+						<param name="range" value="$range" />
+						<param name="home" value="$homeStart" />
+						<param name="PageId" value="$PageId" />
+						<param name="minbuy" value="$minbuy" />
+						<param name="maxbuy" value="$maxbuy" />
+						<param name="minsell" value="$minsell" />
+						<param name="maxsell" value="$maxsell" />
+						<param name="debugchance" value="0" />
+					</run_script>
+				</do_if>
+				<do_else>
+					<run_script name="'jlp.unitrader.trade.ship.ranged'" sinceversion="1">
+						<param name="range" value="$range" />
+						<param name="home" value="$homeStart" />
+						<param name="PageId" value="$PageId" />
+						<param name="debugchance" value="0" />
+					</run_script>
+				</do_else>
 
 				<resume label="start" />
 			</do_if>

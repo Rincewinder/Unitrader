@@ -11,10 +11,10 @@
 						<event_conversation_returned_to_section sectionprefix="gOrders_advanced" />
 						<check_all>
 							<event_cue_completed cue="md.BKCommMenu.Setup" /> <!-- TODO need this?? -->
-							<check_all>
+							<check_any>
 								<event_player_created />
 								<check_value value="@md.BKCommMenu.Setup.state" exact="cuestate.complete" />
-							</check_all>
+							</check_any>
 						</check_all>
 					</check_any>
 					<check_object object="event.object.ship">
