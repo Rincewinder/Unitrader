@@ -194,7 +194,7 @@
 						<find_buy_offer tradepartner="this.ship" space="$checkrange" result="$buyoffer"
 							wares="$currentWare"
 						>
-							<totalvolume min="1" />
+							<offeramount entity="this" min="1" />
 							<match_buyer>
 								<match class="class.ship_xl" owner="faction.player" />
 							</match_buyer>
@@ -240,8 +240,8 @@
 
 
 							<relativeprice max="$relPriceMax" min="$relPriceMin" />
-
-							<totalvolume min="$sellvolume" />
+							<offeramount entity="this" min="$sellvolume"/>
+							
 							<match_buyer>
 								<match class="class.ship_xl" negate="true">
 									<match_any>
@@ -434,7 +434,7 @@
 					<find_buy_offer tradepartner="this.ship" space="$checkrange" result="$buildoffers"
 						multiple="true"
 					>
-						<totalvolume min="1" />
+						<offeramount entity="this" min="1" />
 						<match_buyer>
 							<match class="class.ship_xl" owner="faction.player" />
 						</match_buyer>
@@ -517,7 +517,8 @@
 						>
 
 							<relativeprice max="$relPriceMax" min="$relPriceMin" />
-							<totalvolume min="$searchMinVolume" />
+							<offeramount entity="this" min="$searchMinVolume"/>
+							
 							<match_seller>
 								<match class="class.ship_xl" negate="true" />
 								<match_any>
@@ -639,7 +640,7 @@
 								result="$buyoffers" multiple="true" knowntoplayer="$onlyKnownSell" usereservations="true"
 							>
 
-								<totalvolume min="$searchMinVolume" />
+								<offeramount entity="this" min="$searchMinVolume"/>
 								<relativeprice max="$relPriceMax" min="$relPriceMin" />
 								<match_buyer>
 									<match class="class.ship_xl" negate="true">
@@ -719,7 +720,8 @@
 						<find_buy_offer tradepartner="this.ship" wares="$soldwares" space="$range"
 							result="$buyoffers" multiple="true" knowntoplayer="$onlyKnownSell" usereservations="true"
 						>
-							<totalvolume min="$searchMinVolume" />
+							
+							<offeramount entity="this" min="$searchMinVolume"/>
 							<relativeprice max="$relPriceMax" min="$relPriceMin" />
 							<match_buyer>
 								<match class="class.ship_xl" negate="true">

@@ -254,7 +254,7 @@
 					<replace string="'$MAXBUDGET$'" with="$Entity.$jlp_unitrader_budgetmax/1Cr" />
 				</substitute_text>
 				<show_notification timeout="10s" relationeffect="true" object="$Entity"
-					caption="{8570,1000}" icon="achievement_capitalshipkill_1" queued="false" sound="notification_generic"
+					caption="{8570,1000}" icon="achievement_capitalshipkill_1" queued="true" sound="notification_generic"
 					details="$detail1" />
 				<do_if value="@$Entity.$jlp_unitrader_show_extendedlogbook">
 					<write_to_logbook object="$Entity" category="squad" text="'%1\n %2'.[$notiDears, $detail1]" />
