@@ -42,6 +42,7 @@
 					<param name="PageId" value="$PageId" />
 					<param name="range" value="$range" />
 					<param name="home" value="$home" />
+					<param name="warelist" value="$basket"/>
 					<param name="additionalparams" value="[$minsell, $maxsell, $minbuy, $maxbuy]" />
 					<param name="debugchance" value="$debugchance" />
 				</run_script>
@@ -51,6 +52,7 @@
 					<param name="PageId" value="$PageId" />
 					<param name="range" value="$range" />
 					<param name="home" value="$home" />
+					<param name="warelist" value="$basket"/>
 					<param name="debugchance" value="$debugchance" />
 				</run_script>
 

@@ -68,7 +68,7 @@
 
 			<!-- TODO use default ware list unless it has been overridden by parameter -->
 			<do_if value="$warelist == null">
-
+				<create_list name="$warelist"/>
 			</do_if>
 
 
