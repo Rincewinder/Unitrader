@@ -56,7 +56,7 @@
 	</interrupts>
 	<attention min="unknown">
 		<actions>
-			<set_value name="debugchance" exact="0" />
+			<set_value name="$debugchance" exact="0" />
 			<!-- trade loop start -->
 			<label name="start" />
 			<wait chance="0" exact="0s" /> <!-- Reset script if new -->
