@@ -214,12 +214,8 @@
 							chance="$debugchance" />
 						<!-- Sell after 3 tries to lowes price Sellvolume is 0 -->
 						<do_if value="@this.$trade_failedfindruns" max="3">
-							<set_value name="$relPriceMax"
-								exact="2f - 1f * (1f-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)/200f)f)f" />
 							<set_value name="$relPriceMin"
-								exact="0.0f + 0.9999999f * (1f-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)/200f)f)f" />
-							<set_value name="$relPriceMax" exact="$relPriceMax * (@this.$trade_failedfindruns+1f)f" />
-							<set_value name="$relPriceMin" exact="$relPriceMin / (@this.$trade_failedfindruns+1f)f" />
+								exact="2f * (1f-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency + @this.$trade_failedfindruns*25)f/300.0f))" />
 							<set_value name="$sellvolume"
 								exact="$currentWare.volume * this.ship.cargo.{$currentWare}.count/(1 + @this.$trade_failedfindruns)" />
 							<do_if value="this.ship.cargo.{$currentWare}.free" max="this.ship.cargo.{$currentWare}.max/2">
@@ -237,11 +233,8 @@
 						<find_buy_offer tradepartner="this.ship" space="$checkrange" result="$buyoffers"
 							wares="$currentWare" knowntoplayer="$onlyKnownSell" usereservations="true" multiple="true"
 						>
-
-
-							<relativeprice max="$relPriceMax" min="$relPriceMin" />
+							<relativeprice  min="$relPriceMin" />
 							<offeramount entity="this" min="$sellvolume"/>
-							
 							<match_buyer>
 								<match class="class.ship_xl" negate="true">
 									<match_any>
@@ -250,7 +243,6 @@
 									</match_any>
 								</match>
 							</match_buyer>
-
 						</find_buy_offer>
 						<remove_value name="$sellvolume" />
 
@@ -495,15 +487,10 @@
 					<do_else>
 						<!-- Skill volume -->
 						<set_value name="$minVolumeRange"
-							exact="$minvolume*(1f-((this.$jlp_unitrader_efficiency + this.$jlp_unitrader_courage)/200f)f)f" />
+							exact="$minvolume*(1f-((this.$jlp_unitrader_efficiency + this.$jlp_unitrader_courage)f/200f))" />
 						<set_value name="$searchMinVolume" exact="$minvolume - $minVolumeRange" />
 						<set_value name="$relPriceMax"
-							exact="2.0f - 1.0f * (1.0f-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)/200f)f)f" />
-						<set_value name="$relPriceMin"
-							exact="0.0f + 0.99999999f * (1.0f-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)/200f)f)f" />
-						<set_value name="$relPriceMax" exact="$relPriceMax * (@this.$trade_failedfindruns+1f)f" />
-						<set_value name="$relPriceMin" exact="$relPriceMin / (@this.$trade_failedfindruns+1f)f" />
-						<set_value name="$searchMinVolume" exact="$searchMinVolume / (@this.$trade_failedfindruns+1f)f" />
+							exact="2.0f * (1.0f-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency + @this.$trade_failedfindruns*33)f/300.0f))" />
 
 						<debug_text
 							text="player.age + '%1:%2Look for Buy: relPrice: %3\nVolume: %4\nwith my skills:'.[this.ship.knownname, this.knownname, $relPrice, $searchMinVolume ]"
@@ -515,10 +502,8 @@
 						<find_sell_offer tradepartner="this.ship" space="$checkrange" result="$selloffers"
 							wares="$filteredwarelist" multiple="true" knowntoplayer="$onlyKnownBuy" usereservations="true"
 						>
-
-							<relativeprice max="$relPriceMax" min="$relPriceMin" />
+							<relativeprice max="$relPriceMax" />
 							<offeramount entity="this" min="$searchMinVolume"/>
-							
 							<match_seller>
 								<match class="class.ship_xl" negate="true" />
 								<match_any>
@@ -612,12 +597,8 @@
 					<set_value name="$minVolumeRange"
 						exact="$minvolume*(1f-((this.$jlp_unitrader_efficiency + this.$jlp_unitrader_courage)/200f)f)f" />
 					<set_value name="$searchMinVolume" exact="$minvolume - $minVolumeRange" />
-					<set_value name="$relPriceMax"
-						exact="2f - 1f * (1.0f-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)/200f)f)f" />
 					<set_value name="$relPriceMin"
-						exact="0.0f + 0.9999999f * (1.0f-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)/200f)f)f" />
-					<set_value name="$relPriceMax" exact="$relPriceMax * (@this.$trade_failedfindruns+1f)f" />
-					<set_value name="$relPriceMin" exact="$relPriceMin / (@this.$trade_failedfindruns+1f)f" />
+						exact="2.0f * (1.0f-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency + @this.$trade_failedfindruns*25)/200.0f)f)f" />
 					<set_value name="$searchMinVolume" exact="$searchMinVolume / (@this.$trade_failedfindruns+1f)f" />
 
 					<debug_text
@@ -639,9 +620,8 @@
 							<find_buy_offer tradepartner="this.ship" wares="$soldwares" space="$sellclusters.{$Counter}"
 								result="$buyoffers" multiple="true" knowntoplayer="$onlyKnownSell" usereservations="true"
 							>
-
 								<offeramount entity="this" min="$searchMinVolume"/>
-								<relativeprice max="$relPriceMax" min="$relPriceMin" />
+								<relativeprice  min="$relPriceMin" />
 								<match_buyer>
 									<match class="class.ship_xl" negate="true">
 										<match_any>
@@ -720,9 +700,8 @@
 						<find_buy_offer tradepartner="this.ship" wares="$soldwares" space="$range"
 							result="$buyoffers" multiple="true" knowntoplayer="$onlyKnownSell" usereservations="true"
 						>
-							
 							<offeramount entity="this" min="$searchMinVolume"/>
-							<relativeprice max="$relPriceMax" min="$relPriceMin" />
+							<relativeprice min="$relPriceMin" />
 							<match_buyer>
 								<match class="class.ship_xl" negate="true">
 									<match_any>
