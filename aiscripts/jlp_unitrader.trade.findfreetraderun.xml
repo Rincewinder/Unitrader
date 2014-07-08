@@ -215,7 +215,7 @@
 						<!-- Sell after 3 tries to lowes price Sellvolume is 0 -->
 						<do_if value="@this.$trade_failedfindruns" max="3">
 							<set_value name="$relPriceMin"
-								exact="2f * (1f-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency + @this.$trade_failedfindruns*25)f/300.0f))" />
+								exact="2.0f * (1.0f-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency + @this.$trade_failedfindruns*25)f/300.0f))" />
 							<set_value name="$sellvolume"
 								exact="$currentWare.volume * this.ship.cargo.{$currentWare}.count/(1 + @this.$trade_failedfindruns)" />
 							<do_if value="this.ship.cargo.{$currentWare}.free" max="this.ship.cargo.{$currentWare}.max/2">
@@ -599,7 +599,7 @@
 						exact="$minvolume*(1f-((this.$jlp_unitrader_efficiency + this.$jlp_unitrader_courage)/200f)f)f" />
 					<set_value name="$searchMinVolume" exact="$minvolume - $minVolumeRange" />
 					<set_value name="$relPriceMin"
-						exact="2.0f * (1.0f-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency + @this.$trade_failedfindruns*25)/200.0f)f)f" />
+						exact="2.0f * (1.0f-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency + @this.$trade_failedfindruns*25)/300.0f)f)f" />
 					<set_value name="$searchMinVolume" exact="$searchMinVolume / (@this.$trade_failedfindruns*20+1f)f" />
 
 					<debug_text
