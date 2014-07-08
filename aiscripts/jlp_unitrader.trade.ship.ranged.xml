@@ -53,7 +53,6 @@
 					<param name="range" value="$range" />
 					<param name="home" value="$home" />
 					<param name="warelist" value="$basket"/>
-					<param name="debugchance" value="$debugchance" />
 				</run_script>
 
 			</do_else>

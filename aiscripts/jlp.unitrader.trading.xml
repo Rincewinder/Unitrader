@@ -7,7 +7,6 @@
 		<param name="maxBudget" default="100000000ct" />
 		<param name="range" default="'ranged'" />
 		<param name="homeStart" default="this.ship.cluster" />
-		
 	</params>
 	<interrupts>
 		<handler ref="JLPUnitraderShipOwnedAttackedHandler" />
@@ -56,7 +55,6 @@
 	</interrupts>
 	<attention min="unknown">
 		<actions>
-			<set_value name="$debugchance" exact="0" />
 			<!-- trade loop start -->
 			<label name="start" />
 			<wait chance="0" exact="0s" /> <!-- Reset script if new -->
@@ -66,7 +64,6 @@
 
 				<run_script name="'jlp.unitrader.skills'" sinceversion="1">
 					<param name="Mode" value="'init'" />
-					<param name="debugchance" value="$debugchance" />
 				</run_script>
 
 				<!-- ############## read from config ###################### -->
@@ -167,7 +164,6 @@
 						<param name="maxbuy" value="$maxbuy" />
 						<param name="minsell" value="$minsell" />
 						<param name="maxsell" value="$maxsell" />
-						<param name="debugchance" value="0" />
 					</run_script>
 				</do_if>
 				<do_else>
@@ -175,7 +171,6 @@
 						<param name="range" value="$range" />
 						<param name="home" value="$homeStart" />
 						<param name="PageId" value="$PageId" />
-						<param name="debugchance" value="0" />
 					</run_script>
 				</do_else>
 

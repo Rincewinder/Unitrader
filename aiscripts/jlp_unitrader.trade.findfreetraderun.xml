@@ -26,7 +26,7 @@
 			<do_if value="$capship">
 				<set_value name="$reservetrades" exact="true" />
 				<!-- higher skill -> more minvolume to can sell or buy more -->
-				<set_value name="$minvolume" exact="this.ship.cargo.capacity/20 " />
+				<set_value name="$minvolume" exact="this.ship.cargo.capacity/70 " />
 			</do_if>
 			<debug_text text="'min trade volume for ' + this.ship.knownname + ': ' + $minvolume"
 				chance="$debugchance" />
@@ -214,26 +214,25 @@
 							chance="$debugchance" />
 						<!-- Sell after 3 tries to lowes price Sellvolume is 0 -->
 						<do_if value="@this.$trade_failedfindruns" max="3">
-							<set_value name="$relPriceMin"
-								exact="2.0f * (1.0f-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency + @this.$trade_failedfindruns*25)f/300.0f))" />
+							<set_value name="$relPrice"
+								exact="2.0f * (1.0f-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency + @this.$trade_failedfindruns*33)f/300.0f))" />
 							<set_value name="$sellvolume"
-								exact="$currentWare.volume * this.ship.cargo.{$currentWare}.count/(1 + @this.$trade_failedfindruns)" />
+								exact="$currentWare.volume * this.ship.cargo.{$currentWare}.count/(1 + @this.$trade_failedfindruns*100)" />
 							<do_if value="this.ship.cargo.{$currentWare}.free" max="this.ship.cargo.{$currentWare}.max/2">
 								<!-- if we have <= 50% free cargospace, also accept buyoffers for less -->
 								<set_value name="$sellvolume"
-									exact="($currentWare.volume * this.ship.cargo.{$currentWare}.count)/(1 + @this.$trade_failedfindruns*20)" />
+									exact="($currentWare.volume * this.ship.cargo.{$currentWare}.count)/(1 + @this.$trade_failedfindruns*100)" />
 							</do_if>
 						</do_if>
 						<do_else>
-							<set_value name="$relPriceMax" exact="2f" />
-							<set_value name="$relPriceMin" exact="0.0f" />
+							<set_value name="$relPrice" exact="0.0f" />
 							<set_value name="$sellvolume" exact="1" />
 						</do_else>
 						<!-- Sell cargo in the near -->
 						<find_buy_offer tradepartner="this.ship" space="$checkrange" result="$buyoffers"
 							wares="$currentWare" knowntoplayer="$onlyKnownSell" usereservations="true" multiple="true"
 						>
-							<relativeprice  min="$relPriceMin" />
+							<relativeprice  min="$relPrice" />
 							<offeramount entity="this" min="$sellvolume"/>
 							<match_buyer>
 								<match class="class.ship_xl" negate="true">
@@ -489,21 +488,21 @@
 						<set_value name="$minVolumeRange"
 							exact="$minvolume*(1f-((this.$jlp_unitrader_efficiency + this.$jlp_unitrader_courage)f/200f))" />
 						<set_value name="$searchMinVolume" exact="$minvolume - $minVolumeRange" />
-						<set_value name="$searchMinVolume" exact="$searchMinVolume / (@this.$trade_failedfindruns*20+1)" />
-						<set_value name="$relPriceMax"
-							exact="2.0f * (1.0f-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency + @this.$trade_failedfindruns*33)f/300.0f))" />
+						<set_value name="$searchMinVolume" exact="$searchMinVolume / (@this.$trade_failedfindruns*100+1)" />
+						<set_value name="$relPrice"
+							exact="2.0f * (((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency + @this.$trade_failedfindruns*33)f/300.0f))" />
 
 						<debug_text
 							text="player.age + '%1:%2Look for Buy: relPrice: %3\nVolume: %4\nwith my skills:'.[this.ship.knownname, this.knownname, $relPrice, $searchMinVolume ]"
 							chance="$debugchance" />
 						<write_to_logbook
-							text="'%1:%2Look for Buy: relPrice: Max %3 Min %4\nVolume: %5\nwith my skills:'.[this.ship.knownname, this.knownname, $relPriceMax, $relPriceMin, $searchMinVolume ]"
+							text="'%1:%2Look for Buy: relPrice: %3 \nVolume: %4\nwith my skills:'.[this.ship.knownname, this.knownname, $relPrice, $searchMinVolume]"
 							category="squad" chance="$debugchance2" />
 
 						<find_sell_offer tradepartner="this.ship" space="$checkrange" result="$selloffers"
 							wares="$filteredwarelist" multiple="true" knowntoplayer="$onlyKnownBuy" usereservations="true"
 						>
-							<relativeprice max="$relPriceMax" />
+							<relativeprice max="$relPrice" />
 							<offeramount entity="this" min="$searchMinVolume"/>
 							<match_seller>
 								<match class="class.ship_xl" negate="true" />
@@ -594,19 +593,17 @@
 					<!--##################### step 4, check if we can sell to stations with choosen wares from sell
 						offer##################### -->
 
-
 					<set_value name="$minVolumeRange"
-						exact="$minvolume*(1f-((this.$jlp_unitrader_efficiency + this.$jlp_unitrader_courage)/200f)f)f" />
-					<set_value name="$searchMinVolume" exact="$minvolume - $minVolumeRange" />
-					<set_value name="$relPriceMin"
-						exact="2.0f * (1.0f-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency + @this.$trade_failedfindruns*25)/300.0f)f)f" />
-					<set_value name="$searchMinVolume" exact="$searchMinVolume / (@this.$trade_failedfindruns*20+1f)f" />
+						exact="$minvolume * (1.0f-((this.$jlp_unitrader_efficiency + this.$jlp_unitrader_courage)f/200.0f))" />
+					<set_value name="$searchMinVolume" exact="($minvolume - $minVolumeRange)/ (@this.$trade_failedfindruns*100+1f)f" />
+					<set_value name="$relPrice"
+						exact="2.0f * (1.0f-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency + @this.$trade_failedfindruns*33)f/300.0f))" />
 
 					<debug_text
 						text="player.age + '%1:%2Look for Sell: relPrice %3\nVolume %4\nwith my skills:'.[this.ship.knownname, this.knownname, $relPrice, $searchMinVolume ]"
 						chance="$debugchance" />
 					<write_to_logbook
-						text="'%1:%2Look for Sell: relPrice Max %3 Min %4 \nVolume %5\nwith my skills:'.[this.ship.knownname, this.knownname, $relPriceMax, $relPriceMin, $searchMinVolume ]"
+						text="'%1:%2Look for Sell: relPrice %3 \nVolume %4\nwith my skills:'.[this.ship.knownname, this.knownname, $relPrice, $searchMinVolume ]"
 						category="squad" chance="$debugchance2" />
 
 					<!--Check for buy offers of clusters within the $sellrange -->
@@ -621,8 +618,8 @@
 							<find_buy_offer tradepartner="this.ship" wares="$soldwares" space="$sellclusters.{$Counter}"
 								result="$buyoffers" multiple="true" knowntoplayer="$onlyKnownSell" usereservations="true"
 							>
-								<offeramount entity="this" min="$searchMinVolume"/>
-								<relativeprice  min="$relPriceMin" />
+								<totalvolume min="$searchMinVolume"/>
+								<relativeprice  min="$relPrice" />
 								<match_buyer>
 									<match class="class.ship_xl" negate="true">
 										<match_any>
@@ -693,16 +690,16 @@
 					<!--Check for buy offers within $range -->
 					<do_else>
 						<debug_text
-							text="'soldwares: %1, range: %2, class: %3, minvolume: %4, tradeablewares: %5'.[$soldwares, $range.knownname, $range.class, $minvolume, $tradablewares]"
+							text="'soldwares: %1, range: %2, class: %3, minvolume: %4, tradeablewares: %5'.[$soldwares, $range.knownname, $range.class, $searchMinVolume, $tradablewares]"
 							chance="$debugchance2" />
 						<write_to_logbook
-							text="this.ship.name + ' soldwares: %1, range: %2, class: %3, minvolume: %4, tradeablewares: %5'.[$soldwares, $checkrange.knownname, $checkrange.class, $minvolume, $tradablewares]"
+							text="this.ship.name + ' soldwares: %1, range: %2, class: %3, minvolume: %4, tradeablewares: %5'.[$soldwares, $range.knownname, $range.class, $searchMinVolume, $tradablewares]"
 							category="squad" chance="$debugchance2" />
 						<find_buy_offer tradepartner="this.ship" wares="$soldwares" space="$range"
 							result="$buyoffers" multiple="true" knowntoplayer="$onlyKnownSell" usereservations="true"
 						>
-							<offeramount entity="this" min="$searchMinVolume"/>
-							<relativeprice min="$relPriceMin" />
+							<totalvolume  min="$searchMinVolume"/>
+							<relativeprice min="$relPrice" />
 							<match_buyer>
 								<match class="class.ship_xl" negate="true">
 									<match_any>
