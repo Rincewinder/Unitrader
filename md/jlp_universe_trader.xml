@@ -30,7 +30,7 @@
 				</do_if>
 				<!-- Catch the Universal Comm Relay and without MCE -->
 				<do_if value="event.param2 == 'JLPUniTrade_autotrade_select' or event.param == 'gOrders_advanced'">
-					<add_player_choice_sub text="{8570,1000}" position="right"
+					<add_player_choice text="{8570,1000}" position="right"
 						section="gJLPUniTrade_autotrade_select"
 						selectable="(not @event.object.$shiptrader_docking) and (not @event.object.$ship_parking) and (not @event.object.ship.dockslot) and (not @$event.object.ship.docklink)" />
 					<add_player_choice_return text="{1002,20}" position="bottom_right"
@@ -79,20 +79,18 @@
 		<cue name="JLPUniTradeInitSelect" instantiate="true" namespace="this">
 			<conditions>
 				<check_all>
-					<check_any>
-						<event_conversation_next_section section="gJLPUniTrade_autotrade_select" />
-						<event_conversation_returned_to_section sectionprefix="gJLPUniTrade_autotrade_select" />
-
-						<event_conversation_next_section section="gBKComm_Relay" />
-						<event_conversation_returned_to_section sectionprefix="gBKComm_Relay" />
-					</check_any>
+						<check_any>
+							<event_conversation_next_section section="gJLPUniTrade_autotrade_select" />
+							<event_conversation_returned_to_section sectionprefix="gJLPUniTrade_autotrade_select" />
+							<event_conversation_next_section section="gBKComm_Relay" />
+							<event_conversation_returned_to_section sectionprefix="gBKComm_Relay" />
+						</check_any>
+					</check_all>
 					<check_object object="event.object.ship">
 						<match_relation faction="faction.player" relation="self" comparison="exact" />
 					</check_object>
-				</check_all>
 			</conditions>
 			<actions>
-				<do_if value="event.param2 == 'JLPUniTrade_autotrade_select' or event.param == 'gOrders_advanced'">
 					<set_value name="$Captain" exact="event.object" />
 					<set_value name="$isTradeRun" exact="@$Captain.$jlpUniTraderRun" />
 					<set_value name="$isMiningRun" exact="@$Captain.$jlpUniMiningRun" />
@@ -227,7 +225,7 @@
 					<remove_value name="$isTradeRun" />
 					<remove_value name="$Captain" />
 					<remove_value name="$capship" />
-				</do_if>
+
 			</actions>
 		</cue>
 
