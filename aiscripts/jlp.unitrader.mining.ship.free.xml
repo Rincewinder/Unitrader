@@ -71,7 +71,7 @@
 			<do_all exact="$warebasket.count" counter="$i">
 				<set_value name="$ware" exact="$warebasket.{$i}" />
 				<find_resource ware="$ware" refobject="this.ship"
-					region="$region" zone="$zone" wares="$secwares" />
+					zone="$zone" wares="$secwares" />
 				<do_if value="$region.exists">
 					<do_if value="this.ship.cluster" exact="$zone.cluster">
 						<append_to_list name="$availablewares" exact="$ware" />
@@ -151,7 +151,7 @@
 			<debug_text text="player.age + ' now looking for %1...'.[$ware]"
 				chance="$debugchance" />
 			<find_resource ware="$ware" refobject="this.ship"
-				region="$region" zone="$zone" wares="$secwares" minamount="this.ship.cargo.{$ware}.free" />
+				 zone="$zone" wares="$secwares" minamount="this.ship.cargo.{$ware}.free" />
 			<do_if value="not $region.exists">
 				<debug_text text="player.age + ' failed finding %1!'.[$ware]"
 					chance="$debugchance" />

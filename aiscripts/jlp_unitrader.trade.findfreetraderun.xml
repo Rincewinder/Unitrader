@@ -98,10 +98,7 @@
 						chance="$debugchance2" category="squad" />
 
 					<find_cluster name="this.$traderange_sellclusters" multiple="true">
-						<match_gate_distance object="$range">
-							<min exact="$sellrange.{1}" />
-							<max exact="$sellrange.{2}" />
-						</match_gate_distance>
+						<match_gate_distance object="$range" min="$sellrange.{1}"  max="$sellrange.{2}" />
 					</find_cluster>
 				</do_if>
 				<set_value name="$sellclusters" exact="this.$traderange_sellclusters.clone"
@@ -335,10 +332,7 @@
 					<write_to_logbook text="'using find_cluster to populate the blackboards list of clusters to buy to'"
 						chance="$debugchance2" category="squad" />
 					<find_cluster name="this.$traderange_buyclusters" multiple="true">
-						<match_gate_distance object="$range">
-							<min exact="$buyrange.{1}" />
-							<max exact="$buyrange.{2}" />
-						</match_gate_distance>
+						<match_gate_distance object="$range" min="$buyrange.{1}" max="$buyrange.{2}"/>
 					</find_cluster>
 				</do_if>
 				<set_value name="$buyclusters" exact="this.$traderange_buyclusters.clone"

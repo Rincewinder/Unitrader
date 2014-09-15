@@ -130,9 +130,7 @@
 				<!-- TODO check if $sellrange is the gate distance? -->
 				<do_if value="$buyrange">
 					<find_sector space="player.galaxy" multiple="true" name="$sectors">
-						<match_gate_distance object="$home">
-							<max min="$buyrange.{1}" max="$buyrange.{2}" />
-						</match_gate_distance>
+						<match_gate_distance object="$home"  min="$buyrange.{1}" max="$buyrange.{2}" />
 					</find_sector>
 				</do_if>
 				<do_else>
@@ -193,11 +191,12 @@
 							<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 100">
 								<run_script name="'move.refuel'" sinceversion="1" />
 							</do_if>
-							
+							<set_command command="command.movetozone" param="$tradeoffersSort.{$Counter}.seller.zone" param2="$tradeoffersSort.{$Counter}.seller.sector"/>
 							<wait min="20ms" max="80ms" sinceversion="1" />
 							<run_script name="'move.generic'" sinceversion="1">
 								<param name="destination" value="$tradeoffersSort.{$Counter}.seller" />
 							</run_script>
+							<!--  <set_command command="command.wait"/> -->
 							<break />
 						</do_if>
 					</do_all>
@@ -264,6 +263,14 @@
 					<save_retval name="traderesult" variable="$traderesult" />
 				</run_script>
 
+				<do_if value="@$selloffer.available" negate="true">
+					<set_value name="$profit" exact="$traderesult.{4}" operation="add" />
+					<set_value name="$priceSell" exact="$traderesult.{4}.clone" />
+				</do_if>
+				<do_elseif value="@$buyoffer.available" negate="true">
+					<set_value name="$profit" exact="$traderesult.{4}" operation="subtract" />
+					<set_value name="$priceBuy" exact="$traderesult.{4}.clone" />
+				</do_elseif>
 				<do_if value="not $success">
 					<set_value name="$selloffer" exact="null" />
 					<set_value name="$buyoffer" exact="null" />
@@ -271,16 +278,7 @@
 					<set_value name="$Buyer" exact="null" />
 					<break />
 				</do_if>
-				<do_if value="$success">
-					<do_if value="@$selloffer.available" negate="true">
-						<set_value name="$profit" exact="$traderesult.{4}" operation="add" />
-						<set_value name="$priceSell" exact="$traderesult.{4}" />
-					</do_if>
-					<do_if value="@$buyoffer.available" negate="true">
-						<set_value name="$profit" exact="$traderesult.{4}" operation="subtract" />
-						<set_value name="$priceBuy" exact="$traderesult.{4}" />
-					</do_if>
-				</do_if>
+				
 				<wait min="500ms" max="1s" sinceversion="1" />
 			</do_while>
 
@@ -319,7 +317,7 @@
 				<do_if value="$buyoffer.exists" negate="true">
 					<do_if value="@$Buyer.exists">
 						<do_if value="$Buyer.owner != faction.player">
-							<set_known object="$Buyer" known="true" />
+							<set_known object="$BuyerEntity.container" known="true" />
 							<wait min="4s" max="9s" />
 							<set_faction_known faction="$Buyer.owner" known="true" />
 							<wait min="4s" max="9s" />
@@ -328,6 +326,9 @@
 							<wait min="4s" max="9s" />
 							<add_player_discount name="$notiDearsShip" amount="$CommissionAmount"
 								entity="$BuyerEntity" time="$CommissionTime" />
+							<do_if value="$BuyerEntity.container.hastradesubscription" negate="true">
+								<add_trade_subscription object="$BuyerEntity.container" />
+							</do_if>
 						</do_if>
 					</do_if>
 				</do_if>
@@ -335,7 +336,7 @@
 				<do_if value="$selloffer.exists" negate="true">
 					<do_if value="@$Seller.exists">
 						<do_if value="$Seller.owner != faction.player">
-							<set_known object="$Seller" known="true" />
+							<set_known object="$SellerEntity.container" known="true" />
 							<wait min="4s" max="9s" />
 							<set_faction_known faction="$Seller.owner" known="true" />
 							<wait min="4s" max="9s" />
@@ -344,6 +345,9 @@
 							<wait min="4s" max="9s" />
 							<add_player_commission name="$notiDearsShip" amount="$CommissionAmount"
 								entity="$SellerEntity" time="$CommissionTime" />
+							<do_if value="$SellerEntity.container.hastradesubscription" negate="true">
+								<add_trade_subscription object="$SellerEntity.container" />
+							</do_if>
 						</do_if>
 					</do_if>
 				</do_if>

@@ -9,6 +9,8 @@
 					<check_any>
 						<event_conversation_next_section sectionprefix="gOrders_advanced" />
 						<event_conversation_returned_to_section sectionprefix="gOrders_advanced" />
+						<event_conversation_next_section sectionprefix="gOrders_" />
+						<event_conversation_returned_to_section sectionprefix="gOrders_" />
 						<check_any>
 							<event_cue_completed cue="md.BKCommMenu.Setup" /> <!-- TODO need this?? -->
 							<check_all>
@@ -21,7 +23,7 @@
 						<match_relation faction="faction.player" relation="self" comparison="exact" />
 					</check_object>
 					<check_value
-						value="(event.object.type == entitytype.commander) and (event.object.ship.cargo.capacity gt 0)" />
+						value="(event.object.type == entitytype.commander or event.object.type == entitytype.pilot) and (event.object.ship.cargo.capacity gt 0)" />
 				</check_all>
 			</conditions>
 			<actions>
@@ -29,7 +31,7 @@
 					<add_conversation_view view="facenormal" />
 				</do_if>
 				<!-- Catch the Universal Comm Relay and without MCE -->
-				<do_if value="event.param2 == 'JLPUniTrade_autotrade_select' or event.param == 'gOrders_advanced'">
+				<do_if value="event.param2 == 'JLPUniTrade_autotrade_select' or event.param == 'gOrders_advanced' or event.param == 'gOrders_stop'">
 					<add_player_choice text="{8570,1000}" position="right"
 						section="gJLPUniTrade_autotrade_select"
 						selectable="(not @event.object.$shiptrader_docking) and (not @event.object.$ship_parking) and (not @event.object.ship.dockslot) and (not @$event.object.ship.docklink)" />
@@ -308,7 +310,10 @@
 								<set_value name="$minBudget" exact="100000000ct" />
 							</do_if>
 						</do_else>
-						<set_actor_account actor="$Captain" min="0ct" max="$maxBudget*10ct" />
+						<set_actor_account actor="$Captain" />
+						<set_actor_max_budget amount="$maxBudget*10ct" actor="this"/>
+						<set_actor_min_budget amount="0ct" actor="$maxBudget*10ct"/>
+						
 						<start_script object="$Captain" name="'jlp.unitrader.trading'">
 							<param name="PageId" value="$PageId" />
 							<param name="maxBudget" value="$maxBudget" />
@@ -386,7 +391,10 @@
 					<set_value name="$minBudget" exact="10000000ct" />
 				</do_if>
 
-				<set_actor_account actor="$Captain" min="0ct" max="$maxBudget*10ct" />
+				<set_actor_account actor="$Captain" />
+				<set_actor_max_budget amount="$maxBudget*10ct" actor="this"/>
+				<set_actor_min_budget amount="0ct" actor="$maxBudget*10ct"/>
+
 				<add_npc_line speaker="$Captain" line="[1012, 1013, 1018, 1019].random" comment="Confirmation" />
 				<start_script object="$Captain" name="'jlp.unitrader.mining'">
 					<param name="PageId" value="8570i" />

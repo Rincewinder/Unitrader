@@ -54,8 +54,9 @@
 			<set_command_action commandaction="commandaction.standingby" />
 			<wait chance="0" /> <!-- Reset script if new -->
 			<!-- initial -->
-			<set_actor_account actor="this" min="0ct" max="$maxBudget*10" />
-
+			<set_actor_account actor="this"  />
+			<set_actor_max_budget amount="$maxBudget*10" actor="this"/>
+			<set_actor_min_budget amount="0ct" actor="this"/>
 
 			<do_if value="this.$jlpUniMiningRun" exact="true">
 				<!-- Init -->

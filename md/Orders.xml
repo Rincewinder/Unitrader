@@ -5,7 +5,7 @@
 
 	Prevent trigger from Orders.xml. while Universe Trader is running.
 
-	It would be incompatible with any other Order.xml diff, that change the 
+	It would be incompatible with any other Order.xml diff, that change the
 	condition.
 	It would be better <condition> begin with <check_all><check_any>...</check_any></check_all>.
 	So can change <replace> with <add> for better compatibility.
@@ -15,22 +15,17 @@
 -->
 
 <diff>
-	<replace sel="/mdscript/cues/cue[@name='SectionHandler']/conditions">
-		<conditions>
+	<remove sel="/mdscript/cues/cue[@name='SectionHandler']/conditions/*" />
+	<add sel="/mdscript/cues/cue[@name='SectionHandler']/conditions">
+		<check_all>
+			<check_any>
+				<event_conversation_next_section sectionprefix="gOrders_" />
+				<event_conversation_returned_to_section sectionprefix="gOrders_" />
+			</check_any>
 			<check_all>
-				<check_any>
-					<event_conversation_next_section
-						sectionprefix="gOrders_" />
-					<event_conversation_returned_to_section
-						sectionprefix="gOrders_" />
-				</check_any>
-				<check_all>
-					<check_value value="@event.object.$jlpUniTraderRun"
-						negate="true" />
-					<check_value value="@event.object.$jlpUniMiningRun"
-						negate="true" />
-				</check_all>
+				<check_value value="@event.object.$jlpUniTraderRun" negate="true" />
+				<check_value value="@event.object.$jlpUniMiningRun" negate="true" />
 			</check_all>
-		</conditions>
-	</replace>
+		</check_all>
+	</add>
 </diff>

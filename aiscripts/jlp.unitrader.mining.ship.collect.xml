@@ -125,11 +125,11 @@
 						<do_if value="$gathercounter ge 15s">
 							<set_value name="$gathercounter" exact="15s" />
 							<do_if value="($gatherstart + $traveltime) lt player.age">
-								<get_resource_gatherrate name="$gatherrate"
-									refobject="this.ship" region="$region" zone="$zone" ware="$ware" />
+								<get_resource_gatherrate name="$gatherrate" 
+									refobject="this.ship"  zone="$zone" ware="$ware" />
 								<set_value name="$gathered" min="$gatherrate * $gathercounter * 0.75"
 									max="$gatherrate * $gathercounter * 1.25" />
-								<deplete_yield region="$region" zone="$zone"
+								<deplete_yield  zone="$zone"
 									container="this.ship" ware="$ware" amount="$gathered" />
 								<debug_text
 									text="player.age + ' collected %1 units of %2 (%3 units/s on average)'.[$gathered, $ware, $gatherrate]"
@@ -171,8 +171,8 @@
 						<!-- find pickup (filtered by ownership) and target -->
 						<set_value name="$pickuptarget" exact="false" />
 						<set_value name="$skill" exact="(this.combinedskill - 50) * 3" />
-						<find_asteroid_in_region name="$pickup"
-							region="$region" refobject="this.ship" canpickup="true" multiple="true"
+						<find_asteroid_in_cluster name="$pickup"
+							cluster="$region.cluster" refobject="this.ship" canpickup="true" multiple="true"
 							maxdistance="4km" viewangle="360deg" ware="$checkware" />
 						<do_all exact="$pickup.count" counter="$i" reverse="true">
 							<do_if value="$pickup.{$i}.owner">
@@ -192,8 +192,8 @@
 						</do_all>
 						<!-- find asteroids and calculate their total hull -->
 						<set_value name="$asteroidhull" exact="0" />
-						<find_asteroid_in_region name="$asteroids"
-							region="$region" refobject="this.ship" canpickup="false"
+						<find_asteroid_in_cluster name="$asteroids"
+							cluster="$region.cluster" refobject="this.ship" canpickup="false"
 							multiple="true" maxdistance="3km + this.ship.size" viewangle="360deg"
 							ware="$checkware" />
 						<do_all exact="$asteroids.count" counter="$i">
@@ -239,8 +239,8 @@
 								text="'%1 movement started [pickup count: %2, asteroid count: %3 (%4)]'.[player.age, $pickup.count, $asteroids.count, ($asteroidhull)L]"
 								chance="$debugchance" />
 							<do_if value="not $distantasteroidpos?">
-								<find_asteroid_in_region name="$distantasteroid"
-									region="$region" refobject="this.ship" canpickup="false"
+								<find_asteroid_in_cluster name="$distantasteroid"
+									cluster="$region.cluster" refobject="this.ship" canpickup="false"
 									multiple="false" maxdistance="30km" viewangle="90deg" ware="$checkware" />
 								<do_if value="$distantasteroid">
 									<create_position name="$distantasteroidpos"
@@ -342,8 +342,8 @@
 						<!-- find pickup (filtered by ownership) and target -->
 						<set_value name="$pickuptarget" exact="false" />
 						<set_value name="$skill" exact="(this.combinedskill - 50) * 3" />
-						<find_asteroid_in_region name="$pickup"
-							region="$region" refobject="this.ship" canpickup="true" multiple="true"
+						<find_asteroid_in_cluster name="$pickup"
+							cluster="$region.cluster" refobject="this.ship" canpickup="true" multiple="true"
 							maxdistance="2km" ware="$checkware" />
 						<do_all exact="$pickup.count" counter="$i" reverse="true">
 							<do_if value="$pickup.{$i}.owner">
@@ -366,8 +366,8 @@
 							value="$pickup.count lt (this.ship.units.collect.{$checkware}.count * 2)"
 						>
 							<!-- find asteroids and the best target -->
-							<find_asteroid_in_region name="$asteroids"
-								region="$region" refobject="this.ship" canpickup="false"
+							<find_asteroid_in_cluster name="$asteroids"
+								cluster="$region.cluster" refobject="this.ship" canpickup="false"
 								multiple="true" maxdistance="3km" ware="$checkware" />
 							<do_if value="not $target?">
 								<set_value name="$attackposition" exact="false" />
@@ -385,8 +385,8 @@
 										chance="$debugchance" />
 								</do_if>
 								<do_else>
-									<find_asteroid_in_region name="$target"
-										region="$region" refobject="this.ship" canpickup="false"
+									<find_asteroid_in_cluster name="$target"
+										cluster="$region.cluster" refobject="this.ship" canpickup="false"
 										maxdistance="25km" ware="$checkware" />
 								</do_else>
 							</do_if>
@@ -531,7 +531,7 @@
 					</do_if>
 				</do_if>
 				<get_resource_gatherrate name="$gatherrate"
-					refobject="this.ship" region="$region" zone="$zone" ware="$currentware" />
+					refobject="this.ship"  zone="$zone" ware="$currentware" />
 				<do_if value="$gatherrate" max="0">
 					<debug_text
 						text="player.age + ' WARNING: gatherrate for %1 in zone %2, region %3 is %4'.[$currentware, $zone.knownname, $region.knownname, $gatherrate]"
@@ -550,7 +550,7 @@
 				<do_if value="this.ship.cargo.{$currentware}.free lt $gathered">
 					<set_value name="$gathered" exact="this.ship.cargo.{$currentware}.free" />
 				</do_if>
-				<deplete_yield region="$region" zone="$zone"
+				<deplete_yield zone="$zone"
 					container="this.ship" ware="$currentware" amount="$gathered" />
 				<debug_text
 					text="player.age + ' collected %1 units of %2 in zone %3 in %4 seconds (%5 units/s)'.[$gathered, $currentware, $zone.knownname, $gathertime, $gatherrate]"
