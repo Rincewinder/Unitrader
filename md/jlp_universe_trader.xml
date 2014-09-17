@@ -31,7 +31,9 @@
 					<add_conversation_view view="facenormal" />
 				</do_if>
 				<!-- Catch the Universal Comm Relay and without MCE -->
-				<do_if value="event.param2 == 'JLPUniTrade_autotrade_select' or event.param == 'gOrders_advanced' or event.param == 'gOrders_stop'">
+				<do_if
+					value="event.param2 == 'JLPUniTrade_autotrade_select' or event.param == 'gOrders_advanced' or event.param == 'gOrders_stop'"
+				>
 					<add_player_choice text="{8570,1000}" position="right"
 						section="gJLPUniTrade_autotrade_select"
 						selectable="(not @event.object.$shiptrader_docking) and (not @event.object.$ship_parking) and (not @event.object.ship.dockslot) and (not @$event.object.ship.docklink)" />
@@ -81,47 +83,48 @@
 		<cue name="JLPUniTradeInitSelect" instantiate="true" namespace="this">
 			<conditions>
 				<check_all>
-						<check_any>
-							<event_conversation_next_section section="gJLPUniTrade_autotrade_select" />
-							<event_conversation_returned_to_section sectionprefix="gJLPUniTrade_autotrade_select" />
-							<event_conversation_next_section section="gBKComm_Relay" />
-							<event_conversation_returned_to_section sectionprefix="gBKComm_Relay" />
-						</check_any>
-					</check_all>
-					<check_object object="event.object.ship">
-						<match_relation faction="faction.player" relation="self" comparison="exact" />
-					</check_object>
+					<check_any>
+						<event_conversation_next_section section="gJLPUniTrade_autotrade_select" />
+						<event_conversation_returned_to_section sectionprefix="gJLPUniTrade_autotrade_select" />
+						<event_conversation_next_section section="gBKComm_Relay" />
+						<event_conversation_returned_to_section sectionprefix="gBKComm_Relay" />
+					</check_any>
+				</check_all>
+				<check_object object="event.object.ship">
+					<match_relation faction="faction.player" relation="self" comparison="exact" />
+				</check_object>
 			</conditions>
 			<actions>
-					<set_value name="$Captain" exact="event.object" />
-					<set_value name="$isTradeRun" exact="@$Captain.$jlpUniTraderRun" />
-					<set_value name="$isMiningRun" exact="@$Captain.$jlpUniMiningRun" />
-					<set_value name="$isTransportable" exact="false" />
-					<set_value name="$isMiningable" exact="false" />
-					<set_value name="$drones" exact="0" />
-					<set_value name="$capship" exact="$Captain.ship.isclass.ship_l or $Captain.ship.isclass.ship_xl" />
+				<set_value name="$Captain" exact="event.object" />
+				<set_value name="$isTradeRun" exact="@$Captain.$jlpUniTraderRun" />
+				<set_value name="$isMiningRun" exact="@$Captain.$jlpUniMiningRun" />
+				<set_value name="$isTransportable" exact="false" />
+				<set_value name="$isMiningable" exact="false" />
+				<set_value name="$drones" exact="0" />
+				<set_value name="$capship" exact="$Captain.ship.isclass.ship_l or $Captain.ship.isclass.ship_xl" />
 
-					<do_if value="$capship">
-						<set_value name="$maxDrones" exact="10i" />
-					</do_if>
-					<do_else>
-						<set_value name="$maxDrones" exact="1i" />
-					</do_else>
+				<do_if value="$capship">
+					<set_value name="$maxDrones" exact="10i" />
+				</do_if>
+				<do_else>
+					<set_value name="$maxDrones" exact="1i" />
+				</do_else>
 
-					<do_if value="$capship">
-						<do_all exact="unitcategory.transport.maxmk" counter="$i">
-							<set_value name="$drones" operation="add"
-								exact="@$Captain.ship.units.{unitcategory.transport}.mk.{$i}.count" />
-						</do_all>
-						<do_if value="$drones ge $maxDrones">
-							<set_value name="$isTransportable" exact="true" />
-						</do_if>
-					</do_if>
-					<do_else>
-						<!-- S / M ships dont have transportdrones -->
+				<do_if value="$capship">
+					<do_all exact="unitcategory.transport.maxmk" counter="$i">
+						<set_value name="$drones" operation="add"
+							exact="@$Captain.ship.units.{unitcategory.transport}.mk.{$i}.count" />
+					</do_all>
+					<do_if value="$drones ge $maxDrones">
 						<set_value name="$isTransportable" exact="true" />
-					</do_else>
+					</do_if>
+				</do_if>
+				<do_else>
+					<!-- S / M ships dont need transportdrones -->
+					<set_value name="$isTransportable" exact="true" />
+				</do_else>
 
+				<do_if value="$capship">
 					<set_value name="$drones" exact="0" />
 					<do_all exact="unitcategory.gascollector.maxmk" counter="$i">
 						<set_value name="$drones" operation="add"
@@ -130,7 +133,6 @@
 					<do_if value="$drones ge $maxDrones">
 						<set_value name="$isMiningable" exact="true" />
 					</do_if>
-
 					<do_if value="$isMiningable" negate="true">
 						<set_value name="$drones" exact="0" />
 						<do_all exact="unitcategory.orecollector.maxmk" counter="$i">
@@ -141,8 +143,6 @@
 							<set_value name="$isMiningable" exact="true" />
 						</do_if>
 					</do_if>
-					<remove_value name="$drones" />
-					<remove_value name="$maxDrones" />
 
 					<do_if value="$isMiningable">
 						<!-- TODO: change to check ship tags instead of cargo, need adding of
@@ -186,47 +186,54 @@
 							</do_if>
 						</do_if>
 					</do_if>
+				</do_if>
+				<do_else>
+					<!-- S / M ships dont need miningdrones -->
+					<set_value name="$isMiningable" exact="true" />
+				</do_else>
+				<remove_value name="$drones" />
+				<remove_value name="$maxDrones" />
 
-					<do_if value="$isTradeRun or  $isMiningRun">
-						<add_player_choice_sub text="{8570,3010}" position="right"
-							section="gJLPUniTrade_autotrade_showskills" />
+				<do_if value="$isTradeRun or  $isMiningRun">
+					<add_player_choice_sub text="{8570,3010}" position="right"
+						section="gJLPUniTrade_autotrade_showskills" />
+				</do_if>
+
+				<do_if value="$isTransportable and not  $isMiningRun">
+					<do_if value="not $isTradeRun">
+						<add_player_choice_sub text="{8570,1010}" position="top_left"
+							section="gJLPUniTrade_autotrade_select_type"
+							selectable="(not @$Captain.$shiptrader_docking) and (not @$Captain.$ship_parking) and (not @$Captain.ship.dockslot) and (not @$Captain.ship.docklink)" />
 					</do_if>
-
-					<do_if value="$isTransportable and not  $isMiningRun">
-						<do_if value="not $isTradeRun">
-							<add_player_choice_sub text="{8570,1010}" position="top_left"
-								section="gJLPUniTrade_autotrade_select_type"
-								selectable="(not @$Captain.$shiptrader_docking) and (not @$Captain.$ship_parking) and (not @$Captain.ship.dockslot) and (not @$Captain.ship.docklink)" />
-						</do_if>
-						<do_else>
-							<add_player_choice_sub text="{8570,1011}" position="top_left"
-								section="gJLPUniTrade_autotrade_stop"
-								selectable="(not @$Captain.$shiptrader_docking) and (not @$Captain.$ship_parking) and (not @$Captain.ship.dockslot) and (not @$Captain.ship.docklink)" />
-						</do_else>
+					<do_else>
+						<add_player_choice_sub text="{8570,1011}" position="top_left"
+							section="gJLPUniTrade_autotrade_stop"
+							selectable="(not @$Captain.$shiptrader_docking) and (not @$Captain.$ship_parking) and (not @$Captain.ship.dockslot) and (not @$Captain.ship.docklink)" />
+					</do_else>
+				</do_if>
+				<do_if value="$isTransportable and $isMiningable and not $isTradeRun">
+					<do_if value="not $isMiningRun">
+						<add_player_choice_sub text="{8570,2010}" position="top_right"
+							section="gJLPUniTrade_automining_start"
+							selectable="(not @$Captain.$shiptrader_docking) and (not @$Captain.$ship_parking) and (not @$Captain.ship.dockslot) and (not @$Captain.ship.docklink)" />
 					</do_if>
-					<do_if value="$isTransportable and $isMiningable and not $isTradeRun">
-						<do_if value="not $isMiningRun">
-							<add_player_choice_sub text="{8570,2010}" position="top_right"
-								section="gJLPUniTrade_automining_start"
-								selectable="(not @$Captain.$shiptrader_docking) and (not @$Captain.$ship_parking) and (not @$Captain.ship.dockslot) and (not @$Captain.ship.docklink)" />
-						</do_if>
-						<do_else>
-							<add_player_choice_sub text="{8570,2011}" position="top_right"
-								section="gJLPUniTrade_automining_stop"
-								selectable="(not @$Captain.$shiptrader_docking) and (not @$Captain.$ship_parking) and (not @$Captain.ship.dockslot) and (not @$Captain.ship.docklink)" />
-						</do_else>
-					</do_if>
+					<do_else>
+						<add_player_choice_sub text="{8570,2011}" position="top_right"
+							section="gJLPUniTrade_automining_stop"
+							selectable="(not @$Captain.$shiptrader_docking) and (not @$Captain.$ship_parking) and (not @$Captain.ship.dockslot) and (not @$Captain.ship.docklink)" />
+					</do_else>
+				</do_if>
 
-					<add_player_choice_sub text="{8570,5000}" position="left"
-						section="gJLPUniTrade_autotrade_config" selectable="$isMiningRun or $isTradeRun" />
-					<add_player_choice_return text="{1002,20}" position="bottom_right"
-						comment="(Back)" />
+				<add_player_choice_sub text="{8570,5000}" position="left"
+					section="gJLPUniTrade_autotrade_config" selectable="$isMiningRun or $isTradeRun" />
+				<add_player_choice_return text="{1002,20}" position="bottom_right"
+					comment="(Back)" />
 
-					<remove_value name="$isTransportable" />
-					<remove_value name="$isMiningable" />
-					<remove_value name="$isTradeRun" />
-					<remove_value name="$Captain" />
-					<remove_value name="$capship" />
+				<remove_value name="$isTransportable" />
+				<remove_value name="$isMiningable" />
+				<remove_value name="$isTradeRun" />
+				<remove_value name="$Captain" />
+				<remove_value name="$capship" />
 
 			</actions>
 		</cue>
@@ -311,9 +318,9 @@
 							</do_if>
 						</do_else>
 						<set_actor_account actor="$Captain" />
-						<set_actor_max_budget amount="$maxBudget*10ct" actor="this"/>
-						<set_actor_min_budget amount="0ct" actor="$maxBudget*10ct"/>
-						
+						<set_actor_max_budget amount="$maxBudget*10ct" actor="this" />
+						<set_actor_min_budget amount="0ct" actor="$maxBudget*10ct" />
+
 						<start_script object="$Captain" name="'jlp.unitrader.trading'">
 							<param name="PageId" value="$PageId" />
 							<param name="maxBudget" value="$maxBudget" />
@@ -392,8 +399,8 @@
 				</do_if>
 
 				<set_actor_account actor="$Captain" />
-				<set_actor_max_budget amount="$maxBudget*10ct" actor="this"/>
-				<set_actor_min_budget amount="0ct" actor="$maxBudget*10ct"/>
+				<set_actor_max_budget amount="$maxBudget*10ct" actor="this" />
+				<set_actor_min_budget amount="0ct" actor="$maxBudget*10ct" />
 
 				<add_npc_line speaker="$Captain" line="[1012, 1013, 1018, 1019].random" comment="Confirmation" />
 				<start_script object="$Captain" name="'jlp.unitrader.mining'">

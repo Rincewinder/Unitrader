@@ -57,6 +57,7 @@
 			<set_actor_account actor="this"  />
 			<set_actor_max_budget amount="$maxBudget*10" actor="this"/>
 			<set_actor_min_budget amount="0ct" actor="this"/>
+			<set_value name="$capship" exact="this.ship.isclass.ship_l or this.ship.isclass.ship_xl" />
 
 			<do_if value="this.$jlpUniMiningRun" exact="true">
 				<!-- Init -->
@@ -82,7 +83,7 @@
 					with count = 0 cases; needs adding of ?? -->
 				<create_list name="$orelist" />
 
-				<do_if value="this.ship.units.{unitcategory.gascollector}.count">
+				<do_if value="this.ship.units.{unitcategory.gascollector}.count or not $capship">
 
 					<set_value name="$ware" exact="ware.hydrogen" />
 					<do_if value="this.ship.cargo.{$ware}.max" min="1">
@@ -104,7 +105,7 @@
 
 				</do_if>
 
-				<do_if value="this.ship.units.{unitcategory.orecollector}.count">
+				<do_if value="this.ship.units.{unitcategory.orecollector}.count or not $capship">
 					<set_value name="$ware" exact="ware.ore" />
 					<do_if value="this.ship.cargo.{$ware}.max" min="1">
 						<append_to_list name="$orelist" exact="$ware" />
