@@ -124,73 +124,67 @@
 					<set_value name="$isTransportable" exact="true" />
 				</do_else>
 
-				<do_if value="$capship">
+				<set_value name="$drones" exact="0" />
+				<do_all exact="unitcategory.gascollector.maxmk" counter="$i">
+					<set_value name="$drones" operation="add"
+						exact="@$Captain.ship.units.{unitcategory.gascollector}.mk.{$i}.count" />
+				</do_all>
+				<do_if value="$drones ge $maxDrones">
+					<set_value name="$isMiningable" exact="true" />
+				</do_if>
+				<do_if value="$isMiningable" negate="true">
 					<set_value name="$drones" exact="0" />
-					<do_all exact="unitcategory.gascollector.maxmk" counter="$i">
+					<do_all exact="unitcategory.orecollector.maxmk" counter="$i">
 						<set_value name="$drones" operation="add"
-							exact="@$Captain.ship.units.{unitcategory.gascollector}.mk.{$i}.count" />
+							exact="@$Captain.ship.units.{unitcategory.orecollector}.mk.{$i}.count" />
 					</do_all>
 					<do_if value="$drones ge $maxDrones">
 						<set_value name="$isMiningable" exact="true" />
 					</do_if>
-					<do_if value="$isMiningable" negate="true">
-						<set_value name="$drones" exact="0" />
-						<do_all exact="unitcategory.orecollector.maxmk" counter="$i">
-							<set_value name="$drones" operation="add"
-								exact="@$Captain.ship.units.{unitcategory.orecollector}.mk.{$i}.count" />
-						</do_all>
-						<do_if value="$drones ge $maxDrones">
+				</do_if>
+
+				<do_if value="$isMiningable">
+					<!-- TODO: change to check ship tags instead of cargo, need adding of
+						?? -->
+					<set_value name="$isMiningable" exact="false" />
+					<do_if value="@$Captain.ship.units.{unitcategory.gascollector}.count">
+						<set_value name="$ware" exact="ware.hydrogen" />
+						<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
+							<set_value name="$isMiningable" exact="true" />
+						</do_if>
+						<set_value name="$ware" exact="ware.ions" />
+						<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
+							<set_value name="$isMiningable" exact="true" />
+						</do_if>
+						<set_value name="$ware" exact="ware.plasma" />
+						<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
 							<set_value name="$isMiningable" exact="true" />
 						</do_if>
 					</do_if>
 
-					<do_if value="$isMiningable">
-						<!-- TODO: change to check ship tags instead of cargo, need adding of
-							?? -->
-						<set_value name="$isMiningable" exact="false" />
-						<do_if value="@$Captain.ship.units.{unitcategory.gascollector}.count">
-							<set_value name="$ware" exact="ware.hydrogen" />
-							<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
-								<set_value name="$isMiningable" exact="true" />
-							</do_if>
-							<set_value name="$ware" exact="ware.ions" />
-							<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
-								<set_value name="$isMiningable" exact="true" />
-							</do_if>
-							<set_value name="$ware" exact="ware.plasma" />
-							<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
-								<set_value name="$isMiningable" exact="true" />
-							</do_if>
+					<do_if value="@$Captain.ship.units.{unitcategory.orecollector}.count">
+						<set_value name="$ware" exact="ware.ore" />
+						<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
+							<set_value name="$isMiningable" exact="true" />
 						</do_if>
-
-						<do_if value="@$Captain.ship.units.{unitcategory.orecollector}.count">
-							<set_value name="$ware" exact="ware.ore" />
-							<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
-								<set_value name="$isMiningable" exact="true" />
-							</do_if>
-							<set_value name="$ware" exact="ware.silicon" />
-							<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
-								<set_value name="$isMiningable" exact="true" />
-							</do_if>
-							<set_value name="$ware" exact="ware.crystals" />
-							<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
-								<set_value name="$isMiningable" exact="true" />
-							</do_if>
-							<set_value name="$ware" exact="ware.nividium" />
-							<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
-								<set_value name="$isMiningable" exact="true" />
-							</do_if>
-							<set_value name="$ware" exact="ware.ice" />
-							<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
-								<set_value name="$isMiningable" exact="true" />
-							</do_if>
+						<set_value name="$ware" exact="ware.silicon" />
+						<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
+							<set_value name="$isMiningable" exact="true" />
+						</do_if>
+						<set_value name="$ware" exact="ware.crystals" />
+						<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
+							<set_value name="$isMiningable" exact="true" />
+						</do_if>
+						<set_value name="$ware" exact="ware.nividium" />
+						<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
+							<set_value name="$isMiningable" exact="true" />
+						</do_if>
+						<set_value name="$ware" exact="ware.ice" />
+						<do_if value="@$Captain.ship.cargo.{$ware}.max" min="1">
+							<set_value name="$isMiningable" exact="true" />
 						</do_if>
 					</do_if>
 				</do_if>
-				<do_else>
-					<!-- S / M ships dont need miningdrones -->
-					<set_value name="$isMiningable" exact="true" />
-				</do_else>
 				<remove_value name="$drones" />
 				<remove_value name="$maxDrones" />
 
