@@ -7,19 +7,10 @@
 			<conditions>
 				<check_all>
 					<check_any>
-						<event_conversation_next_section sectionprefix="gOrders_advanced" />
-						<event_conversation_returned_to_section sectionprefix="gOrders_advanced" />
-						<event_conversation_next_section sectionprefix="gOrders_" />
-						<event_conversation_returned_to_section sectionprefix="gOrders_" />
-						<check_any>
-							<event_cue_completed cue="md.BKCommMenu.Setup" /> <!-- TODO need this?? -->
-							<check_all>
-								<event_player_created />
-								<check_value value="@md.BKCommMenu.Setup.state" exact="cuestate.complete" />
-							</check_all>
-						</check_any>
+						<event_conversation_started conversation="default" />
+          				<event_conversation_returned_to_section section="default" />
 					</check_any>
-					<check_object object="event.object.ship">
+					<check_object object="@event.object.ship">
 						<match_relation faction="faction.player" relation="self" comparison="exact" />
 					</check_object>
 					<check_value
@@ -30,19 +21,21 @@
 				<do_if value="event.name == 'event_conversation_returned_to_section'">
 					<add_conversation_view view="facenormal" />
 				</do_if>
-				<!-- Catch the Universal Comm Relay and without MCE -->
-				<do_if
+<!-- 				<do_if
 					value="event.param2 == 'JLPUniTrade_autotrade_select' or event.param == 'gOrders_advanced' or event.param == 'gOrders_stop'"
 				>
-					<add_player_choice text="{8570,1000}" position="right"
+	 -->
+	 				<add_player_choice text="{8570,1000}" position="top_right"
 						section="gJLPUniTrade_autotrade_select"
 						selectable="(not @event.object.$shiptrader_docking) and (not @event.object.$ship_parking) and (not @event.object.ship.dockslot) and (not @$event.object.ship.docklink)" />
+					<!--
 					<add_player_choice_return text="{1002,20}" position="bottom_right"
 						comment="Back" />
-					<!-- <set_conversation_return_section
+					<set_conversation_return_section
 						section="gOrders_advanced" />
-					-->
-				</do_if>
+				
+				</do_if> 
+				-->
 			</actions>
 		</cue>
 
@@ -312,8 +305,9 @@
 							</do_if>
 						</do_else>
 						<set_actor_account actor="$Captain" />
-						<set_actor_max_budget amount="$maxBudget*10ct" actor="this" />
-						<set_actor_min_budget amount="0ct" actor="$maxBudget*10ct" />
+						<set_value name="$maxBudget" exact="$maxBudget * 10ct"/>
+						<set_actor_max_budget amount="$maxBudget" actor="$Captain" />
+						<set_actor_min_budget amount="0ct" actor="$Captain" />
 
 						<start_script object="$Captain" name="'jlp.unitrader.trading'">
 							<param name="PageId" value="$PageId" />
@@ -393,8 +387,9 @@
 				</do_if>
 
 				<set_actor_account actor="$Captain" />
-				<set_actor_max_budget amount="$maxBudget*10ct" actor="this" />
-				<set_actor_min_budget amount="0ct" actor="$maxBudget*10ct" />
+				<set_value name="$maxBudget" exact="$maxBudget * 10ct"/>
+				<set_actor_max_budget amount="$maxBudget" actor="$Captain" />
+				<set_actor_min_budget amount="0ct" actor="$Captain" />
 
 				<add_npc_line speaker="$Captain" line="[1012, 1013, 1018, 1019].random" comment="Confirmation" />
 				<start_script object="$Captain" name="'jlp.unitrader.mining'">
@@ -641,7 +636,8 @@
 							<add_npc_line speaker="$Captain" line="1164" comment="More Money as max, tranfer the rest" />
 						</do_if>
 					</do_if>
-					<set_actor_max_budget amount="$param2 * 10" actor="$Captain" />
+					<set_value name="$maxBudget" exact="$param2 * 10ct"/>
+					<set_actor_max_budget amount="$maxBudget" actor="$Captain" />
 					<add_npc_line speaker="$Captain" line="[1012, 1013, 1018, 1019].random" comment="Confirmation" />
 
 				</do_if>
@@ -918,27 +914,5 @@
 				</do_if>
 			</actions>
 		</cue>
-
-		<!-- ######################## Support for third mods ###################### -->
-		<!-- MCE -->
-		<cue name="Setup">
-			<conditions>
-				<check_any>
-					<event_cue_completed cue="md.BKCommMenu.Setup" />
-					<check_all>
-						<event_player_created />
-						<check_value value="@md.BKCommMenu.Setup.state" exact="cuestate.complete" />
-					</check_all>
-				</check_any>
-			</conditions>
-			<actions>
-				<!-- Please try to make the Parameter strings unique. We don't want mod
-					conflicts. -->
-				<append_to_list name="global.$BKCommMenuInSquad" exact="['JLPUniTrade_autotrade_select', {8570,1000}]" />
-				<append_to_list name="global.$BKCommMenuNonSquad" exact="['JLPUniTrade_autotrade_select', {8570,1000}]" />
-
-			</actions>
-		</cue>
-
 	</cues>
 </mdscript>
