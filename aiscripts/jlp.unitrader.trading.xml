@@ -149,7 +149,7 @@
 					<wait min="4s" max="9s" />
 					<do_if value="$transferMoney" min="1">
 						<transfer_money from="this" to="player.entity" amount="$transferMoney" result="$result" />
-						<add_npc_line speaker="$Captain" line="1164" comment="More Money as max, tranfer the rest" />
+						<add_npc_line speaker="this" line="1164" comment="More Money as max, tranfer the rest" />
 						<write_to_logbook category="squad"
 							text="{8570,50100}.[this.ship.knownname, this.knownname, $transferMoney / 1Cr]" />
 						<wait min="4s" max="9s" />

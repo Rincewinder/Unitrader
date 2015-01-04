@@ -511,13 +511,6 @@
 					<detach_from_masstraffic object="this.ship" wait="true">
 						<interrupt_after_time time="5min" />
 					</detach_from_masstraffic>
-					<!--  Repeat with selloffer to complete the trade in once -->
-					<do_if value="@$isbuyoffer and $failreason != ''">
-						<do_if value="@$selloffer.available">
-							<set_value name="$tradedetails.{0}" exact="[$targetobject, $AMOUNT, $WARE, $PRICE]" />
-							<resume label="check trade offers" />
-						</do_if>
-					</do_if>
 					
 					<do_if value="not $traderesult">
 						<do_if value="$amount le 0">
@@ -539,10 +532,18 @@
 				<set_value name="$failreason" exact="'ERR_TRADEOFFER_GONE'" />
 				<resume label="finish" />
 			</do_else>
-
+			<!--  Repeat with  selloffer from buyoffer to complete the trade in once -->
+			<do_if value="@$isbuyoffer and $failreason == ''">
+				<do_if value="@$selloffer.available">
+					<set_value name="$tradedetails.{0}" exact="[$targetobject, $AMOUNT, $WARE, $PRICE]" />
+					<wait min="1s" max="3s" />
+					<resume label="check trade offers" />
+				</do_if>
+			</do_if>
+<!-- 
 			<wait min="1s" max="3s" />
 			<resume label="check trade offers" />
-
+ -->
 			<label name="finish" />
 			<do_if value="@$targetobject.exists">
 				<remove_ware_reservation object="$targetobject" entity="this" />

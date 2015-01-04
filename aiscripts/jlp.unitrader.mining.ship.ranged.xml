@@ -11,11 +11,11 @@
 	</init>
     <attention min="unknown">
         <actions>
-
+<!-- 
 			<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 800">
 				<run_script name="'move.refuel'" sinceversion="1" />
 			</do_if>
-			
+	 -->		
             <run_script name="'jlp.unitrader.mining.ship.free'" sinceversion="1">
                 <param name="PageId" value="$PageId"/>
                 <param name="basketoverride" value="$basket" />

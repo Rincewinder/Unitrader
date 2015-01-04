@@ -32,11 +32,12 @@
 				' + $wares.{$Counter}.name" />
 				</do_if>
 				</do_all>
-			-->
+		
 
 			<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 1200">
 				<run_script name="'move.refuel'" sinceversion="1" />
 			</do_if>
+				-->
 			<do_if value="$range" exact="'ranged'">
 				<run_script name="'jlp.unitrader.trade.ship'" sinceversion="1">
 					<param name="PageId" value="$PageId" />
