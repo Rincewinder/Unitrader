@@ -30,6 +30,8 @@
 					<retval name="success" value="false" />
 				</return>
 			</do_if>
+			<!-- Remember the trade details in array {0} -> Buy {1} -> Sell  -->					
+			<create_list name="$tradedetails" />
 
 			<!-- set up initial state for trade runs -->
 			<label name="check trade offers" />
@@ -473,7 +475,6 @@
 					<do_else>
 						<set_value name="$traderesult" exact="false" />
 					</do_else>
-
 					<do_if value="$tradeoffer.exists">
 						<!-- prepare texts for notifcation since the actual trade can be deleted
 							by the time this is displayed! -->
@@ -487,7 +488,7 @@
 						</do_elseif>
 						<set_value name="$price" exact="$AMOUNT * $tradeoffer.unitprice" />
 						<set_value name="$PRICE" exact="$price / 1ct" />
-						<set_value name="$tradedetails.{1}" exact="[$targetobject, $AMOUNT, $WARE, $PRICE]" />
+						<set_value name="$tradedetails" exact="[$targetobject, $AMOUNT, $WARE, $PRICE]" operation="insert"/>
 
 					</do_if>
 					<do_if value="@$isbuyoffer">
@@ -535,7 +536,7 @@
 			<!--  Repeat with  selloffer from buyoffer to complete the trade in once -->
 			<do_if value="@$isbuyoffer and $failreason == ''">
 				<do_if value="@$selloffer.available">
-					<set_value name="$tradedetails.{0}" exact="[$targetobject, $AMOUNT, $WARE, $PRICE]" />
+					<set_value name="$tradedetails" exact="[$targetobject, $AMOUNT, $WARE, $PRICE]" operation="insert"/>
 					<wait min="1s" max="3s" />
 					<resume label="check trade offers" />
 				</do_if>
