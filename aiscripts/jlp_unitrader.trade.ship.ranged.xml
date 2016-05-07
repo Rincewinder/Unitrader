@@ -12,9 +12,6 @@
 		<param name="maxsell" default="24" />
 		<param name="debugchance" default="0" />
 	</params>
-	<init>
-		<set_command command="command.freetrade" />
-	</init>
 	<attention min="unknown">
 		<actions>
 
@@ -60,4 +57,5 @@
 
 		</actions>
 	</attention>
+	
 </aiscript>

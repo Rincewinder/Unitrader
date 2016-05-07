@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 <aiscript name="jlp.unitrader.trade.performtraderun" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="1"
+	xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="4"
 >
 	<params>
 		<param name="selloffer" />
@@ -20,18 +20,72 @@
 	<patch sinceversion="1">
 		<set_value name="$simple" exact="null" />
 	</patch>
+	<patch sinceversion="2">
+		<do_if value="$buyoffer.exists">
+			<set_value name="$buyer" exact="$buyoffer.buyer" />
+		</do_if>
+	</patch>
+	<patch sinceversion="3">
+		<set_value name="$lasttrade" exact="[@$isbuyoffer, @$tradeware, @$targetobject]" />
+	</patch>
+	<patch sinceversion="4">
+		<!-- all reservations have been wiped as of 4.0, restore reservations we need, but only for L or XL
+			ships, since smaller traders didn't do reservations before -->
+		<do_if value="this.ship.isclass.ship_xl or this.ship.isclass.ship_l">
+			<debug_text
+				text="'try to restore reservations for %1(%2)\n  $isbuyoffer? = %3\n  $tradeoffer.exists = %4\n  $amount = %5\n  $targetobject.isoperational = %6\n  $tradeware = %7\n  $reservation_removed? = %8'.[this.name, this, $isbuyoffer?, $tradeoffer.exists, $amount, $targetobject.isoperational, $tradeware, $reservation_removed?]"
+				chance="$debugchance" />
+			<do_if value="$isbuyoffer? and $amount gt 0 and $targetobject.isoperational and $tradeware">
+				<do_if value="not $tradeoffer.exists">
+					<do_if value="$isbuyoffer">
+						<find_buy_offer result="$tradeoffer" buyer="$targetobject" wares="$tradeware"
+							tradepartner="this.ship" />
+					</do_if>
+					<do_else>
+						<find_sell_offer result="$tradeoffer" seller="$targetobject" wares="$tradeware"
+							tradepartner="this.ship" />
+					</do_else>
+				</do_if>
+				<do_if value="$tradeoffer.exists">
+					<set_value name="$reserve_amount" exact="[$amount, $tradeoffer.amount].min" />
+					<do_if value="$reserve_amount gt 0">
+						<do_if value="$isbuyoffer">
+							<debug_text
+								text="'restore sell reservation for %1 %2(virtual: %3) at %4(%5) by %6(%7)'.[$reserve_amount, $tradeware, $tradeoffer.unbundle, $targetobject.knownname, $targetobject, this.knownname, this]"
+								chance="$debugchance" />
+							<add_ware_reservation object="$targetobject" type="sell" entity="this"
+								ware="$tradeware" amount="$reserve_amount" virtual="@$tradeoffer.unbundle" />
+						</do_if>
+						<do_elseif value="not $reservation_removed? and $reserve_amount gt 0">
+							<debug_text
+								text="'restore buy reservation for %1 %2(virtual: %3) at %4(%5) by %6(%7)'.[$reserve_amount, $tradeware, $tradeoffer.rebundle, $targetobject.knownname, $targetobject, this.knownname, this]"
+								chance="$debugchance" />
+							<add_ware_reservation object="$targetobject" type="buy" entity="this"
+								ware="$tradeware" amount="$reserve_amount" virtual="@$tradeoffer.rebundle" />
+						</do_elseif>
+					</do_if>
+					<remove_value name="$reserve_amount" />
+				</do_if>
+			</do_if>
+		</do_if>
+		<do_else>
+			<debug_text text="'skip restoring reservations for %1(%2) - not L or XL trader'.[this.name, this]"
+				chance="$debugchance" />
+		</do_else>
+	</patch>
 	<attention min="unknown">
 		<actions>
 			<!-- debugging -->
 			<set_value name="$failreason" exact="''" />
 			<do_if value="this.$jlpUniTraderRun" exact="true" negate="true">
 				<return>
-					<retval name="traderesult" value="0" />
+					<retval name="tradedetails" value="$tradedetails" />
 					<retval name="success" value="false" />
 				</return>
 			</do_if>
-			<!-- Remember the trade details in array {0} -> Buy {1} -> Sell  -->					
-			<create_list name="$tradedetails" />
+			<!-- Remember the trade details in array {0} -> Buy {1} -> Sell -->
+			<create_list name="$tradedetails" exact="0" />
+
 
 			<!-- set up initial state for trade runs -->
 			<label name="check trade offers" />
@@ -61,20 +115,44 @@
 					<set_value name="$amount" exact="$maxamount" />
 				</do_if>
 				<set_value name="$targetobject" exact="$buyoffer.buyer" />
+				<set_value name="$buyer" exact="$targetobject" />
 				<set_value name="$tradeoffer" exact="$buyoffer" />
 				<!--<set_value name="$buyoffer" exact="null" /> -->
+			</do_elseif>
+			<do_elseif value="@$buyer.exists and $tradeware?">
+				<!-- we are working on the buyoffer, but it is no longer available - use the stored information to
+					find another appropriate offer -->
+				<debug_text
+					text="'original buyoffer is no longer available, try to find a new offer for %1 on %2(%3)'.[$tradeware, $buyer.knownname, $buyer]"
+					chance="$debugchance" />
+				<find_buy_offer result="$buyoffer" buyer="$buyer" wares="$tradeware"
+					tradepartner="this.ship" />
+				<debug_text text="'found %1'.[@$buyoffer]" chance="$debugchance" />
+				<!-- remove the buyer variable so that if we haven't found an offer, the default handling is to return
+					to the calling script -->
+				<remove_value name="$buyer" />
+				<!-- now continue as normal -->
+				<resume label="check trade offers" />
 			</do_elseif>
 			<do_else>
 				<do_if value="this.ship.isclass.ship_xl or this.ship.isclass.ship_l">
 					<debug_text text="player.age + ' un-parking...'" chance="$debugchance" />
-					<run_script name="'move.unpark'" />
+					<run_script name="'move.undock'" />
 				</do_if>
-				<do_if value="@$targetobject.exists">
+				<!-- force cleanup -->
+				<do_if value="@$buyer_reserved.exists">
+					<remove_ware_reservation object="$buyer_reserved" entity="this" />
+					<remove_ware_reservation object="$buyer_reserved" entity="this"
+						virtual="true" />
+				</do_if>
+				<do_if value="(@$buyer_reserved != $targetobject) and @$targetobject.exists">
 					<remove_ware_reservation object="$targetobject" entity="this" />
+					<remove_ware_reservation object="$targetobject" entity="this" virtual="true" />
 				</do_if>
 				<return>
-					<retval name="traderesult" value="0" />
-					<retval name="success" value="false" />
+					<retval name="success" value="true" />
+					<retval name="tradedetails" value="$tradedetails" />
+					<retval name="lasttrade" value="@$lasttrade" />
 				</return>
 			</do_else>
 
@@ -90,7 +168,6 @@
 
 			<set_value name="$tradeware" exact="$tradeoffer.ware" />
 			<set_value name="$isbuyoffer" exact="$tradeoffer.buyer == $targetobject" />
-			<set_command command="command.trade" param="$targetobject" />
 
 			<!-- skills -->
 			<do_if value="$isbuyoffer" negate="true">
@@ -188,14 +265,10 @@
 				<substitute_text text="$detail1" source="{8570,50300}">
 					<replace string="'$TRADEWARE$'" with="$tradeware" />
 					<replace string="'$TRADEWAREVOLUME$'" with="$tradeware.volume" />
-					<replace string="'$WAREPRICEBUYOFFER$'" with="$warePriceBuyOffer / 1Cr" />
-					<replace string="'$WAREPRICEBUYOFFERCT$'" with="$warePriceBuyOffer % 100" />
-					<replace string="'$WAREPRICESELLOFFER$'" with="$warePrice / 1Cr" />
-					<replace string="'$WAREPRICESELLOFFERCT$'" with="$warePrice % 100" />
-					<replace string="'$WAREPRICEMAX$'" with="$warePriceMax / 1Cr" />
-					<replace string="'$WAREPRICEMAXCT$'" with="$warePriceMax % 100" />
-					<replace string="'$WAREPRICEMIN$'" with="$warePriceMin / 1Cr" />
-					<replace string="'$WAREPRICEMINCT$'" with="$warePriceMin % 100" />
+					<replace string="'$WAREPRICEBUYOFFER$'" with="$warePriceBuyOffer.formatted.default" />
+					<replace string="'$WAREPRICESELLOFFER$'" with="$warePrice.formatted.default" />
+					<replace string="'$WAREPRICEMAX$'" with="$warePriceMax.formatted.default" />
+					<replace string="'$WAREPRICEMIN$'" with="$warePriceMin.formatted.default" />
 				</substitute_text>
 				<substitute_text text="$detail2" source="{8570,50301}">
 					<replace string="'$TRADEDESTINATION$'" with="$notiTradedestination" />
@@ -206,7 +279,7 @@
 
 
 				<substitute_text text="$detail3" source="{8570,50310}">
-					<replace string="'$AMOUNT$'" with="$amount/1i" />
+					<replace string="'$AMOUNT$'" with="$amount" />
 					<replace string="'$SHIPAMOUNTMAX$'" with="$maxamount" />
 					<replace string="'$BEFORESKILLAMOUNTMAX$'" with="$amountbeforeSkill" />
 					<replace string="'$AMOUNTKAT$'" with="$amountKat" />
@@ -242,8 +315,8 @@
 									<wait min="3s" max="9s" sinceversion="1" />
 									<write_to_logbook category="squad"
 										text="'%1\n %2\n %3 \n %4'.[$notiDears, $detail1, $detail2, $detail3]" />
-									<resume label="move to target object" />
 								</do_if>
+								<resume label="move to target object" />
 							</do_if>
 							<do_else>
 								<set_value name="$tradeFailReason"
@@ -264,13 +337,6 @@
 					<set_value name="$tradeFailReason"
 						exact="'cargoWasteRisk not accept: cargoWasteRisk %1 minCargoWasteRisk %2'.[100-$cargoWasteRisk , 100 - $minCargoWasteRisk + (this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2 ]" />
 				</do_else>
-				<!-- not good trade. delete all -->
-				<do_if value="@$selloffer.available">
-					<remove_ware_reservation object="$selloffer.seller" entity="this" />
-				</do_if>
-				<do_if value="@$buyoffer.available">
-					<remove_ware_reservation object="$buyoffer.buyer" entity="this" />
-				</do_if>
 				<!-- true -> to show the reason why cant -->
 				<do_if value="this.$jlp_unitrader_show_extendedlogbook">
 					<write_to_logbook category="squad"
@@ -280,12 +346,26 @@
 					text="player.age + 'Bad Trade for my skills:\n %1\n Reason: %2'.[$notiDears, $tradeFailReason ]"
 					chance="$debugchance" />
 
-				<return>
+				<!-- special handling for station-owned ships: make a reservation for the buyer if we are getting
+					resources or selling products to better coordinate -->
+				<do_if
+					value="not $buyer_reserved? and $buyoffer.available and ($buyoffer.buyer == this.ship.commander or ($selloffer.available and $selloffer.seller == this.ship.commander))"
+				>
+					<debug_text text="'adding sell reservation for %1 %2 at %3'.[$amount, $tradeware, $buyoffer.buyer]"
+						chance="$debugchance" />
+					<add_ware_reservation object="$buyoffer.buyer" type="sell" entity="this"
+						ware="$tradeware" amount="$amount" duration="5h" virtual="$buyoffer.unbundle" />
+					<set_value name="$buyer_reserved" exact="$buyoffer.buyer" />
+				</do_if>
+
+				<!-- <return>
 					<retval name="traderesult" value="0" />
 					<retval name="success" value="false" />
-				</return>
+					</return>
+				-->
 			</do_if>
 
+			<set_command command="command.trade" param="$targetobject" />
 
 			<label name="move to target object" />
 			<do_if value="this.zone != $targetobject.zone">
@@ -293,7 +373,7 @@
 					<param name="destination" value="$targetobject" />
 					<param name="endintargetzone" value="true" />
 				</run_script>
-				<!-- time has passed for the movement step, make sure there is still an offer that matches what we 
+				<!-- time has passed for the movement step, make sure there is still an offer that matches what we
 					want to buy -->
 				<do_if value="not $isbuyoffer?">
 					<do_if value="$tradeoffer.exists">
@@ -336,28 +416,46 @@
 				<resume label="check trade offers" />
 			</do_if>
 			<set_value name="$reserved" exact="0" />
-			<do_if value="this.ship.isclass.ship_xl or this.ship.isclass.ship_l">
-				<do_if value="not $tradeoffer.unbundle">
-					<!-- reserve the ware amount so we can be reasonably sure that we can trade the entire amount -->
-					<do_if value="$amount gt $tradeoffer.offeramount.{this}">
-						<debug_text
-							text="player.age + ' reducing amount from %1 to %2'.[$amount, $tradeoffer.offeramount.{this}]"
-							chance="$debugchance" />
-						<set_value name="$amount" exact="$tradeoffer.offeramount.{this}" />
-					</do_if>
-					<set_value name="$tradeware" exact="$tradeoffer.ware" />
-					<add_ware_reservation object="$targetobject" entity="this" ware="$tradeware"
-						amount="$amount" result="$reserved" />
-					<do_if value="$reserved != $amount">
-						<debug_text
-							text="player.age + ' reserved %1 %2 at %3 (tried to reserve %4)'.[$reserved, $tradeware, $targetobject, $amount]"
-							chance="$debugchance" />
-					</do_if>
-					<do_if value="$targetobject.isclass.ship">
-						<debug_text text="player.age + ' reserved %1 %2 at %3'.[$reserved, $tradeware, $targetobject]"
-							chance="$debugchance" />
-					</do_if>
+			<!-- reserve the ware amount so we can be reasonably sure that we can trade the entire amount -->
+			<do_if value="$amount gt $tradeoffer.offeramount.{this}">
+				<debug_text
+					text="player.age + ' reducing amount from %1 to %2'.[$amount, $tradeoffer.offeramount.{this}]"
+					chance="$debugchance" />
+				<set_value name="$amount" exact="$tradeoffer.offeramount.{this}" />
+			</do_if>
+			<set_value name="$tradeware" exact="$tradeoffer.ware" />
+			<do_if value="$isbuyoffer">
+				<do_if value="not $buyer_reserved?">
+					<!-- we don't reserve again if we already reserved an amount for the buyoffer before -->
+					<debug_text text="'adding sell reservation for %1 %2 at %3'.[$amount, $tradeware, $targetobject]"
+						chance="$debugchance" />
+					<add_ware_reservation object="$targetobject" type="sell" entity="this"
+						virtual="$tradeoffer.unbundle" ware="$tradeware" amount="$amount" result="$reserved" />
+					<set_value name="$buyer_reserved" exact="$targetobject" />
 				</do_if>
+				<do_else>
+					<debug_text text="'checking sell reservation for %1 at %2'.[$tradeware, $targetobject]"
+						chance="$debugchance" />
+					<add_ware_reservation object="$targetobject" type="sell" entity="this"
+						virtual="$tradeoffer.unbundle" ware="$tradeware" amount="0" result="$reserved" />
+				</do_else>
+			</do_if>
+			<do_else>
+				<debug_text text="'adding buy reservation for %1 %2 at %3'.[$amount, $tradeware, $targetobject]"
+					chance="$debugchance" />
+				<add_ware_reservation object="$targetobject" type="buy" entity="this"
+					virtual="$tradeoffer.rebundle" ware="$tradeware" amount="$amount" result="$reserved" />
+			</do_else>
+			<do_if value="$reserved != $amount">
+				<debug_text
+					text="player.age + ' reserved %1 %2 at %3 (tried to reserve %4)'.[$reserved, $tradeware, $targetobject, $amount]"
+					chance="$debugchance" />
+			</do_if>
+			<do_if value="$targetobject.isclass.ship">
+				<debug_text text="player.age + ' reserved %1 %2 at %3'.[$reserved, $tradeware, $targetobject]"
+					chance="$debugchance" />
+			</do_if>
+			<do_if value="this.ship.isclass.ship_xl or this.ship.isclass.ship_l">
 				<debug_text text="player.age + ' moving to park at ' + $targetobject.knownname"
 					chance="$debugchance" />
 				<run_script name="'move.park'" result="$parkresult">
@@ -392,6 +490,9 @@
 				</do_if>
 				<debug_text text="player.age + ' docked at ' + $targetobject.knownname" chance="$debugchance" />
 			</do_else>
+			<!-- in case the park/dock scripts returned instantly because we are already there, give the offers
+				some time to update after adding reservations -->
+			<wait exact="1s" sinceversion="4" />
 
 			<label name="perform trade" />
 			<!-- time has passed, make sure we have a tradeoffer that fits -->
@@ -415,6 +516,7 @@
 						<resume label="finish" />
 					</do_if>
 					<do_else>
+						<set_value name="$isbuyoffer" exact="$tradeoffer.buyer == $targetobject" />
 						<set_value name="$skipfind" exact="true" />
 					</do_else>
 				</do_else>
@@ -433,20 +535,28 @@
 			<do_if value="$tradeoffer.available">
 				<do_if value="$tradeoffer.offeramount.{this} gt 0">
 					<debug_text text="player.age + ' start trade operation!'" chance="$debugchance" />
-					<do_if value="not $tradeoffer.unbundle">
-						<!-- DEBUG ONLY START -->
-						<set_value name="$d_starttime" exact="player.age" />
-						<set_value name="$d_startamount" exact="this.ship.cargo.{$tradeware}.count" />
-						<!-- DEBUG ONLY END -->
-					</do_if>
-					<do_if value="not @$isbuyoffer">
-						<!-- for sell offers the reservation should be removed directly before the trade is started because 
+					<do_if value="not @$isbuyoffer and not $reservation_removed?">
+						<!-- for sell offers the reservation should be removed directly before the trade is started because
 							wares are immediately put in escrow -->
-						<remove_ware_reservation object="$targetobject" entity="this" ware="$tradeware"
-							virtual="$tradeoffer.unbundle" />
+						<do_if value="this.ship.isclass.ship_xl or this.ship.isclass.ship_l">
+							<remove_ware_reservation object="$targetobject" type="buy" entity="this"
+								ware="$tradeware" virtual="$tradeoffer.rebundle" />
+						</do_if>
+						<do_else>
+							<remove_ware_reservation object="$targetobject" type="buy" entity="this"
+								ware="$tradeware" virtual="$tradeoffer.rebundle" />
+						</do_else>
+						<set_value name="$reservation_removed" exact="1" />
+						<!-- changing ware reservations triggers an offer update which could lead to the offer being removed -->
+						<do_if value="not $tradeoffer.available">
+							<!-- allow a little bit of time for the offer update to take place -->
+							<wait exact="1s" sinceversion="4" />
+							<resume label="perform trade" />
+						</do_if>
 					</do_if>
 					<!-- last minute amount check -->
 					<do_if value="@$isbuyoffer">
+						<!-- we are selling -->
 						<set_value name="$oldamount" exact="$amount" />
 						<set_value name="$amount" exact="$tradeoffer.offeramount.{this}" />
 						<set_value name="$maxamount" exact="this.ship.cargo.{$tradeware}.count" />
@@ -461,58 +571,78 @@
 						<remove_value name="$oldamount" />
 						<remove_value name="$maxamount" />
 					</do_if>
+					<do_elseif
+						value="(not $tradeoffer.buyfree.{this}) and (($tradeoffer.unitprice * $amount) gt this.money)"
+					>
+						<!-- we are buying and the transaction is not free -->
+						<debug_text
+							text="'%1(%2) reducing amount of %3 to buy from %4(%5) from %6 to %7 (directly before trade start; not enough money)'.[this.ship.knownname, this.ship, $tradeware.name, $targetobject.knownname, $targetobject, $amount, this.money / $tradeoffer.unitprice]"
+							chance="$debugchance" />
+						<set_value name="$amount" exact="this.money / $tradeoffer.unitprice" />
+					</do_elseif>
 					<do_if value="$amount gt $tradeoffer.offeramount.{this}">
 						<debug_text
-							text="'%1(%2) reducing amount of %3 traded with %4(%5) from %6 to %7 (directly before trade start)'.[this.ship.knownname, this.ship, $tradeware.name, $targetobject.knownname, $targetobject, $amount, $tradeoffer.offeramount.{this}]"
+							text="'%1(%2) reducing amount of %3 to trade with %4(%5) from %6 to %7 (directly before trade start; offeramount is lower)'.[this.ship.knownname, this.ship, $tradeware.name, $targetobject.knownname, $targetobject, $amount, $tradeoffer.offeramount.{this}]"
 							chance="$debugchance" />
 						<set_value name="$amount" exact="$tradeoffer.offeramount.{this}" />
 					</do_if>
 					<do_if value="$amount gt 0">
 						<!-- now execute the trade -->
+						<set_value name="$lasttrade" exact="[$isbuyoffer, $tradeware, $targetobject]" />
 						<execute_trade tradeoffer="$tradeoffer" tradepartner="this.ship" amount="$amount"
 							result="$traderesult" />
 					</do_if>
 					<do_else>
 						<set_value name="$traderesult" exact="false" />
 					</do_else>
-					<do_if value="$tradeoffer.exists">
-						<!-- prepare texts for notifcation since the actual trade can be deleted
-							by the time this is displayed! -->
-						<set_value name="$WARE" exact="$tradeoffer.ware.name" />
-						<set_value name="$AMOUNT" exact="0" />
-						<do_if value="@$tradeoffer.seller">
-							<set_value name="$AMOUNT" exact="$tradeoffer.transferredamount + $tradeoffer.destroyedamount" />
-						</do_if>
-						<do_elseif value="@$tradeoffer.buyer">
-							<set_value name="$AMOUNT" exact="$tradeoffer.transferredamount + $tradeoffer.destroyedamount" />
-						</do_elseif>
-						<set_value name="$price" exact="$AMOUNT * $tradeoffer.unitprice" />
-						<set_value name="$PRICE" exact="$price / 1ct" />
-						<set_value name="$tradedetails" exact="[$targetobject, $AMOUNT, $WARE, $PRICE]" operation="insert"/>
+					<!-- prepare texts for notifcation since the actual trade can be deleted
+						by the time this is displayed! -->
 
+					<do_if value="$traderesult">
+						<do_if value="@$isbuyoffer">
+							<set_value name="$AMOUNT" exact="$tradeoffer.transferredamount  + $tradeoffer.destroyedamount" />
+						</do_if>
+						<do_else>
+							<set_value name="$AMOUNT" exact="$tradeoffer.transferredamount + $tradeoffer.destroyedamount" />
+						</do_else>
+						<!-- <set_value name="$PRICE" exact="$AMOUNT * $price" /> -->
+						<set_value name="$PRICE" exact="$tradeoffer.unitprice" />
+						<set_value name="$WARE" exact="$tradeoffer.ware.name" />
+						<append_to_list name="$tradedetails" exact="[$targetobject, $AMOUNT, $WARE, $PRICE, $traderesult]" />
 					</do_if>
 					<do_if value="@$isbuyoffer">
 						<!-- buyoffers remove their reservation directly after the trade -->
-						<remove_ware_reservation object="$targetobject" entity="this" ware="$tradeware"
-							virtual="@$tradeoffer.unbundle" />
+						<do_if value="this.ship.isclass.ship_xl or this.ship.isclass.ship_l">
+							<remove_ware_reservation object="$targetobject" type="sell" entity="this"
+								ware="$tradeware" virtual="@$tradeoffer.unbundle" />
+						</do_if>
+						<do_else>
+							<remove_ware_reservation object="$targetobject" type="sell" entity="this"
+								ware="$tradeware" virtual="@$tradeoffer.unbundle" />
+						</do_else>
 					</do_if>
-					<do_if value="@$tradeoffer.unbundle">
-						<!-- $tradeoffer.unbundle = true! in case we failed to buy ammo, trigger an update for our ammo 
-							offers -->
-						<signal_objects object="$targetobject" param="'update_ammo_offers'" />
+					<do_if
+						value="$targetobject.isclass.station and ((@$isbuyoffer and @$tradeoffer.unbundle) or (not @$isbuyoffer and @$tradeoffer.rebundle))"
+					>
+						<!-- in case we attempted to trade ammo, trigger an update for their ammo offers -->
+						<debug_text
+							text="'schedule immediate supply offer update for %1 (%2)'.[$targetobject.knownname, $targetobject]"
+							chance="$debugchance" />
+						<schedule_supply_update object="$targetobject" />
 					</do_if>
 
 					<do_if value="this.isplayerowned">
 						<do_if value="not $targetobject.isplayerowned and not $targetobject.hastradesubscription">
-							<!-- if a playership trades with an NPC station that doesn't have a trade subscription anyway, 
+							<!-- if a playership trades with an NPC station that doesn't have a trade subscription anyway,
 								store one offer snapshot -->
 							<store_trade_offer_snapshot object="$targetobject" />
 						</do_if>
 					</do_if>
+					<remove_value name="$isbuyoffer" />
+					<remove_value name="$reservation_removed" />
 					<detach_from_masstraffic object="this.ship" wait="true">
 						<interrupt_after_time time="5min" />
 					</detach_from_masstraffic>
-					
 					<do_if value="not $traderesult">
 						<do_if value="$amount le 0">
 							<set_value name="$failreason" exact="'ERR_AMOUNT_0'" />
@@ -521,6 +651,11 @@
 							<set_value name="$failreason" exact="'ERR_EXECUTE_FAIL'" />
 						</do_else>
 						<resume label="finish" />
+					</do_if>
+					<do_if value="@$buyer == $targetobject">
+						<!-- we have (probably) sold the wares, make sure the script can return during the next run of
+							check trade offers -->
+						<remove_value name="$buyer" />
 					</do_if>
 					<debug_text text="player.age + ' successfully traded chosen goods!'" chance="$debugchance" />
 				</do_if>
@@ -533,21 +668,19 @@
 				<set_value name="$failreason" exact="'ERR_TRADEOFFER_GONE'" />
 				<resume label="finish" />
 			</do_else>
-			<!--  Repeat with  selloffer from buyoffer to complete the trade in once -->
-			<do_if value="@$isbuyoffer and $failreason == ''">
-				<do_if value="@$selloffer.available">
-					<set_value name="$tradedetails" exact="[$targetobject, $AMOUNT, $WARE, $PRICE]" operation="insert"/>
-					<wait min="1s" max="3s" />
-					<resume label="check trade offers" />
-				</do_if>
-			</do_if>
-<!-- 
+
+			<remove_value name="$traderesult" />
 			<wait min="1s" max="3s" />
 			<resume label="check trade offers" />
- -->
+
 			<label name="finish" />
 			<do_if value="@$targetobject.exists">
 				<remove_ware_reservation object="$targetobject" entity="this" />
+				<remove_ware_reservation object="$targetobject" entity="this" virtual="1" />
+			</do_if>
+			<do_if value="@$buyer_reserved.exists and (@$buyer_reserved != $targetobject)">
+				<remove_ware_reservation object="$buyer_reserved" entity="this" />
+				<remove_ware_reservation object="$buyer_reserved" entity="this" virtual="1" />
 			</do_if>
 			<do_if value="$failreason != ''">
 				<debug_text
@@ -556,11 +689,12 @@
 				<debug_text text="player.age + ' TRADE RUN FAILED! Error: ' + $failreason" chance="$debugchance" />
 				<do_if value="this.ship.isclass.ship_xl or this.ship.isclass.ship_l">
 					<debug_text text="player.age + ' un-parking...'" chance="$debugchance" />
-					<run_script name="'move.unpark'" />
+					<run_script name="'move.undock'" />
 				</do_if>
 				<return>
-					<retval name="traderesult" value="$tradedetails" />
 					<retval name="success" value="false" />
+					<retval name="tradedetails" value="$tradedetails" />
+					<retval name="lasttrade" value="@$lasttrade" />
 				</return>
 			</do_if>
 			<do_else>
@@ -578,19 +712,25 @@
 				<debug_text text="player.age + ' CONGRATULATIONS, TRADE RUN COMPLETE!'" chance="$debugchance" />
 				<do_if value="this.ship.isclass.ship_xl or this.ship.isclass.ship_l">
 					<debug_text text="player.age + ' un-parking...'" chance="$debugchance" />
-					<run_script name="'move.unpark'" />
+					<run_script name="'move.undock'" />
 				</do_if>
 				<return>
-					<retval name="traderesult" value="$tradedetails" />
 					<retval name="success" value="true" />
+					<retval name="tradedetails" value="$tradedetails" />
+					<retval name="lasttrade" value="@$lasttrade" />
 				</return>
 			</do_else>
 
 		</actions>
 	</attention>
 	<on_abort>
-		<do_if value="@$targetobject.exists">
+		<do_if value="@$buyer_reserved.exists">
+			<remove_ware_reservation object="$buyer_reserved" entity="this" />
+			<remove_ware_reservation object="$buyer_reserved" entity="this" virtual="1" />
+		</do_if>
+		<do_if value="(@$buyer_reserved != $targetobject) and @$targetobject.exists">
 			<remove_ware_reservation object="$targetobject" entity="this" />
+			<remove_ware_reservation object="$targetobject" entity="this" virtual="1" />
 		</do_if>
 	</on_abort>
 </aiscript>

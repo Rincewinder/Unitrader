@@ -37,7 +37,7 @@
               <set_value name="$Speak_Line" list="[24] "/>
             </do_if>
             <do_elseif value="event.param.maxlegalscanlevel.{this.ship}" min="this.ship.scannedlevel">
-              <do_if value="@(this.inventory.illegalto.{this.zone.owner}) or @(this.ship.cargo.illegalto.{this.zone.owner})">
+              <do_if value="@this.inventory.illegalto.{this.zone.owner} or @this.ship.cargo.illegalto.{this.zone.owner}">
                 <set_value name="$Speak_Line" list="[26] "/>
               </do_if>
               <do_else>

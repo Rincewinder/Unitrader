@@ -72,7 +72,7 @@
             <t id="50200">%1: '%2' I trained following skills %3 \(Stars:%4\).</t>
 			<t id="50210">arrangement talent:    '$WAITTIME$s'\n technical understand: '$SEARCHTIME$s'\n Charisma:                '$EXTRAFACTION$%'\n Courage:                      '$COURAGE$%'\n Efficiency:                       '$EFFICIENCY$'.</t>
 			<t id="50211">Range: $RANGE$ \('$HOME$'\) \n Max Budget: $MAXBUDGET$ Cr</t>
-			<t id="50300">I found a deal. I want to buy ware '$TRADEWARE$  \($WAREPRICEMIN$.$WAREPRICEMINCT$ Cr - $WAREPRICEMAX$.$WAREPRICEMAXCT$ Cr\)'    Volume: '$TRADEWAREVOLUME$'.\n Buy price '$WAREPRICESELLOFFER$.$WAREPRICESELLOFFERCT$ Cr' Sell Price '$WAREPRICEBUYOFFER$.$WAREPRICEBUYOFFERCT$ Cr'</t>
+			<t id="50300">I found a deal. I want to buy ware '$TRADEWARE$  \($WAREPRICEMIN$ Cr - $WAREPRICEMAX$ Cr\)'    Volume: '$TRADEWAREVOLUME$'.\n Buy price '$WAREPRICESELLOFFER$ Cr' Sell Price '$WAREPRICEBUYOFFER$ Cr'</t>
 			<t id="50301">'$TRADESOURCE$ \(max: $TRADESOURCEAMOUNT$\)' with\n '$TRADEDESTINATION$  \(max: '$TRADEDESTAMOUNT$'\)</t>
 			<t id="50310">I negotiate $AMOUNTKAT$ of '$AMOUNT$' \(max offer: '$SHIPAMOUNTMAX$'\).</t>
 			
@@ -82,7 +82,7 @@
 			<t id="50323">little amount</t>
 			<t id="50324">poor amount</t>			
 			
-			<t id="50400">$SHIP$\n I'm successfully make a Deal.\n Ware: $WARE$ Amount: $AMOUNT$\n Buy price: $PRICEBUY$ Cr Sell price: $PRICESELL$ Cr \n Profit: $PROFIT$ Cr</t>
+			<t id="50400">$SHIP$\n I'm successfully make a Deal.\n Ware: $WARE$\n buyed amount: $AMOUNTBUY$  Buy price: $PRICEBUY$ Cr\nSellamount: $AMOUNTSELL$  Selled price: $PRICESELL$ Cr \n Profit: $PROFIT$ Cr</t>
 			
 
         </page>

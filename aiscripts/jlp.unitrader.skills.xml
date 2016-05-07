@@ -244,14 +244,14 @@
 					<replace string="'$SECTOR$'" with="$Entity.sector.name" />
 				</substitute_text>
 				<substitute_text text="$detail1" source="{8570,50210}">
-					<replace string="'$WAITTIME$'" with="$Entity.$jlp_unitrader_waittime" />
-					<replace string="'$SEARCHTIME$'" with="$Entity.$jlp_unitrader_searchtime" />
+					<replace string="'$WAITTIME$'" with="$Entity.$jlp_unitrader_waittime.formatted.default" />
+					<replace string="'$SEARCHTIME$'" with="$Entity.$jlp_unitrader_searchtime.formatted.default" />
 					<replace string="'$EXTRAFACTION$'" with="$Entity.$jlp_unitrader_extrafaction" />
 					<replace string="'$COURAGE$'" with="$Entity.$jlp_unitrader_courage" />
 					<replace string="'$EFFICIENCY$'" with="$Entity.$jlp_unitrader_efficiency" />
 					<replace string="'$RANGE$'" with="$RangeText" />
 					<replace string="'$HOME$'" with="$HomeText" />
-					<replace string="'$MAXBUDGET$'" with="$Entity.$jlp_unitrader_budgetmax/1Cr" />
+					<replace string="'$MAXBUDGET$'" with="($Entity.$jlp_unitrader_budgetmax/1Cr).formatted.default" />
 				</substitute_text>
 				<show_notification timeout="10s" relationeffect="true" object="$Entity"
 					caption="{8570,1000}" icon="achievement_capitalshipkill_1" queued="true" sound="notification_generic"

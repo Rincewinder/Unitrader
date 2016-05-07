@@ -332,8 +332,8 @@
 						<set_value name="$Captain.$jlpUniMiningRun" exact="false" />
 						<set_value name="$Captain.$jlp_unitrader_show_extendedlogbook" exact="true" />
 						<set_value name="$Captain.$jlp_unitrader_budgetmax" exact="$maxBudget" />
-						<set_value name="$Captain.$jlp_unitrader_trade_stations_buy" exact="'all'" />
-						<set_value name="$Captain.$jlp_unitrader_trade_stations_sell" exact="'all'" />
+						<set_value name="$Captain.$jlp_unitrader_trade_stations_buy" exact="'allBuy'" />
+						<set_value name="$Captain.$jlp_unitrader_trade_stations_sell" exact="'allSell'" />
 
 						<add_npc_line speaker="$Captain" line="[1012, 1013, 1018, 1019].random" comment="Confirmation" />
 					</do_if>

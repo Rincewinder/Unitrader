@@ -69,7 +69,7 @@
             <t id="50200">%1: '%2' Ich habe beim %3 Skill um 1 Stern dazugelernt \(%4 Sterne\).</t>
             <t id="50210">Organisationtalent:     '$WAITTIME$s'\n Technisches Talent:'  '$SEARCHTIME$s'\n Austrahlungsbonus:  '$EXTRAFACTION$%'\n Mut:                              '$COURAGE$%'\n Effektivität:                     '$EFFICIENCY$%'.\n {8570,50211}</t>
 			<t id="50211">Reichweite: $RANGE$ \('$HOME$'\) \n Max Budget: $MAXBUDGET$ Cr</t>
-			<t id="50300">Ich habe ein Handel gefunden.\n Ware: '$TRADEWARE$  \('$WAREPRICEMIN$.$WAREPRICEMINCT$ Cr' - '$WAREPRICEMAX$.$WAREPRICEMINCT$ Cr'\)'    Volumen: '$TRADEWAREVOLUME$'.\n Kaufpreis: '$WAREPRICESELLOFFER$.$WAREPRICESELLOFFERCT$ Cr' Verkaufspreis: '$WAREPRICEBUYOFFER$.$WAREPRICEBUYOFFERCT$ Cr'</t>
+			<t id="50300">Ich habe ein Handel gefunden.\n Ware: '$TRADEWARE$  \('$WAREPRICEMIN$ Cr' - '$WAREPRICEMAX$ Cr'\)'    Volumen: '$TRADEWAREVOLUME$'.\n Kaufpreis: '$WAREPRICESELLOFFER$ Cr' Verkaufspreis: '$WAREPRICEBUYOFFER$ Cr'</t>
 			<t id="50301">'$TRADESOURCE$ \(max: $TRADESOURCEAMOUNT$\)' mit\n '$TRADEDESTINATION$  \(max: '$TRADEDESTAMOUNT$'\)'</t>
 			<t id="50310">Ich konnte $AMOUNTKAT$ von '$AMOUNT$' \(max: '$SHIPAMOUNTMAX$'\) aushandeln.</t>
 			<t id="50320">eine große Menge</t>
@@ -78,7 +78,7 @@
 			<t id="50323">eine unterdurschnittliche Menge</t>
 			<t id="50324">eine schlechte Menge</t>
 			
-			<t id="50400">$SHIP$\n Ich habe erfolgreich ein Handel getätigt.\n Ware: $WARE$ verk. Menge: $AMOUNT$\n Einkaufspreis: $PRICEBUY$ Cr Verkaufspreis: $PRICESELL$ Cr\n Profit: $PROFIT$ Cr</t>
+			<t id="50400">$SHIP$\n Ich habe erfolgreich ein Handel getätigt.\n Ware: $WARE$\n gekaufte Menge: $AMOUNTBUY$   Einkaufspreis: $PRICEBUY$ Cr\n verkaufte Menge: $AMOUNTSELL$  Verkaufspreis: $PRICESELL$ Cr\n Profit: $PROFIT$ Cr</t>
 
 		</page>
     </add>

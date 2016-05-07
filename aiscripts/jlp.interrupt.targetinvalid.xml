@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<aiscript name="jlp.interrupt.targetinvalid" priority="10"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd"
+>
+	<!-- Interrupt handler for target in moveto action (or similar) that disappears for different reasons:
+		jump, go into highway, after savegame, ...
+		Author: Adrian
+	-->
+	<interrupts>
+		<library>
+			<handler name="JLPUnitraderTargetInvalidHandler">
+				<conditions>
+					<event_object_target_invalid object="this.ship" />
+				</conditions>
+				<actions>
+					<!-- Debug messages (deactivated) -->
+					<set_value name="$dbg_target" exact="event.param" chance="0" />
+					<debug_text text="'event TARGET INVALID. param: %1'.[@$dbg_target.knownname]"
+						chance="0" />
+					<debug_text
+						text="' this ship %1(%2) in %3(%4). The target: %5(%6)'.[this.ship.knownname, this.ship, this.ship.zone.knownname, this.ship.zone, @$dbg_target.knownname, @$dbg_target]"
+						chance="0" />
+
+					<abort_called_scripts />
+
+					<!-- ############## read from config ###################### -->
+					<do_if value="typeof @this.$jlp_unitrader_budgetmax == datatype.money">
+						<set_value name="$maxBudget" exact="this.$jlp_unitrader_budgetmax" />
+					</do_if>
+					<do_else>
+						<do_if value="typeof $maxBudget != datatype.money">
+							<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl">
+								<set_value name="$maxBudget" exact="1000000000ct" />
+							</do_if>
+							<do_else>
+								<set_value name="$maxBudget" exact="100000000ct" />
+							</do_else>
+							<set_value name="this.$jlp_unitrader_budgetmax" exact="$maxBudget" />
+						</do_if>
+					</do_else>
+					<!-- Range -->
+					<do_if value="@this.$jlp_unitrader_range != null">
+						<set_value name="$range" exact="this.$jlp_unitrader_range" />
+					</do_if>
+					<do_else>
+						<do_if value="$range == null">
+							<set_value name="$range" exact="'ranged'" />
+						</do_if>
+						<set_value name="this.$jlp_unitrader_range" exact="$range" />
+					</do_else>
+					<do_if value="@this.$jlp_unitrader_home != null">
+						<set_value name="$homeStart" exact="this.$jlp_unitrader_home" />
+					</do_if>
+					<do_else>
+						<do_if value="$homeStart == null">
+							<set_value name="$homeStart" exact="this.ship.zone" />
+						</do_if>
+						<set_value name="this.$jlp_unitrader_home" exact="$homeStart" />
+					</do_else>
+
+					<do_if value="$range == 'ranged'">
+						<!-- Jump -->
+						<do_if value="typeof @this.$jlp_unitrader_jump_buy_min == datatype.integer">
+							<set_value name="$minbuy" exact="this.$jlp_unitrader_jump_buy_min" />
+						</do_if>
+						<do_else>
+							<set_value name="this.$jlp_unitrader_jump_buy_min" exact="0" />
+							<set_value name="$minbuy" exact="this.$jlp_unitrader_jump_buy_min" />
+						</do_else>
+						<do_if value="typeof @this.$jlp_unitrader_jump_buy_max == datatype.integer">
+							<set_value name="$maxbuy"
+								exact="this.$jlp_unitrader_jump_buy_max * this.$jlp_unitrader_courage/100i" />
+						</do_if>
+						<do_else>
+							<set_value name="this.$jlp_unitrader_jump_buy_max" exact="24" />
+							<set_value name="$maxbuy"
+								exact="this.$jlp_unitrader_jump_buy_max * this.$jlp_unitrader_courage/100i" />
+						</do_else>
+						<do_if value="typeof @this.$jlp_unitrader_jump_sell_min == datatype.integer">
+							<set_value name="$minsell" exact="this.$jlp_unitrader_jump_sell_min" />
+						</do_if>
+						<do_else>
+							<set_value name="this.$jlp_unitrader_jump_sell_min" exact="0" />
+							<set_value name="$minsell" exact="this.$jlp_unitrader_jump_sell_min" />
+						</do_else>
+						<do_if value="typeof @this.$jlp_unitrader_jump_sell_max == datatype.integer">
+							<set_value name="$maxsell"
+								exact="this.$jlp_unitrader_jump_sell_max * this.$jlp_unitrader_courage/100i" />
+						</do_if>
+						<do_else>
+							<set_value name="this.$jlp_unitrader_jump_sell_max" exact="24" />
+							<set_value name="$maxsell"
+								exact="this.$jlp_unitrader_jump_sell_max * this.$jlp_unitrader_courage/100i" />
+						</do_else>
+					</do_if>
+
+					<set_value name="$PageId" exact="8570" />
+					<set_value name="this.$jlp_unitrader_range" exact="$range" />
+					<set_value name="this.$jlp_unitrader_home" exact="$homeStart" />
+					<set_value name="this.$jlpUniTraderRun" exact="true" />
+					<set_value name="this.$jlpUniMiningRun" exact="false" />
+					<set_value name="this.$jlp_unitrader_show_extendedlogbook" exact="true" />
+					<set_value name="this.$jlp_unitrader_budgetmax" exact="$maxBudget" />
+					<set_value name="this.$jlp_unitrader_trade_stations_buy" exact="'all'" />
+					<set_value name="this.$jlp_unitrader_trade_stations_sell" exact="'all'" />
+
+
+					<start_script object="$Captain" name="'jlp.unitrader.trading'">
+						<param name="PageId" value="$PageId" />
+						<param name="maxBudget" value="$maxBudget" />
+						<param name="range" value="$range" />
+						<param name="homeStart" value="$homeStart" />
+
+					</start_script>
+				</actions>
+			</handler>
+		</library>
+	</interrupts>
+</aiscript>

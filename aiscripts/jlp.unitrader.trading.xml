@@ -6,52 +6,12 @@
 		<param name="PageId" default="8570" />
 		<param name="maxBudget" default="100000000ct" />
 		<param name="range" default="'ranged'" />
-		<param name="homeStart" default="this.ship.cluster" />
+		<param name="homeStart" default="this.ship.zone" />
 	</params>
 	<interrupts>
+		<handler ref="JLPUnitraderTargetInvalidHandler" />
 		<handler ref="JLPUnitraderShipOwnedAttackedHandler" />
 		<handler ref="JLPUnitraderScannedHandler" />
-
-
-		<!-- Stop ORDERS -->
-		<!-- TODO: I send a signal from md script, but this wont call
-			<handler>
-			<conditions>
-			<event_object_signalled object="this.ship"
-			param="'stop order'" />
-			<check_value value="this.command.value != command.follow" />
-			<check_value
-			value="(not @this.$shiptrader_docking) and (not @this.$ship_parking) and
-			(not this.ship.dockslot) and (not this.ship.docklink)" />
-			</conditions>
-			<actions>
-			<set_value name="$command" exact="this.command.value" />
-			<run_interrupt_script name="'jlp.interrupt.stoporder'"
-			abortscripts="true"
-			>
-			<param name="prevcommand" value="$command" />
-			</run_interrupt_script>
-
-			</actions>
-			</handler>
-
-
-			<handler>
-			<conditions>
-			<event_object_money_updated object="this" />
-			</conditions>
-			<actions>
-			<do_if value="(this.minbudget gt 0) and (this.money lt this.minbudget)">
-			<debug_text
-			text="'money below budget. Money: ' + event.param2 + ' Min budget: ' +
-			this.minbudget"
-			chance="$debugchance" />
-
-			<run_interrupt_script name="'player.interaction.budget'" />
-			</do_if>
-			</actions>
-			</handler>
-		-->
 	</interrupts>
 	<attention min="unknown">
 		<actions>
@@ -110,11 +70,13 @@
 						<set_value name="$minbuy" exact="this.$jlp_unitrader_jump_buy_min" />
 					</do_else>
 					<do_if value="typeof @this.$jlp_unitrader_jump_buy_max == datatype.integer">
-						<set_value name="$maxbuy" exact="this.$jlp_unitrader_jump_buy_max * this.$jlp_unitrader_courage/100i" />
+						<set_value name="$maxbuy"
+							exact="this.$jlp_unitrader_jump_buy_max * this.$jlp_unitrader_courage/100i" />
 					</do_if>
 					<do_else>
 						<set_value name="this.$jlp_unitrader_jump_buy_max" exact="24" />
-						<set_value name="$maxbuy" exact="this.$jlp_unitrader_jump_buy_max * this.$jlp_unitrader_courage/100i" />
+						<set_value name="$maxbuy"
+							exact="this.$jlp_unitrader_jump_buy_max * this.$jlp_unitrader_courage/100i" />
 					</do_else>
 					<do_if value="typeof @this.$jlp_unitrader_jump_sell_min == datatype.integer">
 						<set_value name="$minsell" exact="this.$jlp_unitrader_jump_sell_min" />
@@ -124,23 +86,25 @@
 						<set_value name="$minsell" exact="this.$jlp_unitrader_jump_sell_min" />
 					</do_else>
 					<do_if value="typeof @this.$jlp_unitrader_jump_sell_max == datatype.integer">
-						<set_value name="$maxsell" exact="this.$jlp_unitrader_jump_sell_max * this.$jlp_unitrader_courage/100i" />
+						<set_value name="$maxsell"
+							exact="this.$jlp_unitrader_jump_sell_max * this.$jlp_unitrader_courage/100i" />
 					</do_if>
 					<do_else>
 						<set_value name="this.$jlp_unitrader_jump_sell_max" exact="24" />
-						<set_value name="$maxsell" exact="this.$jlp_unitrader_jump_sell_max * this.$jlp_unitrader_courage/100i" />
+						<set_value name="$maxsell"
+							exact="this.$jlp_unitrader_jump_sell_max * this.$jlp_unitrader_courage/100i" />
 					</do_else>
 				</do_if>
 				<do_else>
-						<remove_value name="this.$jlp_unitrader_jump_sell_max" />
-						<remove_value name="this.$jlp_unitrader_jump_sell_min" />
-						<remove_value name="this.$jlp_unitrader_jump_buy_max" />
-						<remove_value name="this.$jlp_unitrader_jump_buy_min"/>
+					<remove_value name="this.$jlp_unitrader_jump_sell_max" />
+					<remove_value name="this.$jlp_unitrader_jump_sell_min" />
+					<remove_value name="this.$jlp_unitrader_jump_buy_max" />
+					<remove_value name="this.$jlp_unitrader_jump_buy_min" />
 				</do_else>
 				<!-- Set parameters -->
 				<set_actor_min_budget actor="this" amount="0ct" />
 				<set_actor_max_budget actor="this" amount="$maxBudget*10ct" />
-				
+
 
 				<!--<set_actor_max_budget actor="this" amount="$MaxBudget"/> -->
 				<!-- check maxbudget and give the rest to player -->
@@ -151,7 +115,7 @@
 						<transfer_money from="this" to="player.entity" amount="$transferMoney" result="$result" />
 						<add_npc_line speaker="this" line="1164" comment="More Money as max, tranfer the rest" />
 						<write_to_logbook category="squad"
-							text="{8570,50100}.[this.ship.knownname, this.knownname, $transferMoney / 1Cr]" />
+							text="{8570,50100}.[this.ship.knownname, this.knownname, $transferMoney.formatted.default]" />
 						<wait min="4s" max="9s" />
 					</do_if>
 				</do_if>
