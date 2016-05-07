@@ -30,13 +30,14 @@
 				</do_if>
 				</do_all>
 		
-
+-->
 			<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 1200">
-				<run_script name="'move.refuel'" sinceversion="1" />
+				<run_script name="'jlp.unitrader.move.refuel'"  />
 			</do_if>
-				-->
+				
+
 			<do_if value="$range" exact="'ranged'">
-				<run_script name="'jlp.unitrader.trade.ship'" sinceversion="1">
+				<run_script name="'jlp.unitrader.trade.ship'">
 					<param name="PageId" value="$PageId" />
 					<param name="range" value="$range" />
 					<param name="home" value="$home" />
@@ -46,7 +47,7 @@
 				</run_script>
 			</do_if>
 			<do_else>
-				<run_script name="'jlp.unitrader.trade.ship'" sinceversion="1">
+				<run_script name="'jlp.unitrader.trade.ship'">
 					<param name="PageId" value="$PageId" />
 					<param name="range" value="$range" />
 					<param name="home" value="$home" />

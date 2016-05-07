@@ -689,7 +689,7 @@
 				<debug_text text="player.age + ' TRADE RUN FAILED! Error: ' + $failreason" chance="$debugchance" />
 				<do_if value="this.ship.isclass.ship_xl or this.ship.isclass.ship_l">
 					<debug_text text="player.age + ' un-parking...'" chance="$debugchance" />
-					<run_script name="'move.undock'" />
+					<run_script name="'move.undock'"  />
 				</do_if>
 				<return>
 					<retval name="success" value="false" />

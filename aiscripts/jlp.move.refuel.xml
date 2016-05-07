@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<aiscript name="jlp.unitrader.move.refuel" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="3" priority="9"
+>
+	<params>
+		<param name="amount" default="0" comment="if not set, the ship will fully load its storage" />
+		<param name="debugchance" default="0" />
+	</params>
+	<init>
+		<set_command command="command.refuel" />
+	</init>
+	<attention min="unknown">
+		<actions>
+			<label name="initialization" />
+			<set_value name="$failreason" exact="'success'" />
+
+			<find_object_component name="$jumpdrive" object="this.ship" class="class.jumpdrive"
+				checkoperational="false" />
+			<do_if value="not $jumpdrive.exists">
+				<set_value name="$failreason" exact="'ERR_NO_JUMPDRIVE'" />
+				<resume label="finish" />
+			</do_if>
+			<do_if value="this.ship.cargo.{ware.fuelcells}.max == 0 or this.ship.cargo.{ware.fuelcells}.free == 0">
+				<set_value name="$failreason" exact="'ERR_FUEL_STORAGE_MISSING'" />
+				<resume label="finish" />
+			</do_if>
+
+			<label name="findfuel" />
+			<!-- subdivide find_sell_offer to minimize performance spikes -->
+			<debug_text text="'%1 trying to find selloffers for \'%2\'...'.[player.age, ware.fuelcells]"
+				chance="$debugchance" />
+			<find_sell_offer result="$selloffers" space="this.zone" wares="ware.fuelcells"
+				tradepartner="this.ship" multiple="true" />
+
+			<do_if value="$selloffers.count == 0">
+				<wait min="20ms" max="80ms" />
+				<find_sell_offer result="$selloffers" space="this.sector" wares="ware.fuelcells"
+					tradepartner="this.ship" multiple="true" />
+				<do_if value="$selloffers.count == 0">
+					<create_list name="$clusteroffers" />
+					<find_sector name="$sectors" space="this.cluster" multiple="true" />
+					<do_all exact="$sectors.count" counter="$s">
+						<do_if value="$sectors.{$s} == this.sector" negate="true">
+							<wait min="20ms" max="80ms" />
+							<find_sell_offer result="$selloffers" space="$sectors.{$s}" wares="ware.fuelcells"
+								tradepartner="this.ship" multiple="true" />
+							<do_all exact="$selloffers.count" counter="$j">
+								<append_to_list name="$clusteroffers" exact="$selloffers.{$j}" />
+							</do_all>
+						</do_if>
+					</do_all>
+					<set_value name="$selloffers" exact="$clusteroffers" />
+				</do_if>
+			</do_if>
+			<do_if value="$selloffers.count == 0">
+				<set_value name="$failreason" exact="'ERR_FIND_FUEL_FAILED'" />
+				<resume label="finish" />
+			</do_if>
+			<set_value name="$tradeoffer" exact="$selloffers.random" />
+			<debug_text
+				text="'%1 found a \'%2\' in zone \'%3\' selling %4 units of \'%5\''.[player.age, $tradeoffer.seller.knownname, $tradeoffer.seller.zone.knownname, $tradeoffer.amount, ware.fuelcells]"
+				chance="$debugchance" />
+
+			<!-- the next fuel station can be reached with the engine boosters -->
+			<do_if value="this.sector" exact="$tradeoffer.seller.sector">
+				<do_if value="this.zone" exact="$tradeoffer.seller.zone" negate="true">
+					<debug_text text="'%1 target station is in the same sector, starting to move...'.[player.age]"
+						chance="$debugchance" />
+					<jump object="this.ship" zone="this.zone" chance="0" />
+					<run_script name="'move.nohighway'" sinceversion="1">
+						<param name="target" value="$tradeoffer.seller" />
+						<param name="debugchance" value="$debugchance" />
+					</run_script>
+					<wait min="300ms" max="400ms" />
+				</do_if>
+			</do_if>
+			<!-- the next fuel station can be reached with the jump drive only -->
+			<do_else>
+				<do_if value="not $jumpdrive.isoperational">
+					<set_value name="$failreason" exact="'ERR_JUMPDRIVE_BROKEN'" />
+					<resume label="finish" />
+				</do_if>
+				<debug_text text="'%1 target station is not in the same sector, starting to jump...'.[player.age]"
+					chance="$debugchance" />
+				<run_script name="'move.jump'" result="$jumpresult">
+					<param name="autorefuel" value="false" />
+					<param name="destination" value="$tradeoffer.seller" />
+				</run_script>
+				<do_if value="$jumpresult" exact="false">
+					<set_value name="$failreason" exact="'ERR_JUMP_FAILED'" />
+					<resume label="finish" />
+				</do_if>
+			</do_else>
+			<!-- dock at the fuel station, if the tradeoffer is still available -->
+			<do_if value="$tradeoffer.available">
+				<debug_text text="'%1 target reached, trying to dock...'.[player.age]" chance="$debugchance" />
+				<do_if value="$amount gt 0">
+					<!-- Reserve that ware (default for 1 hour) -->
+					<add_ware_reservation object="$tradeoffer.seller" type="buy" entity="this"
+						ware="ware.fuelcells" amount="$amount" />
+				</do_if>
+				<!-- dock at that station -->
+				<run_script name="'move.dockat'" result="$dockresult">
+					<param name="destination" value="$tradeoffer.seller" />
+				</run_script>
+				<do_if value="$dockresult" exact="false">
+					<set_value name="$failreason" exact="'ERR_DOCKING_FAILED'" />
+					<resume label="finish" />
+				</do_if>
+			</do_if>
+			<do_else>
+				<debug_text text="'%1 trade offer vanished, trying to find fuel again...'.[player.age]"
+					chance="$debugchance" />
+				<resume label="findfuel" />
+			</do_else>
+
+			<label name="executetrade" />
+
+			<!-- evaluate trade amount and execute trade -->
+			<do_if value="$tradeoffer.available and $amount gt 0">
+				<!-- Remove the reservation -->
+				<remove_ware_reservation object="$tradeoffer.seller" type="buy" entity="this"
+					ware="ware.fuelcells" amount="$amount"
+					comment="it is possible that the tradeoffer is removed as part of a forced offer-update triggered by removing the reservation!" />
+			</do_if>
+			<do_if value="$tradeoffer.available">
+				<!-- Checkings -->
+				<do_if value="$amount gt this.ship.cargo.{ware.fuelcells}.free or $amount == 0">
+					<set_value name="$amount" exact="this.ship.cargo.{ware.fuelcells}.free" />
+				</do_if>
+				<do_if value="$amount gt $tradeoffer.offeramount.{this}">
+					<set_value name="$amount" exact="$tradeoffer.offeramount.{this}" />
+				</do_if>
+				<!-- find out who has got the money -->
+				<set_value name="$accountholder" exact="this" />
+				<set_value name="$usecommandermoney" exact="false" />
+				<do_if value="this.ship.commander.exists">
+					<set_value name="$usecommandermoney" exact="true" />
+					<do_if value="this.ship.commander == player.primaryship">
+						<set_value name="$accountholder" exact="player.entity" />
+					</do_if>
+					<do_elseif value="this.ship.commanderentity.exists">
+						<set_value name="$accountholder" exact="this.ship.commanderentity" />
+					</do_elseif>
+				</do_if>
+
+				<!-- check if whoever needs to pay can afford all of this -->
+				<do_if value="$tradeoffer.unitprice * $amount gt $accountholder.money">
+					<set_value name="$amount" exact="$accountholder.money / $tradeoffer.unitprice" />
+				</do_if>
+				<do_if value="$amount le 0">
+					<set_value name="$failreason" exact="'ERR_MONEY'" />
+					<resume label="finish" />
+				</do_if>
+				<debug_text text="'%1 trying to buy %2 units of \'%3\'...'.[player.age, $amount, ware.fuelcells]"
+					chance="$debugchance" />
+
+				<do_if value="$usecommandermoney">
+					<execute_custom_trade buyer="this.ship" seller="$tradeoffer.seller" ware="$tradeoffer.ware"
+						amount="$amount" price="$tradeoffer.unitprice" usecommandermoney="true" result="$traderesult"
+						sinceversion="3" />
+				</do_if>
+				<do_else>
+					<execute_custom_trade buyer="this.ship" seller="$tradeoffer.seller" ware="$tradeoffer.ware"
+						amount="$amount" price="$tradeoffer.unitprice" usecommandermoney="false" result="$traderesult"
+						sinceversion="3" />
+				</do_else>
+				<do_if value="$traderesult" negate="true">
+					<set_value name="$failreason" exact="'ERR_EXECUTE_TRADE_FAILED'" />
+					<detach_from_masstraffic object="this.ship" wait="true" />
+					<resume label="finish" />
+				</do_if>
+				<detach_from_masstraffic object="this.ship" wait="true" />
+			</do_if>
+			<do_else>
+				<!-- the station might still have enough fuel, try finding another sell offer -->
+				<find_sell_offer result="$tradeoffer" space="this.zone" wares="ware.fuelcells"
+					tradepartner="this.ship" seller="this.ship.container" />
+				<do_if value="$tradeoffer.available">
+					<debug_text text="'%1 trade offer vanished, trying to find updated sell offer...'.[player.age]"
+						chance="$debugchance" />
+					<resume label="executetrade" />
+				</do_if>
+				<do_else>
+					<debug_text text="'%1 trade offer vanished, undocking from target station...'.[player.age]"
+						chance="$debugchance" />
+					<run_script name="'move.undock'" />
+					<resume label="findfuel" />
+				</do_else>
+			</do_else>
+
+			<!-- finish -->
+			<label name="finish" />
+
+			<!-- undock -->
+			<debug_text text="'%1 undocking from target station...'.[player.age]" chance="$debugchance" />
+			<run_script name="'move.undock'" />
+			<debug_text text="'%1 refueling finished!'.[player.age]" chance="$debugchance" />
+
+			<do_if value="$failreason != 'success'">
+				<debug_text text="'refuel failed with reason: ' + $failreason" chance="$debugchance" />
+			</do_if>
+
+			<!-- In fuel stations, is better move to a final safe position -->
+			<get_safe_pos zone="this.ship.zone" radius="this.ship.size" result="$safepos"
+				object="this.ship" ignored="this.ship" allowyaxis="false" />
+
+			<move_to object="this.ship" destination="this.zone" finishonapproach="true" usehighways="false"
+				forceposition="false" sinceversion="2"
+			>
+				<position value="$safepos" />
+				<interrupt_after_time time="2min" />
+			</move_to>
+
+			<return value="$failreason" />
+
+		</actions>
+	</attention>
+	<on_abort>
+		<do_if value="@$tradeoffer.seller.exists">
+			<remove_ware_reservation object="$tradeoffer.seller" type="buy" entity="this"
+				ware="ware.fuelcells" />
+		</do_if>
+	</on_abort>
+</aiscript>

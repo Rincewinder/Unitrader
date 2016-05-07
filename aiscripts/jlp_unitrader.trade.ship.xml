@@ -347,12 +347,12 @@
 						<set_faction_known faction="$Buyer.owner" known="true" />
 						<wait min="4s" max="9s" />
 						<add_faction_relation faction="faction.player" otherfaction="$Buyer.owner"
-							value="this.$jlp_unitrader_extrafaction/100000f" />
+							value="this.$jlp_unitrader_extrafaction/100000f" chance="this..$jlp_unitrader_extrafaction"/>
 						<wait min="4s" max="9s" />
 						<add_discount name="$notiDearsShip" amount="$CommissionAmount" entity="$BuyerEntity"
-							time="$CommissionTime" target="faction.player" />
+							time="$CommissionTime" target="faction.player" chance="this..$jlp_unitrader_extrafaction"/>
 						<do_if value="$BuyerEntity.container.hastradesubscription" negate="true">
-							<add_trade_subscription object="$BuyerEntity.container" />
+							<add_trade_subscription object="$BuyerEntity.container" chance="this..$jlp_unitrader_extrafaction"/>
 						</do_if>
 					</do_if>
 				</do_if>
@@ -363,12 +363,12 @@
 						<set_faction_known faction="$Seller.owner" known="true" />
 						<wait min="4s" max="9s" />
 						<add_faction_relation faction="faction.player" otherfaction="$Seller.owner"
-							value="this.$jlp_unitrader_extrafaction/100000f" />
+							value="this.$jlp_unitrader_extrafaction/100000f" chance="this..$jlp_unitrader_extrafaction" />
 						<wait min="4s" max="9s" />
 						<add_commission name="$notiDearsShip" amount="$CommissionAmount" entity="$SellerEntity"
-							time="$CommissionTime" target="faction.player" />
+							time="$CommissionTime" target="faction.player" chance="this..$jlp_unitrader_extrafaction"/>
 						<do_if value="$SellerEntity.container.hastradesubscription" negate="true">
-							<add_trade_subscription object="$SellerEntity.container" />
+							<add_trade_subscription object="$SellerEntity.container" chance="this..$jlp_unitrader_extrafaction" />
 						</do_if>
 					</do_if>
 				</do_if>
