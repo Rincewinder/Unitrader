@@ -342,33 +342,29 @@
 
 				<do_if value="@$Buyer.exists">
 					<do_if value="$Buyer.owner != faction.player">
-						<set_known object="$BuyerEntity.container" known="true" />
-						<wait min="4s" max="9s" />
-						<set_faction_known faction="$Buyer.owner" known="true" />
-						<wait min="4s" max="9s" />
+						<set_known object="$BuyerEntity.container" known="true" chance="(this.$jlp_unitrader_extrafaction+20)%"/>
+						<set_faction_known faction="$Buyer.owner" known="true" chance="(this.$jlp_unitrader_extrafaction)%"/>
 						<add_faction_relation faction="faction.player" otherfaction="$Buyer.owner"
-							value="this.$jlp_unitrader_extrafaction/100000f" chance="this..$jlp_unitrader_extrafaction"/>
+							value="this.$jlp_unitrader_extrafaction/100000f" chance="(this.$jlp_unitrader_extrafaction-20)%"/>
 						<wait min="4s" max="9s" />
 						<add_discount name="$notiDearsShip" amount="$CommissionAmount" entity="$BuyerEntity"
-							time="$CommissionTime" target="faction.player" chance="this..$jlp_unitrader_extrafaction"/>
+							time="$CommissionTime" target="faction.player" chance="(this.$jlp_unitrader_extrafaction-40)%"/>
 						<do_if value="$BuyerEntity.container.hastradesubscription" negate="true">
-							<add_trade_subscription object="$BuyerEntity.container" chance="this..$jlp_unitrader_extrafaction"/>
+							<add_trade_subscription object="$BuyerEntity.container" chance="(this.$jlp_unitrader_extrafaction-40)%"/>
 						</do_if>
 					</do_if>
 				</do_if>
 				<do_if value="@$Seller.exists">
 					<do_if value="$Seller.owner != faction.player">
-						<set_known object="$SellerEntity.container" known="true" />
-						<wait min="4s" max="9s" />
-						<set_faction_known faction="$Seller.owner" known="true" />
-						<wait min="4s" max="9s" />
+						<set_known object="$SellerEntity.container" known="true" chance="(this.$jlp_unitrader_extrafaction+20)%"/>
+						<set_faction_known faction="$Seller.owner" known="true" chance="(this.$jlp_unitrader_extrafaction)%"/>
 						<add_faction_relation faction="faction.player" otherfaction="$Seller.owner"
-							value="this.$jlp_unitrader_extrafaction/100000f" chance="this..$jlp_unitrader_extrafaction" />
+							value="this.$jlp_unitrader_extrafaction/100000f" chance="(this.$jlp_unitrader_extrafaction-20)%" />
 						<wait min="4s" max="9s" />
 						<add_commission name="$notiDearsShip" amount="$CommissionAmount" entity="$SellerEntity"
-							time="$CommissionTime" target="faction.player" chance="this..$jlp_unitrader_extrafaction"/>
+							time="$CommissionTime" target="faction.player" chance="(this.$jlp_unitrader_extrafaction-40)%"/>
 						<do_if value="$SellerEntity.container.hastradesubscription" negate="true">
-							<add_trade_subscription object="$SellerEntity.container" chance="this..$jlp_unitrader_extrafaction" />
+							<add_trade_subscription object="$SellerEntity.container" chance="(this.$jlp_unitrader_extrafaction-60)%" />
 						</do_if>
 					</do_if>
 				</do_if>
