@@ -83,7 +83,7 @@
 			<t id="50324">à un prix faible</t>			
 			
 			<t id="50400">$SHIP$\n J\'ai conclu une transaction.\n marchandises: $WARE$\n Quantité: $AMOUNTBUY$  Prix d\'achat: $PRICEBUY$ Cr\n Quantité: $AMOUNTSELL$  Prix de vente: $PRICESELL$ Cr \n Profit: $PROFIT$ Cr</t>
-			
+			<t id="50500">Congratulations.\nI was able to negotiate a permanent contract with the following station:\n"$STATION$"\nThey are now regularly sent to us the trade data.</t>
 
         </page>
     </add>

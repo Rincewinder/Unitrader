@@ -83,8 +83,7 @@
 			<t id="50324">poor amount</t>			
 			
 			<t id="50400">$SHIP$\n I'm successfully make a Deal.\n Ware: $WARE$\n buyed amount: $AMOUNTBUY$  Buy price: $PRICEBUY$ Cr\nSellamount: $AMOUNTSELL$  Selled price: $PRICESELL$ Cr \n Profit: $PROFIT$ Cr</t>
-			
-
+			<t id="50500">Congratulations.\nI was able to negotiate a permanent contract with the following station:\n"$STATION$"\nThey are now regularly sent to us the trade data.</t>
         </page>
     </add>
 </diff>

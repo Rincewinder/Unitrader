@@ -79,7 +79,7 @@
 			<t id="50324">eine schlechte Menge</t>
 			
 			<t id="50400">$SHIP$\n Ich habe erfolgreich ein Handel getätigt.\n Ware: $WARE$\n gekaufte Menge: $AMOUNTBUY$   Einkaufspreis: $PRICEBUY$ Cr\n verkaufte Menge: $AMOUNTSELL$  Verkaufspreis: $PRICESELL$ Cr\n Profit: $PROFIT$ Cr</t>
-
+			<t id="50500">Herzlichen Glückwunsch.\nIch konnte ein dauerhaften Vertrag mit der folgenden Station aushandeln.\n"$STATION$"\n\nSie werden nun Ihre Handelsdaten regelmäßig an uns übersenden. </t>
 		</page>
     </add>
 </diff>
