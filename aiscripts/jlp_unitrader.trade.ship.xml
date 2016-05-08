@@ -181,12 +181,15 @@
 				<!--If the buyclusters are saved to the blackboard, fly to one of them -->
 				<do_if value="this.$traderange_buyclusters?">
 					<set_value name="$moveto" exact="true" />
+					<set_value name="$currentCluster" exact="this.cluster" />
 					<do_if value="this.$traderange_buyclusters.count">
 						<!--Check if we are already in the buy area -->
 						<do_all exact="this.$traderange_buyclusters.count" counter="$Counter">
-							<do_if value="this.ship.hascontext.{this.$traderange_buyclusters.{$Counter}}">
-								<set_value name="$moveto" exact="false" />
-								<break />
+							<do_if value="this.$traderange_buyclusters.{$Counter}" exact="$currentCluster" negate="true">
+								<do_if value="this.ship.hascontext.{this.$traderange_buyclusters.{$Counter}}">
+									<set_value name="$moveto" exact="false" />
+									<break />
+								</do_if>
 							</do_if>
 						</do_all>
 						<do_if value="$moveto">
