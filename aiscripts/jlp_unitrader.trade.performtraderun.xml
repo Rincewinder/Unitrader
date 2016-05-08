@@ -589,8 +589,10 @@
 					<do_if value="$amount gt 0">
 						<!-- now execute the trade -->
 						<set_value name="$lasttrade" exact="[$isbuyoffer, $tradeware, $targetobject]" />
+						<set_value name="$shipmoney" exact="this.money"/>
 						<execute_trade tradeoffer="$tradeoffer" tradepartner="this.ship" amount="$amount"
 							result="$traderesult" />
+						<set_value name="$shipmoney" exact="$shipmoney-this.money"/>	
 					</do_if>
 					<do_else>
 						<set_value name="$traderesult" exact="false" />
@@ -608,7 +610,7 @@
 						<!-- <set_value name="$PRICE" exact="$AMOUNT * $price" /> -->
 						<set_value name="$PRICE" exact="$tradeoffer.unitprice" />
 						<set_value name="$WARE" exact="$tradeoffer.ware.name" />
-						<append_to_list name="$tradedetails" exact="[$targetobject, $AMOUNT, $WARE, $PRICE, $traderesult]" />
+						<append_to_list name="$tradedetails" exact="[$targetobject, $AMOUNT, $WARE, $PRICE, $shipmoney]" />
 					</do_if>
 					<do_if value="@$isbuyoffer">
 						<!-- buyoffers remove their reservation directly after the trade -->

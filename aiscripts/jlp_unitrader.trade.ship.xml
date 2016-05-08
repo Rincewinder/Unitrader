@@ -302,7 +302,6 @@
 
 			<set_value name="$buyoffer" exact="null" />
 			<set_value name="$selloffer" exact="null" />
-			<set_value name="$profit" exact="0" />
 
 			<do_if value="$success" exact="true">
 				<set_known object="this.ship.cluster" known="true" />
@@ -319,9 +318,7 @@
 						exact="20*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
 					<set_value name="$CommissionTime"
 						exact="2h*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
-
 				</do_else>
-
 
 				<substitute_text text="$notiDearsPilot" source="{8570,2}">
 					<replace string="'$ENTITYTYPE$'" with="this.typename" />
@@ -341,9 +338,9 @@
 					<replace string="'$OBJECTNAME$'" with="this.ship.name" />
 					<replace string="'$SECTOR$'" with="this.sector.name" />
 				</substitute_text>
-				<set_value name="$profit" exact="$tradedetails.{2}.{4}" />
+
 				<set_value name="$priceSell" exact="$tradedetails.{2}.{4}" />
-				<set_value name="$profit" exact="($profit - $tradedetails.{1}.{4})*$tradedetails.{2}.{2}" />
+				<set_value name="$profit" exact="($tradedetails.{2}.{5} + $tradedetails.{1}.{5})/-1ct" />
 				<set_value name="$priceBuy" exact="$tradedetails.{1}.{4}" />
 
 				<do_if value="@$Buyer.exists">
@@ -352,41 +349,41 @@
 						<do_if value="$chance" max="0">
 							<set_value name="$chance" exact="0" />
 						</do_if>
-							<do_if value="$chance" min="100">
-								<set_value name="$chance" exact="100" />
-							</do_if>
+						<do_if value="$chance" min="100">
+							<set_value name="$chance" exact="100" />
+						</do_if>
 						<set_known object="$BuyerEntity.container" known="true" chance="$chance" />
-						
+
 						<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction+40)" />
 						<do_if value="$chance" max="0">
 							<set_value name="$chance" exact="0" />
 						</do_if>
-							<do_if value="$chance" min="100">
-								<set_value name="$chance" exact="100" />
-							</do_if>
+						<do_if value="$chance" min="100">
+							<set_value name="$chance" exact="100" />
+						</do_if>
 						<set_faction_known faction="$Buyer.owner" known="true" chance="$chance" />
-						
+
 						<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction)" />
 						<do_if value="$chance" max="0">
 							<set_value name="$chance" exact="0" />
 						</do_if>
-							<do_if value="$chance" min="100">
-								<set_value name="$chance" exact="100" />
-							</do_if>
+						<do_if value="$chance" min="100">
+							<set_value name="$chance" exact="100" />
+						</do_if>
 						<add_faction_relation faction="faction.player" otherfaction="$Buyer.owner"
 							value="this.$jlp_unitrader_extrafaction/100000f" chance="$chance" />
 						<wait min="4s" max="9s" />
-						
+
 						<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction-40)" />
 						<do_if value="$chance" max="0">
 							<set_value name="$chance" exact="0" />
 						</do_if>
-							<do_if value="$chance" min="100">
-								<set_value name="$chance" exact="100" />
-							</do_if>
+						<do_if value="$chance" min="100">
+							<set_value name="$chance" exact="100" />
+						</do_if>
 						<add_discount name="$notiDearsShip" amount="$CommissionAmount" entity="$BuyerEntity"
 							faction="faction.player" time="$CommissionTime" target="faction.player" chance="$chance" />
-							
+
 						<do_if value="$BuyerEntity.container.hastradesubscription" negate="true">
 							<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction-80)" />
 							<do_if value="$chance" max="0">
@@ -418,42 +415,41 @@
 						<do_if value="$chance" max="0">
 							<set_value name="$chance" exact="0" />
 						</do_if>
-							<do_if value="$chance" min="100">
-								<set_value name="$chance" exact="100" />
-							</do_if>
+						<do_if value="$chance" min="100">
+							<set_value name="$chance" exact="100" />
+						</do_if>
 						<set_known object="$SellerEntity.container" known="true" chance="$chance" />
-						
+
 						<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction+40)" />
 						<do_if value="$chance" max="0">
 							<set_value name="$chance" exact="0" />
 						</do_if>
-							<do_if value="$chance" min="100">
-								<set_value name="$chance" exact="100" />
-							</do_if>
+						<do_if value="$chance" min="100">
+							<set_value name="$chance" exact="100" />
+						</do_if>
 						<set_faction_known faction="$Seller.owner" known="true" chance="$chance" />
-						
+
 						<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction)" />
 						<do_if value="$chance" max="0">
 							<set_value name="$chance" exact="0" />
 						</do_if>
-							<do_if value="$chance" min="100">
-								<set_value name="$chance" exact="100" />
-							</do_if>
+						<do_if value="$chance" min="100">
+							<set_value name="$chance" exact="100" />
+						</do_if>
 						<add_faction_relation faction="faction.player" otherfaction="$Seller.owner"
 							value="this.$jlp_unitrader_extrafaction/100000f" chance="$chance" />
 						<wait min="4s" max="9s" />
-						
+
 						<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction-40)" />
 						<do_if value="$chance" max="0">
 							<set_value name="$chance" exact="0" />
 						</do_if>
-							<do_if value="$chance" min="100">
-								<set_value name="$chance" exact="100" />
-							</do_if>
+						<do_if value="$chance" min="100">
+							<set_value name="$chance" exact="100" />
+						</do_if>
 						<add_commission name="$notiDearsShip" amount="$CommissionAmount" entity="$SellerEntity"
-							faction="faction.player" time="$CommissionTime" target="faction.player"
-							chance="$chance" />
-							
+							faction="faction.player" time="$CommissionTime" target="faction.player" chance="$chance" />
+
 						<do_if value="$SellerEntity.container.hastradesubscription" negate="true">
 							<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction-80)" />
 							<do_if value="$chance" max="0">

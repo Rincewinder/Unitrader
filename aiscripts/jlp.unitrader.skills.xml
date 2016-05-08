@@ -251,7 +251,7 @@
 					<replace string="'$EFFICIENCY$'" with="$Entity.$jlp_unitrader_efficiency" />
 					<replace string="'$RANGE$'" with="$RangeText" />
 					<replace string="'$HOME$'" with="$HomeText" />
-					<replace string="'$MAXBUDGET$'" with="$Entity.$jlp_unitrader_budgetmax.formatted.default" />
+					<replace string="'$MAXBUDGET$'" with="($Entity.$jlp_unitrader_budgetmax/10).formatted.default" />
 				</substitute_text>
 				<show_notification timeout="10s" relationeffect="true" object="$Entity"
 					caption="{8570,1000}" icon="achievement_capitalshipkill_1" queued="true" sound="notification_generic"

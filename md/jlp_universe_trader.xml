@@ -292,14 +292,14 @@
 							<!-- MaxBudget in ct -->
 							<set_value name="$maxBudget" exact="100000000ct" />
 							<!-- MinBudget in ct -->
-							<set_value name="$minBudget" exact="10000000ct" />
+							<set_value name="$minBudget" exact="1000000ct" />
 
 							<set_value name="$capship" exact="$Captain.ship.isclass.ship_l or $Captain.ship.isclass.ship_xl" />
 							<do_if value="$capship">
 								<!-- MaxBudget in ct -->
 								<set_value name="$maxBudget" exact="1000000000ct" />
 								<!-- MinBudget in ct -->
-								<set_value name="$minBudget" exact="100000000ct" />
+								<set_value name="$minBudget" exact="1000000ct" />
 							</do_if>
 						</do_else>
 						<set_actor_account actor="$Captain" />
