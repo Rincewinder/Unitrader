@@ -31,10 +31,7 @@
 				</do_all>
 		
 -->
-			<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 1200">
-				<run_script name="'jlp.unitrader.move.refuel'"  />
-			</do_if>
-				
+			<set_value name="this.$trade_failedfindruns" exact="0"  />	
 
 			<do_if value="$range" exact="'ranged'">
 				<run_script name="'jlp.unitrader.trade.ship'">

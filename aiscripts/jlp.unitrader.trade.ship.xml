@@ -32,22 +32,22 @@
 				</do_elseif>
 				<do_if value="not @$range.isclass.space">
 					<do_if value="$range" exact="'zone'">
-						<set_value name="$range" exact="this.ship.zone" />
+						<set_value name="$range" exact="$home.zone" />
 					</do_if>
 					<do_elseif value="$range" exact="'sector'">
-						<set_value name="$range" exact="this.ship.sector" />
+						<set_value name="$range" exact="$home.sector" />
 					</do_elseif>
 					<do_elseif value="$range" exact="'cluster'">
-						<set_value name="$range" exact="this.ship.cluster" />
+						<set_value name="$range" exact="$home.cluster" />
 					</do_elseif>
 					<do_else>
 						<do_if
 							value="(@this.ship.commander.maxradarrange gt 30km) and (this.ship.isclass.ship_l or this.ship.isclass.ship_xl)"
 						>
-							<set_value name="$range" exact="this.ship.cluster" />
+							<set_value name="$range" exact="$home.cluster" />
 						</do_if>
 						<do_else>
-							<set_value name="$range" exact="this.ship.sector" />
+							<set_value name="$range" exact="$home.sector" />
 						</do_else>
 					</do_else>
 				</do_if>
@@ -117,21 +117,20 @@
 					<set_value name="$range" exact="$home.cluster" />
 				</do_elseif>
 				<do_elseif value="$range" exact="'ranged'">
-					<set_value name="$range" exact="$home.cluster" />
+					<set_value name="$range" exact="$home" />
 					<set_value name="$sellrange" exact="[$additionalparams.{1}, $additionalparams.{2}]" />
 					<set_value name="$buyrange" exact="[$additionalparams.{3}, $additionalparams.{4}]" />
-
-					<do_if value="this.$traderange_sellclusters?">
-						<remove_value name="this.$traderange_nexttime" />
-						<remove_value name="this.$traderange_sellclusters" />
-					</do_if>
+					<remove_value name="this.$traderange_nexttime" />
+					<remove_value name="this.$traderange_sellclusters" />
+					<remove_value name="this.$traderange_nexttime" />
+					<remove_value name="this.$traderange_buyclusters" />
 				</do_elseif>
 				<do_else>
 					<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl">
-						<set_value name="$range" exact="this.ship.cluster" />
+						<set_value name="$range" exact="$home.cluster" />
 					</do_if>
 					<do_else>
-						<set_value name="$range" exact="this.ship.sector" />
+						<set_value name="$range" exact="$home.sector" />
 					</do_else>
 				</do_else>
 			</do_if>
@@ -140,6 +139,8 @@
 			<do_if value="$warelist == null">
 				<set_value name="$warelist" exact="this.ship.warebasket.list" />
 			</do_if>
+
+
 
 			<label name="find trade run" />
 
@@ -155,13 +156,6 @@
 				<wait min="10s" max="30s" />
 			</do_else>
 
-			<!--Patch in $debugchance2, $sellrange and $buyrange -->
-			<do_if value="not $sellrange?">
-				<set_value name="$debugchance2" exact="0" />
-				<set_value name="$sellrange" exact="null" />
-				<set_value name="$buyrange" exact="null" />
-			</do_if>
-
 			<run_script name="'jlp.unitrader.trade.findfreetraderun'">
 				<param name="warelist" value="$warelist" />
 				<param name="range" value="$range" />
@@ -175,21 +169,57 @@
 				<save_retval name="buyoffer" variable="$buyoffer" />
 			</run_script>
 
+			<!-- <write_to_logbook category="general"
+				text="'%1\n%2\n%3\n%4\n%5\n%6\n%7\n%8\n%9\n'.[this.$trade_failedfindruns, $range.name, $home.name , $selloffer.sellerentity.container.zone.name , $selloffer.ware, $selloffer.offeramount.{this}, $buyoffer.sellerentity.container.zone.name , $buyoffer.ware, $buyoffer.offeramount.{this} ] " />
+			 -->	
+
+			<do_if value="this.$trade_failedfindruns" min="11">
+				<!--No good trade findable. return the script and go from the start -->
+				<return />
+			</do_if>
+			<do_if value="this.$trade_failedfindruns" min="4">
+				<do_if value="this.$traderange_buyclusters?">
+					<do_if value="this.$traderange_buyclusters.count" min="2">
+						<!--Go to a new cluster for a new chance -->
+						<set_value name="$currentCluster" exact="this.cluster" />
+						<do_while value="true">
+							<wait exact="1s" />
+							<set_value name="$newCluster" exact="this.$traderange_buyclusters.random" />
+							<do_if value="$newCluster" exact="$currentCluster">
+								<continue />
+							</do_if>
+							<do_else>
+								<debug_text text="'No trade was found. Flying back to random buy range cluster.'"
+									chance="$debugchance" />
+								<run_script name="'move.generic'" sinceversion="2">
+									<param name="destination" value="$newCluster" />
+									<param name="endintargetzone" value="true" />
+								</run_script>
+								<set_value name="this.$trade_failedfindruns" exact="0" />
+								<break />
+							</do_else>
+						</do_while>
+					</do_if>
+				</do_if>
+			</do_if>
+
+
 			<!--If no trade was found then at least fly back to the buy area before checking again -->
 			<do_if value="not $selloffer.available and not $buyoffer.available">
 				<set_value name="this.$trade_failedfindruns" operation="add" />
 				<!--If the buyclusters are saved to the blackboard, fly to one of them -->
 				<do_if value="this.$traderange_buyclusters?">
 					<set_value name="$moveto" exact="true" />
-					<set_value name="$currentCluster" exact="this.cluster" />
 					<do_if value="this.$traderange_buyclusters.count">
 						<!--Check if we are already in the buy area -->
 						<do_all exact="this.$traderange_buyclusters.count" counter="$Counter">
-							<do_if value="this.$traderange_buyclusters.{$Counter}" exact="$currentCluster" negate="true">
-								<do_if value="this.ship.hascontext.{this.$traderange_buyclusters.{$Counter}}">
-									<set_value name="$moveto" exact="false" />
-									<break />
-								</do_if>
+							<set_value name="$currentCluster" exact="this.cluster" />
+							<do_if value="$currentCluster" exact="{this.$traderange_buyclusters.{$Counter}">
+								<continue />
+							</do_if>
+							<do_if value="this.ship.hascontext.{this.$traderange_buyclusters.{$Counter}}">
+								<set_value name="$moveto" exact="false" />
+								<break />
 							</do_if>
 						</do_all>
 						<do_if value="$moveto">
@@ -216,7 +246,6 @@
 			<label name="perform trade run" />
 
 
-			<set_value name="this.$trade_failedfindruns" exact="0" />
 
 			<!-- remember for notification -->
 			<do_if value="$buyoffer.available">
@@ -239,25 +268,23 @@
 
 			<set_value name="$profit" exact="0" />
 			<set_value name="$success" exact="false" />
-
 			<do_while value="($selloffer.available and $buyoffer.available) or $buyoffer.available">
-				<!-- <do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl">
+				<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl">
 					<do_if value="@$buyoffer.available">
-					<get_jump_cost ship="this.ship" start="this.ship.sector" end="$buyoffer.buyer.sector"
-					result="$trip" />
-					<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 100">
-					<run_script name="'move.refuel'" />
+						<get_jump_cost ship="this.ship" start="this.ship.sector" end="$buyoffer.buyer.sector"
+							result="$trip" />
+						<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 100">
+							<run_script name="'jlp.unitrader.move.refuel'" />
+						</do_if>
 					</do_if>
-					</do_if>
-					<do_if value="not @$buyoffer.available and @$selloffer.available">
-					<get_jump_cost ship="this.ship" start="this.ship.sector" end="$selloffer.seller.sector"
-					result="$trip" />
-					<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 100">
-					<run_script name="'move.refuel'" />
-					</do_if>
-					</do_if>
-					</do_if>
-				-->
+					<do_elseif value="@$selloffer.available">
+						<get_jump_cost ship="this.ship" start="this.ship.sector" end="$selloffer.seller.sector"
+							result="$trip" />
+						<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 100">
+							<run_script name="'jlp.unitrader.move.refuel'" />
+						</do_if>
+					</do_elseif>
+				</do_if>
 
 				<run_script name="'jlp.unitrader.trade.performtraderun'">
 					<param name="selloffer" value="$selloffer" />
@@ -271,6 +298,7 @@
 					<set_value name="$selloffer" exact="null" />
 					<set_value name="$buyoffer" exact="null" />
 				</do_if>
+
 				<wait exact="this.$jlp_unitrader_waittime" />
 			</do_while>
 

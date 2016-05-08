@@ -77,6 +77,7 @@
 		<actions>
 			<!-- debugging -->
 			<set_value name="$failreason" exact="''" />
+			
 			<do_if value="this.$jlpUniTraderRun" exact="true" negate="true">
 				<return>
 					<retval name="tradedetails" value="$tradedetails" />
@@ -89,6 +90,7 @@
 
 			<!-- set up initial state for trade runs -->
 			<label name="check trade offers" />
+			
 			<do_if value="$selloffer.available">
 				<set_value name="$amount" exact="$selloffer.offeramount.{this}" />
 				<do_if value="$simple">
@@ -149,13 +151,14 @@
 					<remove_ware_reservation object="$targetobject" entity="this" />
 					<remove_ware_reservation object="$targetobject" entity="this" virtual="true" />
 				</do_if>
+				
 				<return>
 					<retval name="success" value="true" />
 					<retval name="tradedetails" value="$tradedetails" />
 					<retval name="lasttrade" value="@$lasttrade" />
 				</return>
 			</do_else>
-
+			
 			<do_if value="not $targetobject.isoperational">
 				<set_value name="$failreason" exact="'ERR_TARGET_INVALID'" />
 				<resume label="finish" />
@@ -165,7 +168,7 @@
 				<set_value name="$failreason" exact="'ERR_NO_CARGO_SPACE'" />
 				<resume label="finish" />
 			</do_if>
-
+			
 			<set_value name="$tradeware" exact="$tradeoffer.ware" />
 			<set_value name="$isbuyoffer" exact="$tradeoffer.buyer == $targetobject" />
 
@@ -285,66 +288,15 @@
 					<replace string="'$AMOUNTKAT$'" with="$amountKat" />
 				</substitute_text>
 
-				<!-- allow cargoWasteRisk, skill used to counteract for more trade) -->
-				<do_if value="100-$cargoWasteRisk"
-					max="100 - $minCargoWasteRisk + (this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2 "
-				>
-					<debug_text chance="$debugchance"
-						text="Player.age + '%1 %2 Cargowaste from Station accept %3 minCargoWaste %4'.[this.ship.knownname, this.knownname, $maxBuyofferCargoAmount, $minCargoWasteRisk + (this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2 ]" />
-					<!-- allow cargo risk -->
-					<do_if value="$cargoRisk"
-						max="100 - $minCargoRisk + (this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2 "
-					>
-						<debug_text chance="$debugchance"
-							text="Player.age + '%1 %2 Amount  accept cargoRisk %3 minargoAmount %4'.[this.ship.knownname, this.knownname, $cargoRisk,$minCargoRisk + (this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2 ]" />
-						<!-- allow Profit -->
-						<do_if value="$profitRisk"
-							max="100 - $minProfitRisk + (this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2 "
-						>
-							<debug_text chance="$debugchance"
-								text="Player.age + '%1 %2 Profit risk  accept wareprice %3 warepricebuy %4 warepricerange %5 is %6'.[this.ship.knownname, this.knownname, $warePrice, $warePriceBuyOffer, $warePriceRange, ($warePriceBuyOffer - $warePrice)*100/$warePriceRange]" />
-							<!-- allow wareprices -->
-							<do_if value="100-$priceRisk"
-								max="100 - $minPriceRisk + (this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2 "
-							>
-								<!-- Trade accepted with skill -->
-								<debug_text
-									text="player.age + 'Choose this Trade for my skills:\n %1\n %2\n %3 \n %4'.[$notiDears, $detail1, $detail2, $detail3]"
-									chance="$debugchance" />
-								<do_if value="this.$jlp_unitrader_show_extendedlogbook">
-									<wait min="3s" max="9s" sinceversion="1" />
-									<write_to_logbook category="squad"
-										text="'%1\n %2\n %3 \n %4'.[$notiDears, $detail1, $detail2, $detail3]" />
-								</do_if>
-								<resume label="move to target object" />
-							</do_if>
-							<do_else>
-								<set_value name="$tradeFailReason"
-									exact="'priceRisk not accept: priceerisk: %1 minPriceRisk %2'.[100-$priceRisk, 100 - $minPriceRisk + (this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2 ] " />
-							</do_else>
-						</do_if>
-						<do_else>
-							<set_value name="$tradeFailReason"
-								exact="'profitRisk not accept: profitrisk %1 minProfitRisk %2'.[$profitRisk, 100 - $minProfitRisk + (this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2 ] " />
-						</do_else>
-					</do_if>
-					<do_else>
-						<set_value name="$tradeFailReason"
-							exact="'cargoRisk not accept: cargoRisk %1 minCargoRisk %2'.[$cargoRisk , 100 - $minCargoRisk + (this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2 ]" />
-					</do_else>
-				</do_if>
-				<do_else>
-					<set_value name="$tradeFailReason"
-						exact="'cargoWasteRisk not accept: cargoWasteRisk %1 minCargoWasteRisk %2'.[100-$cargoWasteRisk , 100 - $minCargoWasteRisk + (this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2 ]" />
-				</do_else>
-				<!-- true -> to show the reason why cant -->
-				<do_if value="this.$jlp_unitrader_show_extendedlogbook">
-					<write_to_logbook category="squad"
-						text="'Bad Trade for my skills:\n %1\n%2\n%3\n%4\nReason: %5'.[$notiDears, $detail1, $detail2,  $detail3,  $tradeFailReason ]" />
-				</do_if>
+
 				<debug_text
-					text="player.age + 'Bad Trade for my skills:\n %1\n Reason: %2'.[$notiDears, $tradeFailReason ]"
+					text="player.age + 'Choose this Trade for my skills:\n %1\n %2\n %3 \n %4'.[$notiDears, $detail1, $detail2, $detail3]"
 					chance="$debugchance" />
+				<do_if value="this.$jlp_unitrader_show_extendedlogbook">
+					<wait min="3s" max="9s" sinceversion="1" />
+					<write_to_logbook category="squad"
+						text="'%1\n %2\n %3 \n %4'.[$notiDears, $detail1, $detail2, $detail3]" />
+				</do_if>
 
 				<!-- special handling for station-owned ships: make a reservation for the buyer if we are getting
 					resources or selling products to better coordinate -->
@@ -364,9 +316,9 @@
 					</return>
 				-->
 			</do_if>
-
+			
 			<set_command command="command.trade" param="$targetobject" />
-
+			<set_value name="this.$trade_failedfindruns" exact="0" />	
 			<label name="move to target object" />
 			<do_if value="this.zone != $targetobject.zone">
 				<run_script name="'move.generic'">
@@ -589,10 +541,10 @@
 					<do_if value="$amount gt 0">
 						<!-- now execute the trade -->
 						<set_value name="$lasttrade" exact="[$isbuyoffer, $tradeware, $targetobject]" />
-						<set_value name="$shipmoney" exact="this.money"/>
+						<set_value name="$shipmoney" exact="this.money" />
 						<execute_trade tradeoffer="$tradeoffer" tradepartner="this.ship" amount="$amount"
 							result="$traderesult" />
-						<set_value name="$shipmoney" exact="$shipmoney-this.money"/>	
+						<set_value name="$shipmoney" exact="$shipmoney-this.money" />
 					</do_if>
 					<do_else>
 						<set_value name="$traderesult" exact="false" />
@@ -691,7 +643,7 @@
 				<debug_text text="player.age + ' TRADE RUN FAILED! Error: ' + $failreason" chance="$debugchance" />
 				<do_if value="this.ship.isclass.ship_xl or this.ship.isclass.ship_l">
 					<debug_text text="player.age + ' un-parking...'" chance="$debugchance" />
-					<run_script name="'move.undock'"  />
+					<run_script name="'move.undock'" />
 				</do_if>
 				<return>
 					<retval name="success" value="false" />
