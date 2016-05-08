@@ -141,35 +141,6 @@
 				<set_value name="$warelist" exact="this.ship.warebasket.list" />
 			</do_if>
 
-			<do_if value="$simple != null">
-				<set_value name="$traderunscript" exact="'jlp.unitrader.trade.findsimpletraderun'" />
-			</do_if>
-			<do_else>
-				<do_if value="this.ship.commander">
-					<set_value name="$traderunscript" exact="'jlp.unitrader.trade.findtraderun'" />
-					<!-- remove wares that might otherwise block cargo space forever because our homebase does not trade
-						with them -->
-					<do_if value="this.ship.owner" exact="faction.player" negate="true">
-						<set_value name="$keepwares" exact="[ware.fuelcells]" />
-						<append_to_list name="$keepwares" exact="this.ship.commander.products.list" />
-						<append_to_list name="$keepwares" exact="this.ship.commander.resources.list" />
-						<append_to_list name="$keepwares" exact="this.ship.commander.tradewares.list" />
-						<set_value name="$cargowares" exact="this.ship.cargo.list" />
-						<do_all exact="$cargowares.count" counter="$c">
-							<set_value name="$currentware" exact="$cargowares.{$c}" />
-							<do_if value="$keepwares.indexof.{$currentware} == 0">
-								<remove_cargo object="this.ship" ware="$currentware" exact="this.ship.cargo.{$currentware}.count" />
-							</do_if>
-						</do_all>
-						<remove_value name="$cargowares" />
-						<remove_value name="$keepwares" />
-					</do_if>
-				</do_if>
-				<do_else>
-					<set_value name="$traderunscript" exact="'jlp.unitrader.trade.findfreetraderun'" />
-				</do_else>
-			</do_else>
-
 			<label name="find trade run" />
 
 			<do_if value="@this.ship.dockslot.component.external">
@@ -191,7 +162,7 @@
 				<set_value name="$buyrange" exact="null" />
 			</do_if>
 
-			<run_script name="$traderunscript">
+			<run_script name="'jlp.unitrader.trade.findfreetraderun'">
 				<param name="warelist" value="$warelist" />
 				<param name="range" value="$range" />
 				<param name="rangeMode" value="$rangeMode" />
