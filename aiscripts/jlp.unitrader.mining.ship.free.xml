@@ -111,7 +111,7 @@
 			<debug_text text="player.age + ' searching for wares...'" chance="$debugchance" />
 			<do_all exact="$warebasket.count" counter="$i">
 				<set_value name="$ware" exact="$warebasket.{$i}" />
-				<find_resource ware="$ware" refobject="this.ship" zone="$zone" wares="$secwares" />
+				<find_resource ware="$ware" refobject="this.ship" zone="$zone" />
 				<do_if value="$zone.exists">
 					<do_if value="this.ship.cluster" exact="$zone.cluster">
 						<append_to_list name="$availablewares" exact="$ware" />
@@ -540,9 +540,8 @@
 							<interrupt_after_time time="5min" />
 						</detach_from_masstraffic>
 						<do_if value="not $unloadlist?">
-							<!-- when loading a save that was created while the above execute_custom_trade action was in progress
-								in a < 3.0 game, the $unloadlist list might not exist, abort and start the unload process properly 
-								again -->
+							<!-- when loading a save that was created while the above execute_custom_trade action was in progress 
+								in a < 3.0 game, the $unloadlist list might not exist, abort and start the unload process properly again -->
 							<resume label="unload" />
 						</do_if>
 					</do_all>

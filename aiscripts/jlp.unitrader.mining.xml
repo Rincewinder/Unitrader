@@ -9,50 +9,18 @@
 	</params>
 
 	<interrupts>
+		<handler ref="JLPUnitraderTargetInvalidHandler" />
 		<handler ref="JLPUnitraderShipOwnedAttackedHandler" />
 		<handler ref="JLPUnitraderScannedHandler" />
-<!--
- 		<handler>
-			<conditions>
-				<event_object_signalled object="this.ship"
-					param="'stop order'" />
-				<check_value value="this.command.value != command.follow" />
-				<check_value
-					value="(not @this.$shiptrader_docking) and (not @this.$ship_parking) and (not this.ship.dockslot) and (not this.ship.docklink)" />
-			</conditions>
-			<actions>
-				<set_value name="$command" exact="this.command.value" />
-				<run_interrupt_script name="'jlp.interrupt.stoporder'"
-					abortscripts="true"
-				>
-					<param name="prevcommand" value="$command" />
-				</run_interrupt_script>
-
-			</actions>
-		</handler>
-
-		<handler>
-			<conditions>
-				<event_object_money_updated object="this"/>
-			</conditions>
-			<actions>
-				<do_if value="(this.minbudget gt 0) and (this.money lt this.minbudget)">
-					<debug_text text="'money below budget. Money: ' + event.param2 + ' Minbudget: ' + this.minbudget" chance="$debugchance"/>
-
-					<run_interrupt_script name="'player.interaction.budget'"/>	
-				</do_if>
-			</actions>
-		</handler>
-	-->
-		</interrupts>
+	</interrupts>
 
 	<attention min="unknown">
 		<actions>
 
 			<!-- trade loop start -->
 			<label name="start" />
-			<set_command_action commandaction="commandaction.standingby" />
 			<wait chance="0" /> <!-- Reset script if new -->
+			<set_command_action commandaction="commandaction.standingby" />
 			<!-- initial -->
 			<set_actor_account actor="this"  />
 			<set_actor_max_budget amount="$maxBudget*10" actor="this"/>
