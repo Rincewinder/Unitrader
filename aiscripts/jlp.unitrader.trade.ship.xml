@@ -9,7 +9,7 @@
 		<param name="simple" default="null" />
 		<!--if $range == 'ranged' then $additionalparams defines min and max jumps for the buy and sell ranges
 			[$minbuy, $maxbuy, $minsell, $maxsell] -->
-		<param name="additionalparams" default="[0,24,0,24]" />
+		<param name="additionalparams" default="[0,2,0,2]" />
 
 		<param name="home" default="this.ship.cluster" />
 		<param name="debugchance" default="0" />

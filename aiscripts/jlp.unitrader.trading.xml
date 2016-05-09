@@ -74,7 +74,7 @@
 							exact="this.$jlp_unitrader_jump_buy_max * this.$jlp_unitrader_courage/100i" />
 					</do_if>
 					<do_else>
-						<set_value name="this.$jlp_unitrader_jump_buy_max" exact="24" />
+						<set_value name="this.$jlp_unitrader_jump_buy_max" exact="2" />
 						<set_value name="$maxbuy"
 							exact="this.$jlp_unitrader_jump_buy_max * this.$jlp_unitrader_courage/100i" />
 					</do_else>
@@ -90,7 +90,7 @@
 							exact="this.$jlp_unitrader_jump_sell_max * this.$jlp_unitrader_courage/100i" />
 					</do_if>
 					<do_else>
-						<set_value name="this.$jlp_unitrader_jump_sell_max" exact="24" />
+						<set_value name="this.$jlp_unitrader_jump_sell_max" exact="2" />
 						<set_value name="$maxsell"
 							exact="this.$jlp_unitrader_jump_sell_max * this.$jlp_unitrader_courage/100i" />
 					</do_else>
