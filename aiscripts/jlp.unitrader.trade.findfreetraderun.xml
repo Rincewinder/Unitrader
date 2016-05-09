@@ -19,18 +19,21 @@
 	</init>
 	<attention min="unknown">
 		<actions>
-			<set_value name="$home" exact="this.$jlp_unitrader_home" />
+			
 			<!-- set up initial state for trade runs -->
 			<set_value name="$reservetrades" exact="false" />
 			<set_value name="$minvolume" exact="1" />
 			<set_value name="$capship" exact="this.ship.isclass.ship_l or this.ship.isclass.ship_xl" />
 			<do_if value="$capship">
 				<set_value name="$reservetrades" exact="true" />
-				<set_value name="$minvolume" exact="this.ship.cargo.capacity / 20" />
+				<set_value name="$minvolume" exact="this.ship.cargo.capacity / (200 * (this.$trade_failedfindruns+1))" />
 			</do_if>
 			<debug_text text="'min trade volume for ' + this.ship.knownname + ': ' + $minvolume"
 				chance="$debugchance" />
+				
 			<label name="start" />
+			
+			<set_value name="$home" exact="this.$jlp_unitrader_home" />
 			<set_value name="$currentcargo" exact="this.ship.cargo.list" />
 			<set_value name="$fuelindex" exact="$currentcargo.indexof.{ware.fuelcells}" />
 			<do_if value="$fuelindex gt 0">
@@ -61,6 +64,7 @@
 				<set_value name="$onlyTraderSell" exact="true" />
 				<set_value name="$onlyKnownSell" exact="true" />
 			</do_if>
+			
 			<set_value name="$checkrange" exact="this.ship.zone" />
 			<!--If there is a $sellrange, find all clusters within the sell range -->
 			<do_if value="@$sellrange">
@@ -78,8 +82,8 @@
 				<do_if value="not this.$traderange_sellclusters? or $findclusters">
 					<debug_text text="'using find_cluster to populate the blackboards list of clusters to sell to'"
 						chance="$debugchance2" />
-					<find_cluster name="this.$traderange_sellclusters" multiple="true" presentation="false">
-						<match_gate_distance object="$home" min="$sellrange.{1}" max="$sellrange.{2}" />
+					<find_cluster name="this.$traderange_sellclusters" multiple="true" presentation="false" >
+						<!-- <match_gate_distance object="$home" min="$sellrange.{1}" max="$sellrange.{2}" /> -->
 					</find_cluster>
 				</do_if>
 				<set_value name="$sellclusters" exact="this.$traderange_sellclusters.clone"
@@ -116,7 +120,9 @@
 					<set_value name="$checkrange" exact="null" />
 				</do_if>
 			</do_if>
+			
 			<label name="check sell range" />
+			
 			<do_if value="@$sellrange">
 				<do_if value="not $checkrange.exists">
 					<do_if value="$sellclusters.count">
@@ -128,7 +134,9 @@
 					</do_if>
 				</do_if>
 			</do_if>
+			
 			<label name="find trade run" />
+			
 			<do_if value="$checkrange.exists">
 				<!-- try to find a buy offer for wares in our cargo first -->
 				<do_if value="$currentcargo.count gt 0">
@@ -147,7 +155,7 @@
 					<debug_text
 						text="player.age + ' checking if we can sell cargo to builder ships in ' + $checkrange.knownname"
 						chance="$debugchance" />
-					<do_if value="$onlyKnownSell">
+					<do_if value="$onlyKnownSell" >
 						<find_buy_offer tradepartner="this.ship" space="$checkrange" result="$buyoffer"
 							wares="$currentcargo" knowntoplayer="true"
 						>
@@ -329,7 +337,8 @@
 					<debug_text text="'using find_cluster to populate the blackboards list of clusters to buy to'"
 						chance="$debugchance2" />
 					<find_cluster name="this.$traderange_buyclusters" multiple="true" presentation="false">
-						<match_gate_distance object="$home" min="$buyrange.{1}" max="$buyrange.{2}" />
+						<!--  <match_gate_distance object="$home" min="$buyrange.{1}" max="$buyrange.{2}" /> -->
+						
 					</find_cluster>
 				</do_if>
 				<set_value name="$buyclusters" exact="this.$traderange_buyclusters.clone"
@@ -370,7 +379,9 @@
 					</do_if>
 				</do_if>
 			</do_if>
+			
 			<label name="check buy range" />
+			
 			<do_if value="@$buyrange">
 				<do_if value="not $checkrange.exists">
 					<do_if value="$buyclusters.count">
@@ -385,12 +396,15 @@
 					</do_else>
 				</do_if>
 			</do_if>
+			
 			<label name="find sell offers" />
+			
 			<wait min="5s" max="15s" sinceversion="1" />
 			<!-- if checkrange was a tempzone and no longer exists, better start clean -->
 			<do_if value="not $checkrange.exists">
 				<resume label="start" />
 			</do_if>
+			
 			<do_if value="this.ship.cargo.free ge $minvolume">
 				<do_if value="@this.$trade_failedfindruns" min="3">
 					<!-- if we have not found a good trade run after 3 attempts, relax the rules -->
@@ -904,6 +918,7 @@
 					<resume label="finish" />
 				</do_if>
 			</do_if>
+			
 			<do_if value="@$sellrange">
 				<set_value name="$checkrange" exact="null" />
 				<resume label="check buy range" />
@@ -925,6 +940,7 @@
 				<remove_value name="$selltobuildership" />
 				<resume label="find sell offers" />
 			</do_if>
+			
 			<!-- can't find anything good at the moment... wait a while, then check again -->
 			<debug_text
 				text="player.age + ' no good trade offer found, waiting for a while before checking again'"
@@ -940,6 +956,7 @@
 			<resume label="start" />
 
 			<label name="finish" />
+			
 			<do_if value="$buyoffer.exists and $selloffer.exists">
 				<debug_text
 					text="player.age + ' Traderun found for [' + this.ship + '] ' + this.ship.knownname + ' in ' + this.ship.sector.knownname"

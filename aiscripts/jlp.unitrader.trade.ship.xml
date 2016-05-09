@@ -144,6 +144,10 @@
 
 			<label name="find trade run" />
 
+			<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 1200">
+				<run_script name="'jlp.unitrader.move.refuel'" />
+			</do_if>
+
 			<do_if value="@this.ship.dockslot.component.external">
 				<!-- make sure we clear the docking area asap -->
 				<run_script name="'move.undock'" sinceversion="3" />
@@ -170,35 +174,44 @@
 			</run_script>
 
 			<!-- <write_to_logbook category="general"
-				text="'%1\n%2\n%3\n%4\n%5\n%6\n%7\n%8\n%9\n'.[this.$trade_failedfindruns, $range.name, $home.name , $selloffer.sellerentity.container.zone.name , $selloffer.ware, $selloffer.offeramount.{this}, $buyoffer.sellerentity.container.zone.name , $buyoffer.ware, $buyoffer.offeramount.{this} ] " />
-			 -->	
+				text="'%1\n%2\n%3\n%4\n%5\n%6\n%7\n%8\n%9\n'.[this.$trade_failedfindruns, $range.name, $home.name
+				, $selloffer.sellerentity.container.zone.name , $selloffer.ware, $selloffer.offeramount.{this}, $buyoffer.sellerentity.container.zone.name
+				, $buyoffer.ware, $buyoffer.offeramount.{this} ] " />
+			-->
 
-			<do_if value="this.$trade_failedfindruns" min="11">
+			<do_if value="this.$trade_failedfindruns" min="12">
 				<!--No good trade findable. return the script and go from the start -->
 				<return />
 			</do_if>
-			<do_if value="this.$trade_failedfindruns" min="4">
+			<do_if value="this.$trade_failedfindruns" min="11">
 				<do_if value="this.$traderange_buyclusters?">
 					<do_if value="this.$traderange_buyclusters.count" min="2">
 						<!--Go to a new cluster for a new chance -->
 						<set_value name="$currentCluster" exact="this.cluster" />
-						<do_while value="true">
-							<wait exact="1s" />
-							<set_value name="$newCluster" exact="this.$traderange_buyclusters.random" />
+						<do_all exact="this.$traderange_buyclusters.count" counter="$Counter">
+							<set_value name="$newCluster" exact="this.$traderange_buyclusters.{$Counter}" />
 							<do_if value="$newCluster" exact="$currentCluster">
 								<continue />
 							</do_if>
 							<do_else>
 								<debug_text text="'No trade was found. Flying back to random buy range cluster.'"
 									chance="$debugchance" />
+								<get_jump_cost ship="this.ship" start="this.ship.sector" end="$newCluster.random"
+									result="$trip" />
+								<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 100">
+									<run_script name="'jlp.unitrader.move.refuel'" />
+								</do_if>
 								<run_script name="'move.generic'" sinceversion="2">
 									<param name="destination" value="$newCluster" />
 									<param name="endintargetzone" value="true" />
 								</run_script>
 								<set_value name="this.$trade_failedfindruns" exact="0" />
+								<set_known object="this.ship.cluster" known="true" />
+								<set_known object="this.ship.sector" known="true" />
+								<set_known object="this.ship.zone" known="true" />
 								<break />
 							</do_else>
-						</do_while>
+						</do_all>
 					</do_if>
 				</do_if>
 			</do_if>
@@ -213,10 +226,6 @@
 					<do_if value="this.$traderange_buyclusters.count">
 						<!--Check if we are already in the buy area -->
 						<do_all exact="this.$traderange_buyclusters.count" counter="$Counter">
-							<set_value name="$currentCluster" exact="this.cluster" />
-							<do_if value="$currentCluster" exact="{this.$traderange_buyclusters.{$Counter}">
-								<continue />
-							</do_if>
 							<do_if value="this.ship.hascontext.{this.$traderange_buyclusters.{$Counter}}">
 								<set_value name="$moveto" exact="false" />
 								<break />
