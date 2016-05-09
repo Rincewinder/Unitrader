@@ -26,7 +26,7 @@
 			<set_value name="$capship" exact="this.ship.isclass.ship_l or this.ship.isclass.ship_xl" />
 			<do_if value="$capship">
 				<set_value name="$reservetrades" exact="true" />
-				<set_value name="$minvolume" exact="this.ship.cargo.capacity / (200 * (this.$trade_failedfindruns+1))" />
+				<set_value name="$minvolume" exact="this.ship.cargo.capacity / (10 * (this.$trade_failedfindruns+1))" />
 			</do_if>
 			<debug_text text="'min trade volume for ' + this.ship.knownname + ': ' + $minvolume"
 				chance="$debugchance" />
@@ -572,7 +572,12 @@
 								</do_if>
 							</do_if>
 							<do_elseif value="$sellware.tags.indexof.{tag.bulk}">
-								<do_if value="this.ship.cargo.tags.indexof.{tag.bulk}" negate="true">
+								<do_if value="this.ship.cargo.tags.indexof.{tag.bulk}">
+									<set_value name="$offerAdd" exact="true" />
+								</do_if>
+							</do_elseif>
+							<do_elseif value="$sellware.tags.indexof.{tag.energy}">
+								<do_if value="this.ship.cargo.tags.indexof.{tag.energy}">
 									<set_value name="$offerAdd" exact="true" />
 								</do_if>
 							</do_elseif>

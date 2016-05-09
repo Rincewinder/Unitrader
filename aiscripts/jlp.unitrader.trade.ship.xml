@@ -173,9 +173,9 @@
 				<save_retval name="buyoffer" variable="$buyoffer" />
 			</run_script>
 
-			<!-- <write_to_logbook category="general"
+			<!--   <write_to_logbook category="general"
 				text="'%1\n%2\n%3\n%4\n%5\n%6\n%7\n%8\n%9\n'.[this.$trade_failedfindruns, $range.name, $home.name
-				, $selloffer.sellerentity.container.zone.name , $selloffer.ware, $selloffer.offeramount.{this}, $buyoffer.sellerentity.container.zone.name
+				, $selloffer.sellerentity.container.zone.name , $selloffer.ware, $selloffer.offeramount.{this}, $buyoffer.entity.container.zone.name
 				, $buyoffer.ware, $buyoffer.offeramount.{this} ] " />
 			-->
 
