@@ -1,42 +1,53 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
-<aiscript name="jlp.interrupt.attacked.owned" priority="10" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd">
-  <!--  Interrupt handler to manage the warning notification to the commander,when an owned ship is under attack
-        Author: Adrian
-  -->
-  <params>
-    <param name="signalname"/>
-    <param name="reporter"/>
-    <param name="shipattacked"/>
-  </params>
-  <interrupts>
-    <library>
-      <handler name="JLPUnitraderShipOwnedAttackedHandler">
-        <conditions>
-          <event_object_signalled object="this.defensible" param="'ShipOwnedAttacked'" />
-          <!-- <check_value value="this.defensible.attention" max="attention.inzone" /> -->
-          <check_value value="this.defensible.isplayerowned" comment="only player owned" />
-          <check_age min="@$signaldelay" />
-        </conditions>
-        <actions>
-          <!-- <debug_text text="'param %1 ,param2 %2 ,param3 %3 '.[event.param,event.param2,event.param3]" /> -->
-          <!-- <debug_text text="'ShipOwnedAttackedHandler attention: '+ this.defensible.attention + ' event: '+ event.name " /> -->
-          
-          <!-- Notificate to commander or player (commander can also be player) -->
-          <do_if value="this.defensible.commander">
-            <set_value name="$commander" exact="this.defensible.commander" />
-          </do_if>
-          <do_else>
-            <set_value name="$commander" exact="player.primaryship" comment="if we want to notify, even if is not in the squad (station or homeless capship)" />
-          </do_else>
-          <!-- Signal to warning about a player´s ship under attack -->
-          <!-- TODO: check if this ship can handle the situation, and if not tell to commander/player -->
-          <do_if value="$commander.isoperational and this.defensible.isoperational">
-            <signal_objects object="$commander" param="'ShipOwnedAttacked'" param2="this.defensible" param3="event.param3" />
-            <set_value name="$signaldelay" exact="player.age + 30s" comment="time between warnings" />
-          </do_if>
+<aiscript name="jlp.interrupt.attacked.owned" priority="10"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd"
+>
+	<!-- Interrupt handler to manage the warning notification to the commander,when an owned ship is under 
+		attack
+		Author: Adrian
+	-->
+	<params>
+		<param name="signalname" />
+		<param name="reporter" />
+		<param name="shipattacked" />
+	</params>
+	<interrupts>
+		<library>
+			<handler name="JLPUnitraderShipOwnedAttackedHandler">
+				<conditions>
+					<event_object_signalled object="this.defensible" param="'ShipOwnedAttacked'" />
+					<!-- <check_value value="this.defensible.attention" max="attention.inzone" /> -->
+					<check_value value="this.defensible.isplayerowned" comment="only player owned" />
+					<check_age min="@$signaldelay" />
+				</conditions>
+				<actions>
+					<!-- <debug_text text="'param %1 ,param2 %2 ,param3 %3 '.[event.param,event.param2,event.param3]" 
+						/> -->
+					<!-- <debug_text text="'ShipOwnedAttackedHandler attention: '+ this.defensible.attention + ' event: 
+						'+ event.name " /> -->
 
-        </actions>
-      </handler>
-    </library>
-  </interrupts>
-  </aiscript>
+					<!-- Notificate to commander or player (commander can also be player) -->
+					<do_if value="this.defensible.commander">
+						<set_value name="$commander" exact="this.defensible.commander" />
+					</do_if>
+					<do_else>
+						<set_value name="$commander" exact="player.primaryship"
+							comment="if we want to notify, even if is not in the squad (station or homeless capship)" />
+					</do_else>
+					<!-- Signal to warning about a player´s ship under attack -->
+					<!-- TODO: check if this ship can handle the situation, and if not tell to commander/player -->
+					<do_if value="$commander.isoperational and this.defensible.isoperational">
+						<signal_objects object="$commander" param="'ShipOwnedAttacked'" param2="this.defensible"
+							param3="event.param3" />
+						<set_value name="$signaldelay" exact="player.age + 30s" comment="time between warnings" />
+					</do_if>
+					<run_script name="'move.generic'">
+						<param name="destination" value="this.ship.zone.adjacentzones.random" />
+						<param name="disablecollisionavoidance" value="true" />
+						<param name="endintargetzone" value="true" />
+					</run_script>
+				</actions>
+			</handler>
+		</library>
+	</interrupts>
+</aiscript>
