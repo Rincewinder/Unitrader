@@ -41,11 +41,6 @@
 							param3="event.param3" />
 						<set_value name="$signaldelay" exact="player.age + 30s" comment="time between warnings" />
 					</do_if>
-					<run_script name="'move.generic'">
-						<param name="destination" value="this.ship.zone.adjacentzones.random" />
-						<param name="disablecollisionavoidance" value="true" />
-						<param name="endintargetzone" value="true" />
-					</run_script>
 				</actions>
 			</handler>
 		</library>
