@@ -6,10 +6,7 @@
 
         <param name="debugchance" default="0"/>
     </params>
-	<init>
-		<set_command command="command.freemining" />
-	</init>
-    <attention min="unknown">
+   <attention min="unknown">
         <actions>
  
 			<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 800">

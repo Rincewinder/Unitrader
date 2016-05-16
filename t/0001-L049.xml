@@ -65,7 +65,7 @@
 			<t id="10000">%1: '%2' Ich konnte keine Ware in diesen Cluster zum Schürfen finden!</t>
 			
 			<t id="50000">%1: '%2' Verkaufte '%3' von '%4' vorhandene Lagermenge %5 für %6 %7Cr Stückpreis. Verkaufte an '%8' gewünschte Lagermenge%9 für %10Cr %11Cr Stückpreis.</t>
-            <t id="50100">%1: '%2' Ich überweise den Rest meines Budget über %3 Cr.</t>
+            <t id="50100">%1: '%2' Ich überweise mein halbes maximales Budget über %3 Cr.</t>
             <t id="50200">%1: '%2' Ich habe beim %3 Skill um 1 Stern dazugelernt \(%4 Sterne\).</t>
             <t id="50210">Organisationtalent:     '$WAITTIME$s'\n Technisches Talent:'  '$SEARCHTIME$s'\n Austrahlungsbonus:  '$EXTRAFACTION$%'\n Mut:                              '$COURAGE$%'\n Effektivität:                     '$EFFICIENCY$%'.\n {8570,50211}</t>
 			<t id="50211">Reichweite: $RANGE$ \('$HOME$'\) \n Max Budget: $MAXBUDGET$ Cr</t>

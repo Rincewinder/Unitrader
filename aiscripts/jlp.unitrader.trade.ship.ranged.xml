@@ -4,12 +4,12 @@
 >
 	<params>
 		<param name="PageId" default="8570" />
-		<param name="range" default="'ranged'" />
-		<param name="home" default="this.ship.cluster" />
-		<param name="minbuy" default="0" />
-		<param name="maxbuy" default="2" />
-		<param name="minsell" default="0" />
-		<param name="maxsell" default="2" />
+		<param name="range"  />
+		<param name="home"  />
+		<param name="minbuy" />
+		<param name="maxbuy" />
+		<param name="minsell" />
+		<param name="maxsell" />
 		<param name="debugchance" default="0" />
 	</params>
 	<attention min="unknown">

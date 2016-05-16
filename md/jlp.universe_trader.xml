@@ -25,10 +25,11 @@
 					value="event.param2 == 'JLPUniTrade_autotrade_select' or event.param == 'gOrders_advanced' or event.param
 					== 'gOrders_stop'"
 					>
-				
-				<add_player_choice text="{8570,1000}" position="top_right" section="gJLPUniTrade_autotrade_select"
-					selectable="(not @event.object.$shiptrader_docking) and (not @event.object.$ship_parking) and (not @event.object.ship.dockslot) and (not @$event.object.ship.docklink)" />
-				
+
+					<add_player_choice text="{8570,1000}" position="top_right" section="gJLPUniTrade_autotrade_select"
+					selectable="(not @event.object.$shiptrader_docking) and (not @event.object.$ship_parking) and (not 
+					@event.object.ship.dockslot) and (not @$event.object.ship.docklink)" />
+
 					<add_player_choice_return text="{1002,20}" position="bottom_right"
 					comment="Back" />
 					<set_conversation_return_section
@@ -302,15 +303,16 @@
 								<set_value name="$minBudget" exact="1000000ct" />
 							</do_if>
 						</do_else>
+
 						<set_actor_account actor="$Captain" />
-						<set_value name="$maxBudget" exact="$maxBudget * 10ct" />
-						<set_actor_max_budget amount="$maxBudget" actor="$Captain" />
+						<set_actor_max_budget amount="$maxBudget* 10ct" actor="$Captain" />
 						<set_actor_min_budget amount="0ct" actor="$Captain" />
 
 
-						<do_if value="$Captain.money" max="5000000ct">
-							<set_value name="$transferMoney" exact="5000000ct" />
-							<transfer_money from="player.entity" to="$Captain" amount="$transferMoney" result="$result" />
+						<do_if value="$Captain.money" max="15000000ct">
+							<set_value name="$transferMoney" exact="15000000ct" />
+							<transfer_money from="player.entity" to="$Captain" amount="$transferMoney"
+								result="$result" />
 						</do_if>
 						<!-- Set init vars -->
 						<!-- <set_value name="$Captain.$jlp_unitrader_jump_buy_max"
@@ -327,10 +329,10 @@
 						<set_value name="$Captain.$jlpUniTraderRun" exact="true" />
 						<set_value name="$Captain.$jlpUniMiningRun" exact="false" />
 						<set_value name="$Captain.$jlp_unitrader_show_extendedlogbook" exact="true" />
-						<set_value name="$Captain.$jlp_unitrader_budgetmax" exact="$maxBudget/10ct" />
+						<set_value name="$Captain.$jlp_unitrader_budgetmax" exact="$maxBudget" />
 						<set_value name="$Captain.$jlp_unitrader_trade_stations_buy" exact="'allBuy'" />
 						<set_value name="$Captain.$jlp_unitrader_trade_stations_sell" exact="'allSell'" />
-						
+
 						<add_npc_line speaker="$Captain" line="[1012, 1013, 1018, 1019].random" comment="Confirmation" />
 
 						<start_script object="$Captain" name="'jlp.unitrader.trading'">
@@ -377,22 +379,27 @@
 					is used in Parameter of other script and i call {$..,$..} -->
 				<set_value name="$PageId" exact="8570i" />
 				<!-- MaxBudget in ct -->
-				<set_value name="$maxBudget" exact="10000000ct" />
+				<set_value name="$maxBudget" exact="5000000ct" />
 				<!-- MinBudget in ct -->
-				<set_value name="$minBudget" exact="1000000ct" />
+				<set_value name="$minBudget" exact="500000ct" />
 
 				<set_value name="$capship" exact="$Captain.ship.isclass.ship_l or $Captain.ship.isclass.ship_xl" />
 				<do_if value="$capship">
 					<!-- MaxBudget in ct -->
-					<set_value name="$maxBudget" exact="100000000ct" />
+					<set_value name="$maxBudget" exact="50000000ct" />
 					<!-- MinBudget in ct -->
-					<set_value name="$minBudget" exact="10000000ct" />
+					<set_value name="$minBudget" exact="5000000ct" />
 				</do_if>
 
 				<set_actor_account actor="$Captain" />
-				<set_value name="$maxBudget" exact="$maxBudget * 10ct" />
-				<set_actor_max_budget amount="$maxBudget" actor="$Captain" />
+				<set_actor_max_budget amount="$maxBudget* 10ct" actor="$Captain" />
 				<set_actor_min_budget amount="0ct" actor="$Captain" />
+
+				<do_if value="$Captain.money" max="5000000ct">
+					<set_value name="$transferMoney" exact="5000000ct" />
+					<transfer_money from="player.entity" to="$Captain" amount="$transferMoney"
+						result="$result" />
+				</do_if>
 
 				<add_npc_line speaker="$Captain" line="[1012, 1013, 1018, 1019].random" comment="Confirmation" />
 				<start_script object="$Captain" name="'jlp.unitrader.mining'">
@@ -639,8 +646,7 @@
 							<add_npc_line speaker="$Captain" line="1164" comment="More Money as max, tranfer the rest" />
 						</do_if>
 					</do_if>
-					<set_value name="$maxBudget" exact="$param2 * 10ct" />
-					<set_actor_max_budget amount="$maxBudget" actor="$Captain" />
+					<set_actor_max_budget amount="$maxBudget *10ct" actor="$Captain" />
 					<add_npc_line speaker="$Captain" line="[1012, 1013, 1018, 1019].random" comment="Confirmation" />
 
 				</do_if>
@@ -706,9 +712,9 @@
 						<set_value name="$Captain.$jlp_unitrader_range" exact="$range" />
 						<set_value name="$Captain.$jlp_unitrader_home" exact="$homeStart" />
 						<do_if value="$range == 'ranged'">
-							<set_value name="$Captain.$jlp_unitrader_jump_buy_max" exact="24 * $Captain.$jlp_unitrader_courage/100i" />
+							<set_value name="$Captain.$jlp_unitrader_jump_buy_max" exact="8 * $Captain.$jlp_unitrader_courage/100i" />
 							<set_value name="$Captain.$jlp_unitrader_jump_buy_min" exact="0" />
-							<set_value name="$Captain.$jlp_unitrader_jump_sell_max" exact="24 * $Captain.$jlp_unitrader_courage/100i" />
+							<set_value name="$Captain.$jlp_unitrader_jump_sell_max" exact="8 * $Captain.$jlp_unitrader_courage/100i" />
 							<set_value name="$Captain.$jlp_unitrader_jump_sell_min" exact="0" />
 						</do_if>
 						<add_npc_line speaker="$Captain" line="[1012, 1013, 1018, 1019].random" comment="Confirmation" />
@@ -836,7 +842,7 @@
 				</do_if>
 				<set_value name="$param2" exact="event.param2" />
 				<do_if value="typeof $param2 == datatype.integer">
-					<set_value name="$Captain.$jlp_unitrader_jump_buy_max" exact="$param2 * $Captain.$jlp_unitrader_courage/100i" />
+					<set_value name="$Captain.$jlp_unitrader_jump_sell_max" exact="$param2 * $Captain.$jlp_unitrader_courage/100i" />
 					<add_npc_line speaker="$Captain" line="[1012, 1013, 1018, 1019].random" comment="Confirmation" />
 				</do_if>
 
@@ -871,7 +877,7 @@
 				</do_if>
 
 				<do_if value="typeof $param2 == datatype.integer">
-					<set_value name="$Captain.$jlp_unitrader_jump_buy_min" exact="$param2 * $Captain.$jlp_unitrader_courage/100i" />
+					<set_value name="$Captain.$jlp_unitrader_jump_sell_min" exact="$param2 * $Captain.$jlp_unitrader_courage/100i" />
 					<add_npc_line speaker="$Captain" line="[1012, 1013, 1018, 1019].random" comment="Confirmation" />
 				</do_if>
 

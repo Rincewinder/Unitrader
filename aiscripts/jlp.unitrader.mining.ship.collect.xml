@@ -9,7 +9,6 @@
 		by Michael, Benedikt, Adrian
 	-->
 	<params>
-		<param name="region" />
 		<param name="zone" />
 		<param name="ware" />
 		<param name="secwares" />

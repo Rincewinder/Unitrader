@@ -9,7 +9,7 @@
 		<param name="simple" default="null" />
 		<!--if $range == 'ranged' then $additionalparams defines min and max jumps for the buy and sell ranges
 			[$minbuy, $maxbuy, $minsell, $maxsell] -->
-		<param name="additionalparams" default="[0,2,0,2]" />
+		<param name="additionalparams" default="null" />
 
 		<param name="home" default="this.ship.cluster" />
 		<param name="debugchance" default="0" />
@@ -173,7 +173,7 @@
 				<save_retval name="buyoffer" variable="$buyoffer" />
 			</run_script>
 
-			<!--   <write_to_logbook category="general"
+			<!-- <write_to_logbook category="general"
 				text="'%1\n%2\n%3\n%4\n%5\n%6\n%7\n%8\n%9\n'.[this.$trade_failedfindruns, $range.name, $home.name
 				, $selloffer.sellerentity.container.zone.name , $selloffer.ware, $selloffer.offeramount.{this}, $buyoffer.entity.container.zone.name
 				, $buyoffer.ware, $buyoffer.offeramount.{this} ] " />
@@ -316,8 +316,11 @@
 
 			<do_if value="$success" exact="true">
 				<set_known object="this.ship.cluster" known="true" />
+				<wait exact="50ms" />
 				<set_known object="this.ship.sector" known="true" />
+				<wait exact="50ms" />
 				<set_known object="this.ship.zone" known="true" />
+				<wait exact="50ms" />
 				<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl" negate="true">
 					<set_value name="$CommissionAmount"
 						exact="10*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
@@ -350,12 +353,11 @@
 					<replace string="'$SECTOR$'" with="this.sector.name" />
 				</substitute_text>
 
-				<set_value name="$priceSell" exact="$tradedetails.{2}.{4}" />
-				<set_value name="$profit" exact="($tradedetails.{2}.{5} + $tradedetails.{1}.{5})/-1ct" />
-				<set_value name="$priceBuy" exact="$tradedetails.{1}.{4}" />
-
 				<do_if value="@$Buyer.exists">
 					<do_if value="$Buyer.owner != faction.player">
+						<set_value name="$priceSell" exact="$tradedetails.{2}.{4}" />
+						<set_value name="$profit" exact="($tradedetails.{2}.{5} + $tradedetails.{1}.{5})/-1ct" />
+						<set_value name="$priceBuy" exact="$tradedetails.{1}.{4}" />
 						<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction+80)" />
 						<do_if value="$chance" max="0">
 							<set_value name="$chance" exact="0" />
@@ -405,7 +407,7 @@
 							</do_if>
 							<add_trade_subscription object="$BuyerEntity.container" chance="$chance" />
 							<wait min="4s" max="9s" />
-							<do_if value="$SellerEntity.container.hastradesubscription">
+							<do_if value="$BuyerEntity.container.hastradesubscription">
 								<substitute_text text="$notiTradesource" source="{8570,11}">
 									<replace string="'$ENTITYNAME$'" with="@$Buyer.name" />
 									<replace string="'$CLUSTER$'" with="@$Buyer.cluster.name" />

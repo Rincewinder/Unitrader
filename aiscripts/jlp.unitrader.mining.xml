@@ -33,16 +33,32 @@
 					<param name="Mode" value="'init'" />
 					<param name="debugchance" value="$debugchance" />
 				</run_script>
+				
+				<!-- ############## read from config ###################### -->
+				<do_if value="typeof @this.$jlp_unitrader_budgetmax == datatype.money">
+					<set_value name="$maxBudget" exact="this.$jlp_unitrader_budgetmax" />
+				</do_if>
+				<do_else>
+					<do_if value="typeof $maxBudget != datatype.money">
+						<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl">
+							<set_value name="$maxBudget" exact="5000000ct" />
+						</do_if>
+						<do_else>
+							<set_value name="$maxBudget" exact="500000ct" />
+						</do_else>
+						<set_value name="this.$jlp_unitrader_budgetmax" exact="$maxBudget" />
+					</do_if>
+				</do_else>
 
 				<!-- check maxbudget and give the rest to player -->
 				<do_if value="this.money" min="$maxBudget">
-					<set_value name="$transferMoney" exact="this.money - $maxBudget" />
+					<set_value name="$transferMoney" exact="$maxBudget / 2" />
 					<wait min="4s" max="9s" />
 					<do_if value="$transferMoney" min="1">
 						<transfer_money from="this" to="player.entity"
 							amount="$transferMoney" result="$result" />
 						<write_to_logbook category="squad"
-							text="{8570,50100}.[this.ship.knownname, this.knownname, $transferMoney/1Cr]" />
+							text="{8570,50100}.[this.ship.knownname, this.knownname, $transferMoney.formatted.default]" />
 						<wait min="4s" max="9s" />
 					</do_if>
 				</do_if>

@@ -19,7 +19,7 @@
 	</init>
 	<attention min="unknown">
 		<actions>
-			
+
 			<!-- set up initial state for trade runs -->
 			<set_value name="$reservetrades" exact="false" />
 			<set_value name="$minvolume" exact="1" />
@@ -30,9 +30,9 @@
 			</do_if>
 			<debug_text text="'min trade volume for ' + this.ship.knownname + ': ' + $minvolume"
 				chance="$debugchance" />
-				
+
 			<label name="start" />
-			
+
 			<set_value name="$home" exact="this.$jlp_unitrader_home" />
 			<set_value name="$currentcargo" exact="this.ship.cargo.list" />
 			<set_value name="$fuelindex" exact="$currentcargo.indexof.{ware.fuelcells}" />
@@ -64,7 +64,7 @@
 				<set_value name="$onlyTraderSell" exact="true" />
 				<set_value name="$onlyKnownSell" exact="true" />
 			</do_if>
-			
+
 			<set_value name="$checkrange" exact="this.ship.zone" />
 			<!--If there is a $sellrange, find all clusters within the sell range -->
 			<do_if value="@$sellrange">
@@ -82,7 +82,7 @@
 				<do_if value="not this.$traderange_sellclusters? or $findclusters">
 					<debug_text text="'using find_cluster to populate the blackboards list of clusters to sell to'"
 						chance="$debugchance2" />
-					<find_cluster name="this.$traderange_sellclusters" multiple="true" presentation="false" >
+					<find_cluster name="this.$traderange_sellclusters" multiple="true" presentation="false">
 						<match_gate_distance object="$home" min="$sellrange.{1}" max="$sellrange.{2}" />
 					</find_cluster>
 				</do_if>
@@ -120,9 +120,9 @@
 					<set_value name="$checkrange" exact="null" />
 				</do_if>
 			</do_if>
-			
+
 			<label name="check sell range" />
-			
+
 			<do_if value="@$sellrange">
 				<do_if value="not $checkrange.exists">
 					<do_if value="$sellclusters.count">
@@ -134,9 +134,9 @@
 					</do_if>
 				</do_if>
 			</do_if>
-			
+
 			<label name="find trade run" />
-			
+
 			<do_if value="$checkrange.exists">
 				<!-- try to find a buy offer for wares in our cargo first -->
 				<do_if value="$currentcargo.count gt 0">
@@ -155,7 +155,7 @@
 					<debug_text
 						text="player.age + ' checking if we can sell cargo to builder ships in ' + $checkrange.knownname"
 						chance="$debugchance" />
-					<do_if value="$onlyKnownSell" >
+					<do_if value="$onlyKnownSell">
 						<find_buy_offer tradepartner="this.ship" space="$checkrange" result="$buyoffer"
 							wares="$currentcargo" knowntoplayer="true"
 						>
@@ -338,7 +338,7 @@
 						chance="$debugchance2" />
 					<find_cluster name="this.$traderange_buyclusters" multiple="true" presentation="false">
 						<match_gate_distance object="$home" min="$buyrange.{1}" max="$buyrange.{2}" />
-						
+
 					</find_cluster>
 				</do_if>
 				<set_value name="$buyclusters" exact="this.$traderange_buyclusters.clone"
@@ -379,9 +379,9 @@
 					</do_if>
 				</do_if>
 			</do_if>
-			
+
 			<label name="check buy range" />
-			
+
 			<do_if value="@$buyrange">
 				<do_if value="not $checkrange.exists">
 					<do_if value="$buyclusters.count">
@@ -396,15 +396,15 @@
 					</do_else>
 				</do_if>
 			</do_if>
-			
+
 			<label name="find sell offers" />
-			
+
 			<wait min="5s" max="15s" sinceversion="1" />
 			<!-- if checkrange was a tempzone and no longer exists, better start clean -->
 			<do_if value="not $checkrange.exists">
 				<resume label="start" />
 			</do_if>
-			
+
 			<do_if value="this.ship.cargo.free ge $minvolume">
 				<do_if value="@this.$trade_failedfindruns" min="3">
 					<!-- if we have not found a good trade run after 3 attempts, relax the rules -->
@@ -486,36 +486,33 @@
 							chance="$debugchance" />
 					</do_if>
 					<do_else>
-						<set_value name="$relPrice"
-							exact="(200 * (this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)/2)/100f" />
 						<do_if value="$onlyKnownBuy">
 							<find_sell_offer tradepartner="this.ship" space="$checkrange" result="$selloffers"
 								wares="$filteredwarelist" multiple="true" knowntoplayer="true"
 							>
-								<totalvolume min="$minvolume" />
-								<relativeprice max="$relPrice"
-									comment="this effectively means the price must be below the average price to be considered" />
+								<offeramount entity="this" min="1" />
 							</find_sell_offer>
 						</do_if>
 						<do_else>
 							<find_sell_offer tradepartner="this.ship" space="$checkrange" result="$selloffers"
 								wares="$filteredwarelist" multiple="true"
 							>
-								<totalvolume min="$minvolume" />
-								<relativeprice max="$relPrice"
-									comment="this effectively means the price must be below the average price to be considered" />
+								<offeramount entity="this" min="1" />
 							</find_sell_offer>
 						</do_else>
 						<debug_text text="player.age + ' found %1 selloffers for regular check'.[$selloffers.count]"
 							chance="$debugchance" />
 					</do_else>
 				</do_if>
+
+				<sort_trades name="$selloffers" tradelist="$selloffers" sorter="relativeprice" />
 				<do_if value="$selloffers.count">
-					<!--List all wares of the found trades so we can search for buy offers in our sell range. This prevents
-						the ship buying wares it can't sell -->
 					<set_value name="$soldwares" exact="[]" />
 					<set_value name="$tradablewares" exact="[]" />
 					<set_value name="$bestbuyoffers" exact="[]" />
+					<!--List all wares of the found trades so we can search for buy offers in our sell range. This
+						prevents
+						the ship buying wares it can't sell -->
 					<do_all exact="$selloffers.count" counter="$Counter" reverse="true">
 						<set_value name="$destination" exact="$selloffers.{$Counter}.seller" />
 						<do_if value="$destination.isclass.ship_xl" negate="true">
@@ -533,96 +530,305 @@
 							<remove_value name="$selloffers.{$Counter}" />
 							<continue />
 						</do_if>
-						<do_if value="$capship">
-							<get_global_path component="$pathcomponents" multiple="1" usehighways="false">
-								<start object="this.ship" />
-								<end object="$destination" />
-							</get_global_path>
+
+						<set_value name="$offerAdd" exact="false" />
+						<do_if value="$selloffers and $selloffers.{$Counter}">
+							<set_value name="$sellware" exact="$selloffers.{$Counter}.ware" />
+							<do_if value="$sellware" exact="ware.fuelcells" negate="true">
+								<do_if value="$sellware.tags.indexof.{tag.liquid}">
+									<do_if value="this.ship.cargo.tags.indexof.{tag.liquid}">
+										<set_value name="$offerAdd" exact="true" />
+									</do_if>
+								</do_if>
+								<do_elseif value="$sellware.tags.indexof.{tag.container}">
+									<do_if value="this.ship.cargo.tags.indexof.{tag.container}">
+										<set_value name="$offerAdd" exact="true" />
+									</do_if>
+								</do_elseif>
+								<do_elseif value="$sellware.tags.indexof.{tag.energy}">
+									<do_if value="this.ship.cargo.tags.indexof.{tag.energy}">
+										<set_value name="$offerAdd" exact="true" />
+									</do_if>
+								</do_elseif>
+								<do_elseif value="$sellware.tags.indexof.{tag.bulk}">
+									<do_if value="this.ship.cargo.tags.indexof.{tag.bulk}">
+										<set_value name="$offerAdd" exact="true" />
+									</do_if>
+								</do_elseif>
+							</do_if>
 						</do_if>
-						<do_else>
-							<get_global_path component="$pathcomponents" multiple="1" usehighways="true">
-								<start object="this.ship" />
-								<end object="$selloffers.{$Counter}.seller" />
-							</get_global_path>
-						</do_else>
-						<set_value name="$offerAdd" exact="true" />
-						<do_all exact="$pathcomponents.count" counter="$Counter2">
-							<do_if
-								value="$pathcomponents.{$Counter2}.isclass.zone and @$pathcomponents.{$Counter2}.haspriority"
-							>
-								<set_value name="$targetzoneOwner" exact="$pathcomponents.{$Counter2}.owner" />
-							</do_if>
-							<do_elseif value="$pathcomponents.{$Counter2}.isclass.object">
-								<set_value name="$targetzoneOwner" exact="$pathcomponents.{$Counter2}.zone.owner" />
-							</do_elseif>
-							<get_factions_by_relation result="$EnemyFactions" faction="faction.player"
-								relation="enemy" />
-							<do_if value="$EnemyFactions.indexof.{$targetzoneOwner}">
-								<set_value name="$offerAdd" exact="false" />
-								<break />
-							</do_if>
-						</do_all>
 
 						<do_if value="$offerAdd" exact="true">
 							<set_value name="$offerAdd" exact="false" />
-							<set_value name="$sellware" exact="$selloffers.{$Counter}.ware" />
-							<do_if value="$sellware.tags.indexof.{tag.liquid}">
-								<do_if value="this.ship.cargo.tags.indexof.{tag.liquid}">
+
+							<set_value name="$warePrice" exact="$selloffers.{$Counter}.unitprice" />
+							<set_value name="$warePriceMin" exact="$selloffers.{$Counter}.ware.minprice" />
+							<set_value name="$warePriceMax" exact="$selloffers.{$Counter}.ware.maxprice" />
+							<set_value name="$warePriceRange" exact="$warePriceMax - $warePriceMin" />
+							<!-- risk of price that buy to min price of ware (min price give max %) -->
+							<set_value name="$priceRisk" exact="(($warePrice - $warePriceMin) * 100 / $warePriceRange)" />
+							<do_if
+								value="($priceRisk + 10 * this.$trade_failedfindruns) ge 90- ((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+								exact="true"
+							>
+								<do_if
+									value="($priceRisk - 10 * this.$trade_failedfindruns) le ((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+									exact="true"
+								>
 									<set_value name="$offerAdd" exact="true" />
 								</do_if>
 							</do_if>
-							<do_elseif value="$sellware.tags.indexof.{tag.bulk}">
-								<do_if value="this.ship.cargo.tags.indexof.{tag.bulk}">
-									<set_value name="$offerAdd" exact="true" />
-								</do_if>
-							</do_elseif>
-							<do_elseif value="$sellware.tags.indexof.{tag.energy}">
-								<do_if value="this.ship.cargo.tags.indexof.{tag.energy}">
-									<set_value name="$offerAdd" exact="true" />
-								</do_if>
-							</do_elseif>
 						</do_if>
 
 						<do_if value="$offerAdd" exact="true">
-							<!-- Illegal ware Transport depend on skill -->
+							<set_value name="$offerAdd" exact="false" />
+							<set_value name="$offerAmount" exact="$selloffers.{$Counter}.offeramount.{this}" />
+							<set_value name="$shipAmount" exact="this.ship.cargo.{$selloffers.{$Counter}.ware}.free" />
+							<do_if value="$offerAmount gt $shipAmount">
+								<set_value name="$offerAmount" exact="this.ship.cargo.{$selloffers.{$Counter}.ware}.free" />
+							</do_if>
+							<set_value name="$riskAmount" exact="(($offerAmount) * 100 / $shipAmount)" />
 							<do_if
-								value="$selloffers.{$Counter}.ware.illegalto.{$selloffers.{$Counter}.seller.owner}.{this.ship.owner}"
+								value="($riskAmount + 10 * this.$trade_failedfindruns) ge (90 -((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2))"
+								exact="true"
 							>
-								<do_if value="not $soldwares.indexof.{$selloffers.{$Counter}.ware}">
-									<append_to_list name="$soldwares" exact="$selloffers.{$Counter}.ware"
-										chance="this.$jlp_unitrader_courage-50" />
-								</do_if>
+								<set_value name="$offerAdd" exact="true" />
+							</do_if>
+						</do_if>
+
+						<do_if value="$offerAdd" exact="true">
+							<set_value name="$offerAdd" exact="false" />
+							<do_if value="$capship">
+								<get_global_path component="$pathcomponents" multiple="1" usehighways="false">
+									<start object="this.ship" />
+									<end object="$destination" />
+								</get_global_path>
 							</do_if>
 							<do_else>
-								<do_if value="not $soldwares.indexof.{$selloffers.{$Counter}.ware}">
-									<append_to_list name="$soldwares" exact="$selloffers.{$Counter}.ware" />
-								</do_if>
+								<get_global_path component="$pathcomponents" multiple="1" usehighways="true">
+									<start object="this.ship" />
+									<end object="$selloffers.{$Counter}.seller" />
+								</get_global_path>
 							</do_else>
+							<set_value name="$offerAdd" exact="true" />
+							<do_all exact="$pathcomponents.count" counter="$Counter2">
+								<do_if
+									value="$pathcomponents.{$Counter2}.isclass.zone and @$pathcomponents.{$Counter2}.haspriority"
+								>
+									<set_value name="$targetzoneOwner" exact="$pathcomponents.{$Counter2}.owner" />
+								</do_if>
+								<do_elseif value="$pathcomponents.{$Counter2}.isclass.object">
+									<set_value name="$targetzoneOwner" exact="$pathcomponents.{$Counter2}.zone.owner" />
+								</do_elseif>
+								<get_factions_by_relation result="$EnemyFactions" faction="faction.player"
+									relation="enemy" />
+								<do_if value="$EnemyFactions.indexof.{$targetzoneOwner}">
+									<set_value name="$offerAdd" exact="false" />
+									<break />
+								</do_if>
+							</do_all>
+
+							<do_if value="$offerAdd" exact="true">
+								<!-- Illegal ware Transport depend on skill -->
+								<do_if
+									value="$selloffers.{$Counter}.ware.illegalto.{$selloffers.{$Counter}.seller.owner}.{this.ship.owner}"
+								>
+									<do_if value="not $soldwares.indexof.{$selloffers.{$Counter}.ware}">
+										<append_to_list name="$soldwares" exact="$selloffers.{$Counter}.ware"
+											chance="this.$jlp_unitrader_courage-50" />
+									</do_if>
+								</do_if>
+								<do_else>
+									<do_if value="not $soldwares.indexof.{$selloffers.{$Counter}.ware}">
+										<append_to_list name="$soldwares" exact="$selloffers.{$Counter}.ware" />
+									</do_if>
+								</do_else>
+							</do_if>
+
 						</do_if>
 					</do_all>
-					<!--Check for buy offers of clusters within the $sellrange -->
-					<do_if value="@$sellrange">
-						<set_value name="$sellclusters" exact="this.$traderange_sellclusters.clone"
-							comment="Copy the list from the blackboard. We will work with this." />
-						<do_all exact="$sellclusters.count" counter="$Counter">
+					<do_if value="$soldwares.count">
+						<!--Check for buy offers of clusters within the $sellrange -->
+						<do_if value="@$sellrange">
+							<set_value name="$sellclusters" exact="this.$traderange_sellclusters.clone"
+								comment="Copy the list from the blackboard. We will work with this." />
+							<do_all exact="$sellclusters.count" counter="$Counter">
+								<do_if value="$onlyKnownSell">
+									<find_buy_offer tradepartner="this.ship" wares="$soldwares" space="$sellclusters.{$Counter}"
+										result="$buyoffers" multiple="true" knowntoplayer="true"
+									>
+										<offeramount entity="this" min="1" />
+									</find_buy_offer>
+								</do_if>
+								<do_else>
+									<find_buy_offer tradepartner="this.ship" wares="$soldwares" space="$sellclusters.{$Counter}"
+										result="$buyoffers" multiple="true"
+									>
+										<offeramount entity="this" min="1" />
+									</find_buy_offer>
+								</do_else>
+								<sort_trades name="$buyoffers" tradelist="$buyoffers" sorter="relativeprice" />
+								<do_all exact="$buyoffers.count" counter="$Counter2" reverse="true">
+									<do_if
+										value="@$lasttrade and (not $lasttrade.{1}) and $lasttrade.{2} == $buyoffers.{$Counter2}.ware and $lasttrade.{3} == $buyoffers.{$Counter2}.buyer"
+									>
+										<!-- the last thing we did was buy this ware from the buyer, don't sell it back immediately! -->
+										<debug_text
+											text="'we just bought %1 from %2 (%3), don\'t try to sell it right back!'.[$lasttrade.{2}, $lasttrade.{3}.knownname, $lasttrade.{3}]"
+											chance="$debugchance2" />
+										<continue />
+									</do_if>
+									<set_value name="$destination" exact="$buyoffers.{$Counter2}.buyer" />
+									<do_if value="$destination.isclass.ship_xl" negate="true">
+										<do_if value="(not $destination.tradenpc.container.hastradesubscription) and $onlyTraderBuy">
+											<continue />
+										</do_if>
+									</do_if>
+
+
+									<set_value name="$offerAdd" exact="false" />
+									<!-- Price risk -->
+									<set_value name="$warePrice" exact="$buyoffers.{$Counter2}.unitprice" />
+									<set_value name="$warePriceMin" exact="$buyoffers.{$Counter2}.ware.minprice" />
+									<set_value name="$warePriceMax" exact="$buyoffers.{$Counter2}.ware.maxprice" />
+									<set_value name="$warePriceRange" exact="$warePriceMax - $warePriceMin" />
+									<!-- risk of price that buy to min price of ware (min price give max %) -->
+									<set_value name="$priceRisk" exact="(($warePrice - $warePriceMin) * 100 / $warePriceRange)" />
+									<do_if
+										value="($priceRisk - 10 * this.$trade_failedfindruns) le (((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2))"
+										exact="true"
+									>
+										<do_if
+											value="($priceRisk + 10 * this.$trade_failedfindruns) ge 90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+											exact="true"
+										>
+											<set_value name="$offerAdd" exact="true" />
+										</do_if>
+									</do_if>
+									<!-- Shipcargo risk -->
+									<do_if value="$offerAdd" exact="true">
+										<set_value name="$offerAdd" exact="false" />
+										<set_value name="$offerAmount" exact="$buyoffers.{$Counter2}.offeramount.{this}" />
+										<set_value name="$shipAmount" exact="this.ship.cargo.{$buyoffers.{$Counter2}.ware}.free" />
+										<do_if value="$offerAmount gt $shipAmount">
+											<set_value name="$offerAmount" exact="this.ship.cargo.{$buyoffers.{$Counter2}.ware}.free" />
+										</do_if>
+										<set_value name="$riskAmount" exact="(($offerAmount) * 100 / $shipAmount)" />
+										<do_if
+											value="($riskAmount + 10 * this.$trade_failedfindruns) ge (90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2))"
+											exact="true"
+										>
+											<set_value name="$offerAdd" exact="true" />
+										</do_if>
+									</do_if>
+									<!-- Stationcargo risk -->
+									<do_if value="$offerAdd" exact="true">
+										<set_value name="$offerAdd" exact="false" />
+										<set_value name="$offerAmount" exact="$buyoffers.{$Counter2}.offeramount.{this}" />
+										<set_value name="$stationAmount" exact="$buyoffers.{$Counter2}.offeramount" />
+										<!-- <set_value name="$stationAmount"
+											exact="$buyoffers.{$Counter2}.buyerentity.container.cargo.{$buyoffers.{$Counter2}.ware}.max" 
+											/>
+										-->
+										<set_value name="$riskAmount" exact="(($offerAmount)) * 100 / $stationAmount" />
+										<do_if
+											value="($riskAmount + 10 * this.$trade_failedfindruns) ge (((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2))"
+											exact="true"
+										>
+											<set_value name="$offerAdd" exact="true" />
+										</do_if>
+									</do_if>
+									<!-- flying way -->
+									<do_if value="$offerAdd" exact="true">
+										<do_if value="$capship">
+											<get_global_path component="$pathcomponents" multiple="1" usehighways="false">
+												<start object="this.ship" />
+												<end object="$destination" />
+											</get_global_path>
+										</do_if>
+										<do_else>
+											<get_global_path component="$pathcomponents" multiple="1" usehighways="true">
+												<start object="this.ship" />
+												<end object="$buyoffers.{$Counter2}.buyer" />
+											</get_global_path>
+										</do_else>
+										<set_value name="$offerAdd" exact="true" />
+
+										<do_all exact="$pathcomponents.count" counter="$Counter3">
+											<do_if
+												value="$pathcomponents.{$Counter3}.isclass.zone and @$pathcomponents.{$Counter3}.haspriority"
+											>
+												<set_value name="$targetzoneOwner" exact="$pathcomponents.{$Counter3}.owner" />
+											</do_if>
+											<do_elseif value="$pathcomponents.{$Counter3}.isclass.object">
+												<set_value name="$targetzoneOwner" exact="$pathcomponents.{$Counter3}.zone.owner" />
+											</do_elseif>
+											<get_factions_by_relation result="$EnemyFactions" faction="faction.player"
+												relation="enemy" />
+											<do_if value="$EnemyFactions.indexof.{$targetzoneOwner}">
+												<set_value name="$offerAdd" exact="false" />
+												<break />
+											</do_if>
+										</do_all>
+
+										<do_if value="$offerAdd" exact="true">
+											<do_if value="not $tradablewares.indexof.{$buyoffers.{$Counter2}.ware}">
+												<do_if
+													value="$buyoffers.{$Counter2}.ware.illegalto.{$buyoffers.{$Counter2}.buyer.owner}.{this.ship.owner}"
+												>
+													<do_if value="true" chance="this.$jlp_unitrader_courage">
+														<append_to_list name="$tradablewares" exact="$buyoffers.{$Counter2}.ware" />
+														<append_to_list name="$bestbuyoffers" exact="$buyoffers.{$Counter2}" />
+														<do_if value="$soldwares.count == $tradablewares.count">
+															<break />
+														</do_if>
+													</do_if>
+												</do_if>
+												<do_else>
+													<append_to_list name="$tradablewares" exact="$buyoffers.{$Counter2}.ware" />
+													<append_to_list name="$bestbuyoffers" exact="$buyoffers.{$Counter2}" />
+													<do_if value="$soldwares.count == $tradablewares.count">
+														<break />
+													</do_if>
+												</do_else>
+
+											</do_if>
+										</do_if>
+									</do_if>
+								</do_all>
+								<do_if value="$soldwares.count == $tradablewares.count">
+									<break />
+								</do_if>
+							</do_all>
+						</do_if>
+						<!--Check for buy offers within $range -->
+						<do_else>
+							<debug_text
+								text="'soldwares: %1, range: %2, class: %3, minvolume: %4, tradeablewares: %5'.[$soldwares, $range.knownname, $range.class, $minvolume, $tradablewares]"
+								chance="$debugchance2" />
 							<do_if value="$onlyKnownSell">
-								<find_buy_offer tradepartner="this.ship" wares="$soldwares" space="$sellclusters.{$Counter}"
+								<find_buy_offer tradepartner="this.ship" wares="$soldwares" space="$range"
 									result="$buyoffers" multiple="true" knowntoplayer="true"
 								>
-									<totalvolume min="$minvolume" />
+
+									<offeramount entity="this" min="1" />
 								</find_buy_offer>
 							</do_if>
 							<do_else>
-								<find_buy_offer tradepartner="this.ship" wares="$soldwares" space="$sellclusters.{$Counter}"
+								<find_buy_offer tradepartner="this.ship" wares="$soldwares" space="$range"
 									result="$buyoffers" multiple="true"
 								>
-									<totalvolume min="$minvolume" />
+
+									<offeramount entity="this" min="1" />
 								</find_buy_offer>
 							</do_else>
-							<sort_trades name="$buyoffers" tradelist="$buyoffers" sorter="relativeprice" />
-							<do_all exact="$buyoffers.count" counter="$Counter2" reverse="true">
+
+							<!-- we prefer to use offers where selling above agerage price is possible, try those first but
+								use a random one -->
+							<create_list name="$preferredoffers" />
+							<do_all exact="$buyoffers.count" counter="$Counter" reverse="true">
 								<do_if
-									value="@$lasttrade and (not $lasttrade.{1}) and $lasttrade.{2} == $buyoffers.{$Counter2}.ware and $lasttrade.{3} == $buyoffers.{$Counter2}.buyer"
+									value="@$lasttrade and (not $lasttrade.{1}) and $lasttrade.{2} == $buyoffers.{$Counter}.ware and $lasttrade.{3} == $buyoffers.{$Counter}.buyer"
 								>
 									<!-- the last thing we did was buy this ware from the buyer, don't sell it back immediately! -->
 									<debug_text
@@ -630,123 +836,141 @@
 										chance="$debugchance2" />
 									<continue />
 								</do_if>
-								<do_if value="not $tradablewares.indexof.{$buyoffers.{$Counter2}.ware}">
-									<append_to_list name="$tradablewares" exact="$buyoffers.{$Counter2}.ware" />
-									<append_to_list name="$bestbuyoffers" exact="$buyoffers.{$Counter2}" />
-									<do_if value="$soldwares.count == $tradablewares.count">
-										<break />
-									</do_if>
-								</do_if>
-							</do_all>
-							<do_if value="$soldwares.count == $tradablewares.count">
-								<break />
-							</do_if>
-						</do_all>
-					</do_if>
-					<!--Check for buy offers within $range -->
-					<do_else>
-						<debug_text
-							text="'soldwares: %1, range: %2, class: %3, minvolume: %4, tradeablewares: %5'.[$soldwares, $range.knownname, $range.class, $minvolume, $tradablewares]"
-							chance="$debugchance2" />
-						<do_if value="$onlyKnownSell">
-							<find_buy_offer tradepartner="this.ship" wares="$soldwares" space="$range"
-								result="$buyoffers" multiple="true" knowntoplayer="true"
-							>
-								<totalvolume min="$minvolume" />
-							</find_buy_offer>
-						</do_if>
-						<do_else>
-							<find_buy_offer tradepartner="this.ship" wares="$soldwares" space="$range"
-								result="$buyoffers" multiple="true"
-							>
-								<totalvolume min="$minvolume" />
-							</find_buy_offer>
-						</do_else>
-						<!-- we prefer to use offers where selling above agerage price is possible, try those first but
-							use a random one -->
-						<create_list name="$preferredoffers" />
-						<set_value name="$relPrice"
-							exact="(200 * (this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)/2)/100f" />
-						<do_all exact="$buyoffers.count" counter="$Counter" reverse="true">
-							<do_if value="$buyoffers.{$Counter}.relativeprice gt $relPrice">
+
 								<set_value name="$destination" exact="$buyoffers.{$Counter}.buyer" />
 								<do_if value="$destination.isclass.ship_xl" negate="true">
 									<do_if value="(not $destination.tradenpc.container.hastradesubscription) and $onlyTraderBuy">
 										<continue />
 									</do_if>
 								</do_if>
-								<do_if value="$capship">
-									<get_global_path component="$pathcomponents" multiple="1" usehighways="false">
-										<start object="this.ship" />
-										<end object="$destination" />
-									</get_global_path>
+
+								<set_value name="$offerAdd" exact="false" />
+								<!-- price risk -->
+								<set_value name="$warePrice" exact="$buyoffers.{$Counter}.unitprice" />
+								<set_value name="$warePriceMin" exact="$buyoffers.{$Counter}.ware.minprice" />
+								<set_value name="$warePriceMax" exact="$buyoffers.{$Counter}.ware.maxprice" />
+								<set_value name="$warePriceRange" exact="$warePriceMax - $warePriceMin" />
+								<!-- risk of price that buy to min price of ware (min price give max %) -->
+								<set_value name="$priceRisk" exact="(($warePrice - $warePriceMin) * 100 / $warePriceRange)" />
+								<do_if
+									value="($priceRisk - 10 * this.$trade_failedfindruns) le ((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+									exact="true"
+								>
+									<do_if
+										value="($priceRisk + 10 * this.$trade_failedfindruns) ge 90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+										exact="true"
+									>
+										<set_value name="$offerAdd" exact="true" />
+									</do_if>
 								</do_if>
-								<do_else>
-									<get_global_path component="$pathcomponents" multiple="1" usehighways="true">
-										<start object="this.ship" />
-										<end object="$selloffers.{$Counter}.seller" />
-									</get_global_path>
-								</do_else>
-								<set_value name="$offerAdd" exact="true" />
-								<do_all exact="$pathcomponents.count" counter="$Counter2">
-									<do_if
-										value="$pathcomponents.{$Counter2}.isclass.zone and @$pathcomponents.{$Counter2}.haspriority"
-									>
-										<set_value name="$targetzoneOwner" exact="$pathcomponents.{$Counter2}.owner" />
-									</do_if>
-									<do_elseif value="$pathcomponents.{$Counter2}.isclass.object">
-										<set_value name="$targetzoneOwner" exact="$pathcomponents.{$Counter2}.zone.owner" />
-									</do_elseif>
-									<get_factions_by_relation result="$EnemyFactions" faction="faction.player"
-										relation="enemy" />
-									<do_if value="$EnemyFactions.indexof.{$targetzoneOwner}">
-										<set_value name="$offerAdd" exact="false" />
-										<break />
-									</do_if>
-								</do_all>
+
+								<!-- Shipcargo risk -->
 								<do_if value="$offerAdd" exact="true">
+									<set_value name="$offerAdd" exact="false" />
+									<set_value name="$offerAmount" exact="$buyoffers.{$Counter}.offeramount.{this}" />
+									<set_value name="$shipAmount" exact="this.ship.cargo.{$buyoffers.{$Counter}.ware}.free" />
+									<do_if value="$offerAmount gt $shipAmount">
+										<set_value name="$offerAmount" exact="this.ship.cargo.{$buyoffers.{$Counter}.ware}.free" />
+									</do_if>
+									<set_value name="$riskAmount" exact="(($offerAmount) * 100 / $shipAmount)" />
 									<do_if
-										value="$buyoffers.{$Counter}.ware.illegalto.{$buyoffers.{$Counter}.buyer.owner}.{this.ship.owner}"
+										value="($riskAmount + 10 * this.$trade_failedfindruns) ge 90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+										exact="true"
 									>
-										<append_to_list name="$preferredoffers" exact="$buyoffers.{$Counter}" />
+										<set_value name="$offerAdd" exact="true" />
+									</do_if>
+								</do_if>
+
+								<!-- Stationcargo risk -->
+								<do_if value="$offerAdd" exact="true">
+									<set_value name="$offerAdd" exact="false" />
+									<set_value name="$offerAmount" exact="$buyoffers.{$Counter}.offeramount.{this}" />
+									<set_value name="$stationAmount" exact="$buyoffers.{$Counter2}.offeramount" />
+<!-- 									<set_value name="$stationAmount"
+										exact="$buyoffers.{$Counter}.buyerentity.container.cargo.{$buyoffers.{$Counter}.ware}.max" />
+-->									<set_value name="$riskAmount" exact="(($offerAmount)) * 100 / $stationAmount" />
+									<do_if
+										value="($riskAmount + 10 * this.$trade_failedfindruns) ge (((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2))"
+										exact="true"
+									>
+										<set_value name="$offerAdd" exact="true" />
+									</do_if>
+								</do_if>
+
+								<!-- flying way risk -->
+								<do_if value="$offerAdd" exact="true">
+									<do_if value="$capship">
+										<get_global_path component="$pathcomponents" multiple="1" usehighways="false">
+											<start object="this.ship" />
+											<end object="$destination" />
+										</get_global_path>
 									</do_if>
 									<do_else>
-										<append_to_list name="$preferredoffers" exact="$buyoffers.{$Counter}" />
+										<get_global_path component="$pathcomponents" multiple="1" usehighways="true">
+											<start object="this.ship" />
+											<end object="$buyoffers.{$Counter}.buyer" />
+										</get_global_path>
 									</do_else>
+									<set_value name="$offerAdd" exact="true" />
+
+									<do_all exact="$pathcomponents.count" counter="$Counter2">
+										<do_if
+											value="$pathcomponents.{$Counter2}.isclass.zone and @$pathcomponents.{$Counter2}.haspriority"
+										>
+											<set_value name="$targetzoneOwner" exact="$pathcomponents.{$Counter2}.owner" />
+										</do_if>
+										<do_elseif value="$pathcomponents.{$Counter2}.isclass.object">
+											<set_value name="$targetzoneOwner" exact="$pathcomponents.{$Counter2}.zone.owner" />
+										</do_elseif>
+										<get_factions_by_relation result="$EnemyFactions" faction="faction.player"
+											relation="enemy" />
+										<do_if value="$EnemyFactions.indexof.{$targetzoneOwner}">
+											<set_value name="$offerAdd" exact="false" />
+											<break />
+										</do_if>
+									</do_all>
+									<do_if value="$offerAdd" exact="true">
+										<do_if
+											value="$buyoffers.{$Counter}.ware.illegalto.{$buyoffers.{$Counter}.buyer.owner}.{this.ship.owner}"
+										>
+											<append_to_list name="$preferredoffers" exact="$buyoffers.{$Counter}"
+												chance="this.$jlp_unitrader_courage" />
+										</do_if>
+										<do_else>
+											<append_to_list name="$preferredoffers" exact="$buyoffers.{$Counter}" />
+										</do_else>
+									</do_if>
 								</do_if>
+							</do_all>
+							<do_if value="$preferredoffers.count == 0">
+								<set_value name="$preferredoffers" exact="$buyoffers" />
 							</do_if>
-							<do_else>
-								<break />
-							</do_else>
-						</do_all>
-						<do_if value="$preferredoffers.count == 0">
-							<set_value name="$preferredoffers" exact="$buyoffers" />
-						</do_if>
-						<do_all exact="$preferredoffers.count">
-							<set_value name="$Counter" min="1" max="$preferredoffers.count" />
-							<do_if
-								value="@$lasttrade and (not $lasttrade.{1}) and $lasttrade.{2} == $preferredoffers.{$Counter}.ware and $lasttrade.{3} == $preferredoffers.{$Counter}.buyer"
-							>
-								<!-- the last thing we did was buy this ware from the buyer, don't sell it back immediately! -->
+							<do_all exact="$preferredoffers.count">
+								<set_value name="$Counter" min="1" max="$preferredoffers.count" />
+								<do_if
+									value="@$lasttrade and (not $lasttrade.{1}) and $lasttrade.{2} == $preferredoffers.{$Counter}.ware and $lasttrade.{3} == $preferredoffers.{$Counter}.buyer"
+								>
+									<!-- the last thing we did was buy this ware from the buyer, don't sell it back immediately! -->
+									<debug_text
+										text="'we just bought %1 from %2 (%3), don\'t try to sell it right back!'.[$lasttrade.{2}, $lasttrade.{3}.knownname, $lasttrade.{3}]"
+										chance="$debugchance2" />
+									<continue />
+								</do_if>
 								<debug_text
-									text="'we just bought %1 from %2 (%3), don\'t try to sell it right back!'.[$lasttrade.{2}, $lasttrade.{3}.knownname, $lasttrade.{3}]"
+									text="'%1(%2) is buying %3 %4'.[$preferredoffers.{$Counter}.buyer.knownname, $preferredoffers.{$Counter}.buyer, $preferredoffers.{$Counter}.offeramount.{this}, $preferredoffers.{$Counter}.ware]"
 									chance="$debugchance2" />
-								<continue />
-							</do_if>
-							<debug_text
-								text="'%1(%2) is buying %3 %4'.[$preferredoffers.{$Counter}.buyer.knownname, $preferredoffers.{$Counter}.buyer, $preferredoffers.{$Counter}.offeramount.{this}, $preferredoffers.{$Counter}.ware]"
-								chance="$debugchance2" />
-							<do_if value="not $tradablewares.indexof.{$preferredoffers.{$Counter}.ware}">
-								<debug_text text="'adding to list of tradeablewares'" chance="$debugchance2" />
-								<append_to_list name="$tradablewares" exact="$preferredoffers.{$Counter}.ware" />
-								<append_to_list name="$bestbuyoffers" exact="$preferredoffers.{$Counter}" />
-								<do_if value="$soldwares.count == $tradablewares.count">
-									<break />
+								<do_if value="not $tradablewares.indexof.{$preferredoffers.{$Counter}.ware}">
+									<debug_text text="'adding to list of tradeablewares'" chance="$debugchance2" />
+									<append_to_list name="$tradablewares" exact="$preferredoffers.{$Counter}.ware" />
+									<append_to_list name="$bestbuyoffers" exact="$preferredoffers.{$Counter}" />
+									<do_if value="$soldwares.count == $tradablewares.count">
+										<break />
+									</do_if>
 								</do_if>
-							</do_if>
-							<remove_value name="$preferredoffers.{$Counter}" />
-						</do_all>
-					</do_else>
+								<remove_value name="$preferredoffers.{$Counter}" />
+							</do_all>
+						</do_else>
+					</do_if>
 					<!--<do_all exact="$bestbuyoffers.count" counter="$Counter">
 						<debug_text text="$bestbuyoffers.{$Counter} + ' adjustment:' + $bestbuyoffers.{$Counter}.relativeprice
 						+ ' - ' + $bestbuyoffers.{$Counter}.ware + ' ' + $bestbuyoffers.{$Counter}.offeramount.{this} +
@@ -904,7 +1128,9 @@
 										<debug_text
 											text="'trip to buy %1 %2 at %3(%4) and sell to %5(%6) has potential profit of %7 Cr and costs %8 Cr. real profit: %9 Cr.'.[$checkamount, $checkoffer.ware, $selloffer.seller.knownname, $selloffer.seller, $checkoffer.buyer.knownname, $checkoffer.buyer, $profit/1Cr, $fuelcost/1Cr, ($profit - $fuelcost)/1Cr]"
 											chance="$debugchance" />
-										<do_if value="$fuelcost ge ($profit - ($selloffer.unitprice * $checkamount * 0.02f))">
+										<do_if
+											value="$fuelcost ge ($profit - ($selloffer.unitprice * $checkamount * (0.02f*(1-(this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /200))))"
+										>
 											<!-- if we don't make at least 2% of the ware price after expenses, this isn't worth our time -->
 											<debug_text
 												text="'skip buy offer, reason: %1, %2, %3, %4 => %5'.[$fuelcost, $profit, $selloffer.unitprice, $checkamount, ($profit - ($selloffer.unitprice * $checkamount * 0.02f))]"
@@ -923,7 +1149,7 @@
 					<resume label="finish" />
 				</do_if>
 			</do_if>
-			
+
 			<do_if value="@$sellrange">
 				<set_value name="$checkrange" exact="null" />
 				<resume label="check buy range" />
@@ -945,7 +1171,7 @@
 				<remove_value name="$selltobuildership" />
 				<resume label="find sell offers" />
 			</do_if>
-			
+
 			<!-- can't find anything good at the moment... wait a while, then check again -->
 			<debug_text
 				text="player.age + ' no good trade offer found, waiting for a while before checking again'"
@@ -961,7 +1187,7 @@
 			<resume label="start" />
 
 			<label name="finish" />
-			
+
 			<do_if value="$buyoffer.exists and $selloffer.exists">
 				<debug_text
 					text="player.age + ' Traderun found for [' + this.ship + '] ' + this.ship.knownname + ' in ' + this.ship.sector.knownname"

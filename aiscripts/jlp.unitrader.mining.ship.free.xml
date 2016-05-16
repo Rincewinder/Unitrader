@@ -18,8 +18,16 @@
 		<handler ref="TargetInvalidHandler" />
 		<handler ref="AttackHandler" />
 	</interrupts>
+
 	<init>
-		<set_command command="command.freemining" />
+		<do_if value="this.ship.commander">
+			<set_command command="command.mining" param="this.ship.commander" />
+		</do_if>
+		<do_else>
+			<set_command command="command.freemining" />
+		</do_else>
+		<!-- Main action for waiting times -->
+		<set_command_action commandaction="commandaction.searchingresources" />
 	</init>
 	<patch sinceversion="3">
 		<do_if value="not $buyer? and @$buyoffer.exists">
@@ -318,6 +326,7 @@
 
 			<!-- find a buyoffer for the mineable wares in this cluster, split into sector searches to keep the
 				spikes lower -->
+			<set_command_action commandaction="commandaction.searchingtrades" />
 			<set_value name="$preferredsector" exact="$startsector" />
 			<do_if value="this.ship.isclass.ship_s or this.ship.isclass.ship_m">
 				<set_value name="$preferredsector" exact="this.sector" />
@@ -366,6 +375,7 @@
 							wares="$Ware"
 						>
 							<offeramount min="$Amount_To_Sell" entity="this" />
+
 						</find_buy_offer>
 						<do_if value="$buyoffer.available">
 							<break />
@@ -382,6 +392,7 @@
 			<do_if value="$buyoffer.available">
 				<set_value name="$ware" exact="$buyoffer.ware" />
 				<set_value name="$buyer" exact="$buyoffer.buyer" />
+				<set_command command="command.trade" param="$buyoffer.buyer" param2="$buyoffer.ware" />
 				<debug_text
 					text="player.age + ' %1 in zone %2 wants %3 units of %4'.[$buyer.knownname, $buyer.zone.knownname, $buyoffer.amount, $buyoffer.ware.name]"
 					chance="$debugchance" />
@@ -519,17 +530,143 @@
 					<do_all exact="$unloadlist.count" counter="$u">
 						<set_value name="$currentware" exact="$unloadlist.{$u}.{1}" />
 						<set_value name="$amount" exact="$unloadlist.{$u}.{2}" />
+						<set_value name="$tradeoffer" exact="$unloadlist.{$u}.{3}" />
+						<set_value name="$Buyer" exact="$tradeoffer.buyer" />
+						<set_value name="$BuyerEntity" exact="$tradeoffer.buyerentity" />
 						<debug_text
 							text="player.age + ' unloading %1 units of %2 to %3...'.[$amount, $currentware, $buyer.knownname]"
 							chance="$debugchance" />
-						<execute_trade tradeoffer="$unloadlist.{$u}.{3}" tradepartner="this.ship"
-							amount="$amount" result="$traderesult" />
+						<execute_trade tradeoffer="$tradeoffer" tradepartner="this.ship" amount="$amount"
+							result="$traderesult" />
 						<do_if value="not $traderesult">
 							<debug_text
-								text="player.age + ': unloading FAILED! tried to transfer %1 %2 to %3(%4)'.[$amount, $currentware, $buyer.knownname, $buyer]"
+								text="player.age + ': unloading FAILED! tried to transfer %1 %2 to %3(%4)'.[$amount, $currentware, $Buyer.knownname, $Buyer]"
 								chance="$debugchance" />
 						</do_if>
 						<do_else>
+							<do_if
+								value="not $BuyerEntity.container.isplayerowned and not $BuyerEntity.container.hastradesubscription"
+							>
+								<!-- if a playership trades with an NPC station that doesn't have a trade subscription anyway,
+									store one offer snapshot -->
+								<store_trade_offer_snapshot object="$BuyerEntity.container" />
+							</do_if>
+
+							<set_known object="this.ship.cluster" known="true" />
+							<wait exact="50ms" />
+							<set_known object="this.ship.sector" known="true" />
+							<wait exact="50ms" />
+							<set_known object="this.ship.zone" known="true" />
+							<wait exact="50ms" />
+							<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl" negate="true">
+								<set_value name="$CommissionAmount"
+									exact="10*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
+								<set_value name="$CommissionTime"
+									exact="1h*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
+							</do_if>
+							<do_else>
+								<set_value name="$CommissionAmount"
+									exact="20*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
+								<set_value name="$CommissionTime"
+									exact="2h*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
+							</do_else>
+
+							<do_if value="@$Buyer.exists">
+								<substitute_text text="$notiDearsShip" source="{8570,4}">
+									<replace string="'$ENTITYTYPE$'" with="this.typename" />
+									<replace string="'$ENTITYNAME$'" with="this.name" />
+									<replace string="'$OBJECTNAME$'" with="this.ship.name" />
+									<replace string="'$SECTOR$'" with="this.sector.name" />
+								</substitute_text>
+
+								<do_if value="$Buyer.owner != faction.player">
+									<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction+80)" />
+									<do_if value="$chance" max="0">
+										<set_value name="$chance" exact="0" />
+									</do_if>
+									<do_if value="$chance" min="100">
+										<set_value name="$chance" exact="100" />
+									</do_if>
+									<set_known object="$BuyerEntity.container" known="true" chance="$chance" />
+
+									<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction+40)" />
+									<do_if value="$chance" max="0">
+										<set_value name="$chance" exact="0" />
+									</do_if>
+									<do_if value="$chance" min="100">
+										<set_value name="$chance" exact="100" />
+									</do_if>
+									<set_faction_known faction="$Buyer.owner" known="true" chance="$chance" />
+
+									<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction)" />
+									<do_if value="$chance" max="0">
+										<set_value name="$chance" exact="0" />
+									</do_if>
+									<do_if value="$chance" min="100">
+										<set_value name="$chance" exact="100" />
+									</do_if>
+									<add_faction_relation faction="faction.player" otherfaction="$Buyer.owner"
+										value="this.$jlp_unitrader_extrafaction/100000f" chance="$chance" />
+									<wait min="4s" max="9s" />
+
+									<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction-40)" />
+									<do_if value="$chance" max="0">
+										<set_value name="$chance" exact="0" />
+									</do_if>
+									<do_if value="$chance" min="100">
+										<set_value name="$chance" exact="100" />
+									</do_if>
+									<add_discount name="$notiDearsShip" amount="$CommissionAmount" entity="$BuyerEntity"
+										faction="faction.player" time="$CommissionTime" target="faction.player" chance="$chance" />
+
+									<do_if value="$BuyerEntity.container.hastradesubscription" negate="true">
+										<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction-80)" />
+										<do_if value="$chance" max="0">
+											<set_value name="$chance" exact="0" />
+										</do_if>
+										<do_if value="$chance" min="100">
+											<set_value name="$chance" exact="100" />
+										</do_if>
+										<add_trade_subscription object="$BuyerEntity.container" chance="$chance" />
+										<wait min="4s" max="9s" />
+										<do_if value="$BuyerEntity.container.hastradesubscription">
+											<substitute_text text="$notiDears" source="{8570,10}">
+												<replace string="'$ENTITYTYPE$'" with="this.typename" />
+												<replace string="'$ENTITYNAME$'" with="this.name" />
+												<replace string="'$OBJECTNAME$'" with="this.ship.name" />
+												<replace string="'$SECTOR$'" with="this.sector.name" />
+											</substitute_text>
+
+											<substitute_text text="$notiTradesource" source="{8570,11}">
+												<replace string="'$ENTITYNAME$'" with="@$Buyer.name" />
+												<replace string="'$CLUSTER$'" with="@$Buyer.cluster.name" />
+												<replace string="'$SECTOR$'" with="@$Buyer.sector.name" />
+												<replace string="'$ZONE$'" with="@$Buyer.zone.name" />
+											</substitute_text>
+											<substitute_text text="$detail1" source="{8570,50500}">
+												<replace string="'$STATION$'" with="$notiTradesource" />
+											</substitute_text>
+											<write_to_logbook category="general" text="'%1\n %2\n'.[$notiDears, $detail1]" />
+										</do_if>
+									</do_if>
+								</do_if>
+							</do_if>
+
+
+							<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl" negate="true">
+								<set_value name="$CommissionAmount"
+									exact="10*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
+								<set_value name="$CommissionTime"
+									exact="1h*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
+							</do_if>
+							<do_else>
+								<set_value name="$CommissionAmount"
+									exact="20*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
+								<set_value name="$CommissionTime"
+									exact="2h*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
+							</do_else>
+
+
 							<debug_text
 								text="player.age + ' %1(job: \'%5\') unloaded %2 units of \'%3\' at \'%4\', traderesult: %5'.[this.ship.knownname, $amount, $currentware, $buyer.knownname, this.ship.job, $traderesult]"
 								chance="$debugchance2" />
@@ -539,6 +676,7 @@
 						<detach_from_masstraffic object="this.ship" wait="true">
 							<interrupt_after_time time="5min" />
 						</detach_from_masstraffic>
+
 						<do_if value="not $unloadlist?">
 							<!-- when loading a save that was created while the above execute_custom_trade action was in progress
 								in a < 3.0 game, the $unloadlist list might not exist, abort and start the unload process properly
@@ -588,11 +726,6 @@
 				<debug_text text="player.age + ' un-parking...'" chance="$debugchance" />
 				<run_script name="'move.undock'" />
 			</do_if>
-
-			<run_script name="'move.die'" sinceversion="4">
-				<param name="byidle" value="true" />
-			</run_script>
-
 		</actions>
 	</attention>
 	<on_abort>

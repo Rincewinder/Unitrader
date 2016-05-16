@@ -68,7 +68,7 @@
 			<t id="10000">%1: '%2' unable to find any ware that can be collected by this ship in this cluster!</t>
 			
 			<t id="50000">%1: '%2' Trade '%3'  from '%4' \(available amount: %5 \) for '%6'\(%7Cr price per unit\).  Sell to '%8' \(wanted amount %9\) for '%10' \(%11Cr price per unit\)</t>
-            <t id="50100">%1: '%2' Transfer the differences from my max Budget by %3 Cr.</t>
+            <t id="50100">%1: '%2' Transfer the half differences from my max Budget by %3 Cr.</t>
             <t id="50200">%1: '%2' I trained following skills %3 \(Stars:%4\).</t>
 			<t id="50210">arrangement talent:    '$WAITTIME$s'\n technical understand: '$SEARCHTIME$s'\n Charisma:                '$EXTRAFACTION$%'\n Courage:                      '$COURAGE$%'\n Efficiency:                       '$EFFICIENCY$'.</t>
 			<t id="50211">Range: $RANGE$ \('$HOME$'\) \n Max Budget: $MAXBUDGET$ Cr</t>
