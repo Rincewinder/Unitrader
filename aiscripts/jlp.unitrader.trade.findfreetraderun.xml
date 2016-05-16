@@ -725,7 +725,7 @@
 									<do_if value="$offerAdd" exact="true">
 										<set_value name="$offerAdd" exact="false" />
 										<set_value name="$offerAmount" exact="$buyoffers.{$Counter2}.offeramount.{this}" />
-										<set_value name="$stationAmount" exact="$buyoffers.{$Counter2}.offeramount" />
+										<set_value name="$stationAmount" exact="$buyoffers.{$Counter2}.desiredamount" />
 										<!-- <set_value name="$stationAmount"
 											exact="$buyoffers.{$Counter2}.buyerentity.container.cargo.{$buyoffers.{$Counter2}.ware}.max" 
 											/>
@@ -885,7 +885,7 @@
 								<do_if value="$offerAdd" exact="true">
 									<set_value name="$offerAdd" exact="false" />
 									<set_value name="$offerAmount" exact="$buyoffers.{$Counter}.offeramount.{this}" />
-									<set_value name="$stationAmount" exact="$buyoffers.{$Counter2}.offeramount" />
+									<set_value name="$stationAmount" exact="$buyoffers.{$Counter2}.desiredamount" />
 <!-- 									<set_value name="$stationAmount"
 										exact="$buyoffers.{$Counter}.buyerentity.container.cargo.{$buyoffers.{$Counter}.ware}.max" />
 -->									<set_value name="$riskAmount" exact="(($offerAmount)) * 100 / $stationAmount" />
