@@ -123,7 +123,7 @@
 					########################################################### -->
 				<!-- Skill add factor -->
 				<set_value name="$Entity.$jlpUniTraderLastLearn" exact="player.age" />
-				<set_value name="$skillFactor" exact="0.01f*$Entity.$jlp_unitrader_efficiency" />
+				<set_value name="$skillFactor" exact="0.005f*$Entity.$jlp_unitrader_efficiency" />
 				<do_if value="$morale" max="0">
 					<set_value name="$morale" exact="$skillFactor" />
 				</do_if>

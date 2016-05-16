@@ -572,7 +572,7 @@
 								exact="true"
 							>
 								<do_if
-									value="($priceRisk - 10 * this.$trade_failedfindruns) le ((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+									value="($priceRisk - 10 * this.$trade_failedfindruns) le ((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /4)"
 									exact="true"
 								>
 									<set_value name="$offerAdd" exact="true" />
@@ -699,7 +699,7 @@
 										exact="true"
 									>
 										<do_if
-											value="($priceRisk + 10 * this.$trade_failedfindruns) ge 90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+											value="($priceRisk + 10 * this.$trade_failedfindruns) ge 90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /4)"
 											exact="true"
 										>
 											<set_value name="$offerAdd" exact="true" />
@@ -732,7 +732,7 @@
 										-->
 										<set_value name="$riskAmount" exact="(($offerAmount)) * 100 / $stationAmount" />
 										<do_if
-											value="($riskAmount + 10 * this.$trade_failedfindruns) ge (((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2))"
+											value="($riskAmount + 10 * this.$trade_failedfindruns) ge (90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2))"
 											exact="true"
 										>
 											<set_value name="$offerAdd" exact="true" />
@@ -857,7 +857,7 @@
 									exact="true"
 								>
 									<do_if
-										value="($priceRisk + 10 * this.$trade_failedfindruns) ge 90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+										value="($priceRisk + 10 * this.$trade_failedfindruns) ge 90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /4)"
 										exact="true"
 									>
 										<set_value name="$offerAdd" exact="true" />
@@ -890,7 +890,7 @@
 										exact="$buyoffers.{$Counter}.buyerentity.container.cargo.{$buyoffers.{$Counter}.ware}.max" />
 -->									<set_value name="$riskAmount" exact="(($offerAmount)) * 100 / $stationAmount" />
 									<do_if
-										value="($riskAmount + 10 * this.$trade_failedfindruns) ge (((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2))"
+										value="($riskAmount + 10 * this.$trade_failedfindruns) ge (90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2))"
 										exact="true"
 									>
 										<set_value name="$offerAdd" exact="true" />
