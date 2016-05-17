@@ -536,7 +536,7 @@
 							<!-- if a playership trades with an NPC station that doesn't have a trade subscription anyway,
 								store one offer snapshot -->
 							<store_trade_offer_snapshot object="$selloffers.{$Counter}.owner"
-								chance="((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)-75" />
+								chance="((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)-50" />
 						</do_if>
 
 
@@ -710,7 +710,7 @@
 										<!-- if a playership trades with an NPC station that doesn't have a trade subscription anyway,
 											store one offer snapshot -->
 										<store_trade_offer_snapshot object="$buyoffers.{$Counter2}.owner"
-											chance="((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)-75" />
+											chance="((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)-50" />
 									</do_if>
 
 									<set_value name="$offerAdd" exact="false" />
@@ -887,7 +887,7 @@
 									<!-- if a playership trades with an NPC station that doesn't have a trade subscription anyway,
 										store one offer snapshot -->
 									<store_trade_offer_snapshot object="$buyoffers.{$Counter}.owner"
-										chance="((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)-75" />
+										chance="((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)-50" />
 								</do_if>
 
 								<set_value name="$offerAdd" exact="false" />
