@@ -530,6 +530,15 @@
 							<remove_value name="$selloffers.{$Counter}" />
 							<continue />
 						</do_if>
+						<do_if
+							value="not $selloffers.{$Counter}.owner.isplayerowned and not $selloffers.{$Counter}.owner.hastradesubscription"
+						>
+							<!-- if a playership trades with an NPC station that doesn't have a trade subscription anyway,
+								store one offer snapshot -->
+							<store_trade_offer_snapshot object="$selloffers.{$Counter}.owner"
+								chance="((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)-75" />
+						</do_if>
+
 
 						<set_value name="$offerAdd" exact="false" />
 						<do_if value="$selloffers and $selloffers.{$Counter}">
@@ -592,7 +601,17 @@
 								value="($riskAmount + 10 * this.$trade_failedfindruns) ge (90 -((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2))"
 								exact="true"
 							>
-								<set_value name="$offerAdd" exact="true" />
+								<do_if value="this.ship.isclass.ship_xl">
+									<do_if
+										value="($riskAmount + 10 * this.$trade_failedfindruns) ge 90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /4)"
+										exact="true"
+									>
+										<set_value name="$offerAdd" exact="true" />
+									</do_if>
+								</do_if>
+								<do_else>
+									<set_value name="$offerAdd" exact="true" />
+								</do_else>
 							</do_if>
 						</do_if>
 
@@ -685,6 +704,14 @@
 										</do_if>
 									</do_if>
 
+									<do_if
+										value="not $buyoffers.{$Counter2}.owner.isplayerowned and not $buyoffers.{$Counter2}.owner.hastradesubscription"
+									>
+										<!-- if a playership trades with an NPC station that doesn't have a trade subscription anyway,
+											store one offer snapshot -->
+										<store_trade_offer_snapshot object="$buyoffers.{$Counter2}.owner"
+											chance="((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)-75" />
+									</do_if>
 
 									<set_value name="$offerAdd" exact="false" />
 									<!-- Price risk -->
@@ -718,7 +745,17 @@
 											value="($riskAmount + 10 * this.$trade_failedfindruns) ge (90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2))"
 											exact="true"
 										>
-											<set_value name="$offerAdd" exact="true" />
+											<do_if value="this.ship.isclass.ship_xl">
+												<do_if
+													value="($riskAmount + 10 * this.$trade_failedfindruns) ge 90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /4)"
+													exact="true"
+												>
+													<set_value name="$offerAdd" exact="true" />
+												</do_if>
+											</do_if>
+											<do_else>
+												<set_value name="$offerAdd" exact="true" />
+											</do_else>
 										</do_if>
 									</do_if>
 									<!-- Stationcargo risk -->
@@ -727,7 +764,7 @@
 										<set_value name="$offerAmount" exact="$buyoffers.{$Counter2}.offeramount.{this}" />
 										<set_value name="$stationAmount" exact="$buyoffers.{$Counter2}.desiredamount" />
 										<!-- <set_value name="$stationAmount"
-											exact="$buyoffers.{$Counter2}.buyerentity.container.cargo.{$buyoffers.{$Counter2}.ware}.max" 
+											exact="$buyoffers.{$Counter2}.buyerentity.container.cargo.{$buyoffers.{$Counter2}.ware}.max"
 											/>
 										-->
 										<set_value name="$riskAmount" exact="(($offerAmount)) * 100 / $stationAmount" />
@@ -801,6 +838,7 @@
 								</do_if>
 							</do_all>
 						</do_if>
+
 						<!--Check for buy offers within $range -->
 						<do_else>
 							<debug_text
@@ -843,6 +881,14 @@
 										<continue />
 									</do_if>
 								</do_if>
+								<do_if
+									value="not $buyoffers.{$Counter}.owner.isplayerowned and not $buyoffers.{$Counter}.owner.hastradesubscription"
+								>
+									<!-- if a playership trades with an NPC station that doesn't have a trade subscription anyway,
+										store one offer snapshot -->
+									<store_trade_offer_snapshot object="$buyoffers.{$Counter}.owner"
+										chance="((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)-75" />
+								</do_if>
 
 								<set_value name="$offerAdd" exact="false" />
 								<!-- price risk -->
@@ -877,7 +923,17 @@
 										value="($riskAmount + 10 * this.$trade_failedfindruns) ge 90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
 										exact="true"
 									>
-										<set_value name="$offerAdd" exact="true" />
+										<do_if value="this.ship.isclass.ship_xl">
+											<do_if
+												value="($riskAmount + 10 * this.$trade_failedfindruns) ge 90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /4)"
+												exact="true"
+											>
+												<set_value name="$offerAdd" exact="true" />
+											</do_if>
+										</do_if>
+										<do_else>
+											<set_value name="$offerAdd" exact="true" />
+										</do_else>
 									</do_if>
 								</do_if>
 
@@ -886,9 +942,11 @@
 									<set_value name="$offerAdd" exact="false" />
 									<set_value name="$offerAmount" exact="$buyoffers.{$Counter}.offeramount.{this}" />
 									<set_value name="$stationAmount" exact="$buyoffers.{$Counter2}.desiredamount" />
-<!-- 									<set_value name="$stationAmount"
-										exact="$buyoffers.{$Counter}.buyerentity.container.cargo.{$buyoffers.{$Counter}.ware}.max" />
--->									<set_value name="$riskAmount" exact="(($offerAmount)) * 100 / $stationAmount" />
+									<!-- <set_value name="$stationAmount"
+										exact="$buyoffers.{$Counter}.buyerentity.container.cargo.{$buyoffers.{$Counter}.ware}.max"
+										/>
+									-->
+									<set_value name="$riskAmount" exact="(($offerAmount)) * 100 / $stationAmount" />
 									<do_if
 										value="($riskAmount + 10 * this.$trade_failedfindruns) ge (90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2))"
 										exact="true"

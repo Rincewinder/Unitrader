@@ -207,8 +207,11 @@
 								</run_script>
 								<set_value name="this.$trade_failedfindruns" exact="0" />
 								<set_known object="this.ship.cluster" known="true" />
+								<wait exact="1s"/>
 								<set_known object="this.ship.sector" known="true" />
+								<wait exact="1s"/>
 								<set_known object="this.ship.zone" known="true" />
+								<wait exact="1s"/>
 								<break />
 							</do_else>
 						</do_all>

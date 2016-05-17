@@ -77,20 +77,20 @@
 		<actions>
 			<!-- debugging -->
 			<set_value name="$failreason" exact="''" />
-			
+			<!-- Remember the trade details in array {0} -> Buy {1} -> Sell -->
+			<create_list name="$tradedetails" exact="0" />
+
+
+
+			<!-- set up initial state for trade runs -->
+			<label name="check trade offers" />
 			<do_if value="this.$jlpUniTraderRun" exact="true" negate="true">
 				<return>
 					<retval name="tradedetails" value="$tradedetails" />
 					<retval name="success" value="false" />
 				</return>
 			</do_if>
-			<!-- Remember the trade details in array {0} -> Buy {1} -> Sell -->
-			<create_list name="$tradedetails" exact="0" />
 
-
-			<!-- set up initial state for trade runs -->
-			<label name="check trade offers" />
-			
 			<do_if value="$selloffer.available">
 				<set_value name="$amount" exact="$selloffer.offeramount.{this}" />
 				<do_if value="$simple">
@@ -151,14 +151,14 @@
 					<remove_ware_reservation object="$targetobject" entity="this" />
 					<remove_ware_reservation object="$targetobject" entity="this" virtual="true" />
 				</do_if>
-				
+
 				<return>
 					<retval name="success" value="true" />
 					<retval name="tradedetails" value="$tradedetails" />
 					<retval name="lasttrade" value="@$lasttrade" />
 				</return>
 			</do_else>
-			
+
 			<do_if value="not $targetobject.isoperational">
 				<set_value name="$failreason" exact="'ERR_TARGET_INVALID'" />
 				<resume label="finish" />
@@ -168,7 +168,7 @@
 				<set_value name="$failreason" exact="'ERR_NO_CARGO_SPACE'" />
 				<resume label="finish" />
 			</do_if>
-			
+
 			<set_value name="$tradeware" exact="$tradeoffer.ware" />
 			<set_value name="$isbuyoffer" exact="$tradeoffer.buyer == $targetobject" />
 
@@ -316,9 +316,9 @@
 					</return>
 				-->
 			</do_if>
-			
+
 			<set_command command="command.trade" param="$targetobject" />
-			<set_value name="this.$trade_failedfindruns" exact="0" />	
+			<set_value name="this.$trade_failedfindruns" exact="0" />
 			<label name="move to target object" />
 			<do_if value="this.zone != $targetobject.zone">
 				<run_script name="'move.generic'">
@@ -585,13 +585,12 @@
 						<schedule_supply_update object="$targetobject" />
 					</do_if>
 
-					<do_if value="this.isplayerowned">
-						<do_if value="not $targetobject.isplayerowned and not $targetobject.hastradesubscription">
-							<!-- if a playership trades with an NPC station that doesn't have a trade subscription anyway,
-								store one offer snapshot -->
-							<store_trade_offer_snapshot object="$targetobject" />
-						</do_if>
+					<do_if value="not $targetobject.isplayerowned and not $targetobject.hastradesubscription">
+						<!-- if a playership trades with an NPC station that doesn't have a trade subscription anyway,
+							store one offer snapshot -->
+						<store_trade_offer_snapshot object="$targetobject" />
 					</do_if>
+
 					<remove_value name="$isbuyoffer" />
 					<remove_value name="$reservation_removed" />
 					<detach_from_masstraffic object="this.ship" wait="true">
