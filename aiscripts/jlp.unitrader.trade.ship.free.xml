@@ -117,7 +117,7 @@
 					<set_value name="$range" exact="$home.cluster" />
 				</do_elseif>
 				<do_elseif value="$range" exact="'ranged'">
-					<set_value name="$range" exact="$home" />
+					<set_value name="$range" exact="$home.cluster" />
 					<set_value name="$sellrange" exact="[$additionalparams.{1}, $additionalparams.{2}]" />
 					<set_value name="$buyrange" exact="[$additionalparams.{3}, $additionalparams.{4}]" />
 					<remove_value name="this.$traderange_nexttime" />
@@ -183,6 +183,7 @@
 				<!--No good trade findable. return the script and go from the start -->
 				<return />
 			</do_if>
+
 			<do_if value="this.$trade_failedfindruns" min="11">
 				<do_if value="this.$traderange_buyclusters?">
 					<do_if value="this.$traderange_buyclusters.count" min="2">
@@ -218,7 +219,6 @@
 					</do_if>
 				</do_if>
 			</do_if>
-
 
 			<!--If no trade was found then at least fly back to the buy area before checking again -->
 			<do_if value="not $selloffer.available and not $buyoffer.available">
@@ -256,8 +256,6 @@
 			</do_if>
 
 			<label name="perform trade run" />
-
-
 
 			<!-- remember for notification -->
 			<do_if value="$buyoffer.available">
@@ -425,6 +423,7 @@
 						</do_if>
 					</do_if>
 				</do_if>
+
 				<do_if value="@$Seller.exists">
 					<do_if value="$Seller.owner != faction.player">
 						<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction+80)" />
@@ -492,6 +491,7 @@
 						</do_if>
 					</do_if>
 				</do_if>
+
 				<!-- is success when offer is gone and trade is succesfull -->
 				<do_if value="@$Buyer.exists and @$Seller.exists">
 					<do_if value="this.$jlp_unitrader_show_extendedlogbook">
@@ -507,6 +507,9 @@
 
 						<wait min="4s" max="9s" />
 						<write_to_logbook category="squad" text="$detail1" />
+					</do_if>
+					<do_if value="$tradedetails.{2}.{2}" min="1" negate="true">
+						<resume label="start"/>
 					</do_if>
 					<run_script name="'jlp.unitrader.skills'" sinceversion="1">
 						<param name="Mode" value="'learn'" />

@@ -83,7 +83,7 @@
 					<debug_text text="'using find_cluster to populate the blackboards list of clusters to sell to'"
 						chance="$debugchance2" />
 					<find_cluster name="this.$traderange_sellclusters" multiple="true" presentation="false">
-						<match_gate_distance object="$home" min="$sellrange.{1}" max="$sellrange.{2}" />
+						<match_gate_distance object="$home.cluster" min="$sellrange.{1}" max="$sellrange.{2}" />
 					</find_cluster>
 				</do_if>
 				<set_value name="$sellclusters" exact="this.$traderange_sellclusters.clone"
@@ -337,7 +337,7 @@
 					<debug_text text="'using find_cluster to populate the blackboards list of clusters to buy to'"
 						chance="$debugchance2" />
 					<find_cluster name="this.$traderange_buyclusters" multiple="true" presentation="false">
-						<match_gate_distance object="$home" min="$buyrange.{1}" max="$buyrange.{2}" />
+						<match_gate_distance object="$home.cluster" min="$buyrange.{1}" max="$buyrange.{2}" />
 
 					</find_cluster>
 				</do_if>
@@ -399,14 +399,14 @@
 
 			<label name="find sell offers" />
 
-			<wait min="5s" max="15s" sinceversion="1" />
+			<!-- <wait min="5s" max="15s" sinceversion="1" />  -->
 			<!-- if checkrange was a tempzone and no longer exists, better start clean -->
 			<do_if value="not $checkrange.exists">
 				<resume label="start" />
 			</do_if>
 
 			<do_if value="this.ship.cargo.free ge $minvolume">
-				<do_if value="@this.$trade_failedfindruns" min="3">
+				<do_if value="@this.$trade_failedfindruns" min="2">
 					<!-- if we have not found a good trade run after 3 attempts, relax the rules -->
 					<set_value name="$minvolume" exact="($minvolume / 2) + 1"
 						comment="add 1 to make sure we don't end up with minamount == 0" />
@@ -676,14 +676,14 @@
 									<find_buy_offer tradepartner="this.ship" wares="$soldwares" space="$sellclusters.{$Counter}"
 										result="$buyoffers" multiple="true" knowntoplayer="true"
 									>
-										<offeramount entity="this" min="1" />
+										<!-- <offeramount min="1" /> -->
 									</find_buy_offer>
 								</do_if>
 								<do_else>
 									<find_buy_offer tradepartner="this.ship" wares="$soldwares" space="$sellclusters.{$Counter}"
 										result="$buyoffers" multiple="true"
 									>
-										<offeramount entity="this" min="1" />
+										<!-- <offeramount min="1" /> -->
 									</find_buy_offer>
 								</do_else>
 								<sort_trades name="$buyoffers" tradelist="$buyoffers" sorter="relativeprice" />
@@ -849,7 +849,7 @@
 									result="$buyoffers" multiple="true" knowntoplayer="true"
 								>
 
-									<offeramount entity="this" min="1" />
+									<!-- <offeramount entity="faction.player"  min="1" /> -->
 								</find_buy_offer>
 							</do_if>
 							<do_else>
@@ -857,7 +857,7 @@
 									result="$buyoffers" multiple="true"
 								>
 
-									<offeramount entity="this" min="1" />
+									<!-- <offeramount entity="faction.player" min="1" /> -->
 								</find_buy_offer>
 							</do_else>
 
@@ -1137,7 +1137,6 @@
 								<break />
 							</do_else>
 						</do_if>
-						<wait min="500ms" max="3s" sinceversion="1" />
 						<!-- if we saved in this part, clean up i and the previously tried entries -->
 						<do_if value="$i?">
 							<do_all exact="$i" counter="$j" reverse="true">

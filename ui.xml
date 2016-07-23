@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon
+  name="gJLPUniTrader"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="../../ui/core/addon.xsd">
+  <environment type="detailmonitor">
+    <file name="ui/jlp.menu_config.lua" />
+      
+	 <file name="ui/jlp.menu_setmoneylimit.lua" />
+     <file name="ui/jlp.menu_moneytransfer.lua" />
+     <file name="ui/jlp.menu_setjumplimit.lua" />
+     <file name="ui/jlp.menu_trading_details.lua" />
+
+    <dependency name="ego_detailmonitorHelper" />
+  </environment>
+</addon>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<diff>
+  <add sel="/components/component[@name='unit_player_ship']/connections">
+    <connection name="connection_software_jlp_unitrader_trade_mk3" tags="software unitradermk3">
+      <offset>
+        <position x="-13.86133" y="2.953517" z="-22.59698"/>
+      </offset>
+    </connection>
+  </add>
+</diff>

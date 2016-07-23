@@ -5,6 +5,7 @@
 	<!-- Interrupt handler to manage the warning notification to the commander,when an owned ship is under 
 		attack
 		Author: Adrian
+        Modified: JohnLukePicard
 	-->
 	<params>
 		<param name="signalname" />

@@ -5,6 +5,7 @@
 	<!-- Interrupt handler for target in moveto action (or similar) that disappears for different reasons:
 		jump, go into highway, after savegame, ...
 		Author: Adrian
+		Modified: JohnLukePicard
 	-->
 	<interrupts>
 		<library>

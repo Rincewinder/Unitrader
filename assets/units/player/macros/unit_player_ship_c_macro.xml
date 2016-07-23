@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diff>
+  <add sel="/macros/macro[@name='unit_player_ship_c_macro']/properties/upgrades">
+    <upgrade upgrade="software_jlp_unitrader_trade_mk3_macro" tags="software unitradermk3" />
+  </add>
+</diff>

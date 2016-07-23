@@ -2,7 +2,7 @@
 <aiscript name="jlp.interrupt.stoporder" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="1">
   <!--  Interrupt handler to Stop a current order, of a player ship
         Author: Adrian
-        modified: JohnLukePicard
+        Modified: JohnLukePicard
   -->
   <params>
     <param name="prevcommand" default="null" />

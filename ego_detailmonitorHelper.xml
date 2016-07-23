@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon name="ego_detailmonitorHelper" viewtype="detailmonitor">
+    <file name="ui/menu_maxBudget.lua" />
+    <file name="ui/menu_moneyTransfer.lua" />
+</addon>
