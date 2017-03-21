@@ -11,6 +11,6 @@
      <file name="ui/jlp.menu_setjumplimit.lua" />
      <file name="ui/jlp.menu_trading_details.lua" />
 
-    <dependency name="ego_detailmonitorHelper" />
+    <dependency name="jlp_detailmonitorHelper" />
   </environment>
 </addon>

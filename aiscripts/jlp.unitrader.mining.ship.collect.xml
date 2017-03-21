@@ -18,10 +18,6 @@
 	<init>
 		<set_command command="command.mining" param="$zone" />
 	</init>
-	<patch sinceversion="3">
-		<!--Reset gathertime as low attention case may have modified it incorrectly -->
-		<set_value name="$gathertime" min="172s" max="188s" />
-	</patch>
 
 	<attention min="visible">
 		<actions>

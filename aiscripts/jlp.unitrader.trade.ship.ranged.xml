@@ -4,21 +4,34 @@
 >
 	<params>
 		<param name="PageId" default="8570" />
-		<param name="range"  />
-		<param name="home"  />
-		<param name="minbuy" />
-		<param name="maxbuy" />
-		<param name="minsell" />
-		<param name="maxsell" />
+		<param name="homeBuy" default="@this.$jlp_unitrader_home_buy" />
+		<param name="homeSell" default="@this.$jlp_unitrader_home_sell" />
+		<param name="rangeBuy" default="@this.$jlp_unitrader_range_buy" />
+		<param name="rangeSell" default="@this.$jlp_unitrader_range_sell" />
+		<param name="minbuy" default="null" />
+		<param name="maxbuy" default="null" />
+		<param name="minsell" default="null" />
+		<param name="maxsell" default="null" />
 		<param name="debugchance" default="0" />
 	</params>
+	<init>
+		<do_if value="this.ship.commander">
+			<set_command command="command.trade" param="this.ship.commander" />
+		</do_if>
+		<do_else>
+			<set_command command="command.freetrade" />
+		</do_else>
+		<!-- Main action for waiting times -->
+		<set_command_action commandaction="commandaction.calculating" />
+	</init>
 	<attention min="unknown">
 		<actions>
 
+			<!-- initial -->
 
 			<create_list name="$basket" />
 			<!--
-				
+
 				<find_object groupname="$wares" class="class.container" tag="tag.economy"
 				space="player.galaxy" multiple="true" />
 				<do_all exact="$wares.count" counter="$Counter">
@@ -29,31 +42,93 @@
 				' + $wares.{$Counter}.name" />
 				</do_if>
 				</do_all>
-		
--->
-			<set_value name="this.$trade_failedfindruns" exact="0"  />	
 
-			<do_if value="$range" exact="'ranged'">
-				<run_script name="'jlp.unitrader.trade.ship'">
+			-->
+			<!-- set range with home (mode range and zone need a zone) -->
+			<do_if value="$rangeBuy == 'sector'">
+				<set_value name="$homeBuy" exact="$homeBuy.sector" />
+			</do_if>
+			<do_elseif value="$rangeBuy == 'cluster'">
+				<set_value name="$homeBuy" exact="$homeBuy.cluster" />
+			</do_elseif>
+			<do_elseif value="$rangeBuy == 'ranged'">
+				<set_value name="$homeBuy" exact="$homeBuy.cluster" />
+			</do_elseif>
+
+			<do_if value="$rangeSell == 'sector'">
+				<set_value name="$homeSell" exact="$homeSell.sector" />
+			</do_if>
+			<do_elseif value="$rangeSell == 'cluster'">
+				<set_value name="$homeSell" exact="$homeSell.cluster" />
+			</do_elseif>
+			<do_elseif value="$rangeSell == 'ranged'">
+				<set_value name="$homeSell" exact="$homeSell.cluster" />
+			</do_elseif>
+
+			<set_value name="this.$trade_failedfindruns" exact="0" />
+
+			<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 1000">
+				<run_script name="'jlp.unitrader.move.refuel'" />
+			</do_if>
+
+			<wait exact="this.$jlp_unitrader_searchtime" />
+			<run_script name="'jlp.unitrader.trade.ship.free'">
+				<param name="PageId" value="$PageId" />
+				<param name="homeBuy" value="$homeBuy" />
+				<param name="homeSell" value="$homeSell" />
+				<param name="rangeBuy" value="$rangeBuy" />
+				<param name="rangeSell" value="$rangeSell" />
+				<param name="warelist" value="$basket" />
+				<param name="additionalparams" value="[$minsell, $maxsell, $minbuy, $maxbuy]" />
+				<param name="debugchance" value="$debugchance" />
+			</run_script>
+			<!-- TODO: read from config -->
+			<!-- Switch home <-> sell -->
+			<do_if value="this.$trade_failedfindruns" min="11">
+				<set_value name="this.$trade_failedfindruns" exact="0" />
+			
+				<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 1000">
+					<run_script name="'jlp.unitrader.move.refuel'" />
+				</do_if>
+
+				<wait exact="this.$jlp_unitrader_searchtime" />
+				<run_script name="'jlp.unitrader.trade.ship.free'">
 					<param name="PageId" value="$PageId" />
-					<param name="range" value="$range" />
-					<param name="home" value="$home" />
-					<param name="warelist" value="$basket"/>
-					<param name="additionalparams" value="[$minsell, $maxsell, $minbuy, $maxbuy]" />
+					<param name="homeBuy" value="$homeSell" />
+					<param name="homeSell" value="$homeBuy" />
+					<param name="rangeBuy" value="$rangeSell" />
+					<param name="rangeSell" value="$rangeBuy" />
+					<param name="warelist" value="$basket" />
+					<param name="additionalparams" value="[$minbuy, $maxbuy, $minsell, $maxsell]" />
 					<param name="debugchance" value="$debugchance" />
 				</run_script>
 			</do_if>
-			<do_else>
-				<run_script name="'jlp.unitrader.trade.ship'">
-					<param name="PageId" value="$PageId" />
-					<param name="range" value="$range" />
-					<param name="home" value="$home" />
-					<param name="warelist" value="$basket"/>
-				</run_script>
 
-			</do_else>
+			<!-- if we are still failing to sell our cargo after 10 failed attemps, dump some of it -->
+			<set_value name="$currentcargo" exact="this.ship.cargo.list" />
+			<do_if value="@this.$trade_failedfindruns" min="10">
+				<do_all exact="$currentcargo.count" counter="$c">
+					<set_value name="$dropware" exact="$currentcargo.{$c}" />
+					<do_if value="$dropware" exact="ware.fuelcells" negate="true">
+						<drop_cargo object="this.ship" ware="$dropware" min="(this.ship.cargo.{$dropware}.count * 0.4f)i"
+							max="(this.ship.cargo.{$dropware}.count * 0.8f)i" amounts="$droppedamounts" wares="$droppedwares" />
+						<substitute_text text="$notiDearsPilot" source="{8570,2}">
+							<replace string="'$ENTITYTYPE$'" with="this.typename" />
+							<replace string="'$ENTITYNAME$'" with="this.name" />
+							<replace string="'$OBJECTNAME$'" with="this.ship.name" />
+							<replace string="'$SECTOR$'" with="this.sector.name" />
+						</substitute_text>
+
+						<do_all exact="$droppedwares.count" counter="$d">
+							<set_value name="$detail1"
+								exact="{8570,10001}.[$droppedamounts.{$d}, $droppedwares.{$d}]" />
+							<write_to_logbook category="squad" text="'%1\n %2\n'.[$notiDearsPilot, $detail1]" />
+						</do_all>
+					</do_if>
+				</do_all>
+			</do_if>
 
 		</actions>
 	</attention>
-	
+
 </aiscript>

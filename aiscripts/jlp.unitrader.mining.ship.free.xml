@@ -12,57 +12,16 @@
 		<param name="PageId" default="8570" />
 		<param name="basketoverride" default="null"
 			comment="list of wares that takes precedence over any defined warebasket" />
+		<param name="collectZone" default="this.ship.zone" />
+		<param name="rangeCollect" default="'sector'" />
+		<param name="homeSell" default="this.ship.zone" />
+		<param name="rangeSell" default="'sector'" />
+		<param name="minCol" default="null" />
+		<param name="maxCol" default="null" />
+		<param name="minSell" default="null" />
+		<param name="maxSell" default="null" />
 		<param name="debugchance" default="0" />
 	</params>
-	<interrupts>
-		<handler ref="TargetInvalidHandler" />
-		<handler ref="AttackHandler" />
-	</interrupts>
-
-	<init>
-		<do_if value="this.ship.commander">
-			<set_command command="command.mining" param="this.ship.commander" />
-		</do_if>
-		<do_else>
-			<set_command command="command.freemining" />
-		</do_else>
-		<!-- Main action for waiting times -->
-		<set_command_action commandaction="commandaction.searchingresources" />
-	</init>
-	<patch sinceversion="3">
-		<do_if value="not $buyer? and @$buyoffer.exists">
-			<set_value name="$buyer" exact="$buyoffer.buyer" />
-		</do_if>
-	</patch>
-	<patch sinceversion="5">
-		<do_if value="not $Possible_Wares?">
-			<set_value name="$Possible_Wares" exact="this.ship.cargo.list" />
-			<set_value name="$fuelindex" exact="$Possible_Wares.indexof.{ware.fuelcells}" />
-			<do_if value="$fuelindex gt 0">
-				<remove_value name="$Possible_Wares.{$fuelindex}" />
-			</do_if>
-		</do_if>
-	</patch>
-	<patch sinceversion="8">
-		<do_if value="this.sector.exists">
-			<set_value name="$startsector" exact="this.sector" />
-		</do_if>
-		<do_elseif value="this.zone.isclass.highway">
-			<set_value name="$startsector" exact="this.zone.destination.sector" />
-		</do_elseif>
-	</patch>
-	<patch sinceversion="10">
-		<!-- all reservations have been wiped as of 4.0, if we are currently processing the $unloadlist restore
-			reservations for the current and remaining items -->
-		<do_if value="@$buyer.exists and $unloadlist? and $u?">
-			<do_all exact="$unloadlist.count" counter="$u_patch">
-				<do_if value="$u_patch ge $u">
-					<add_ware_reservation type="sell" ware="$unloadlist.{$u_patch}.{1}"
-						amount="$unloadlist.{$u_patch}.{2}" entity="this" object="$buyer" replace="true" />
-				</do_if>
-			</do_all>
-		</do_if>
-	</patch>
 
 	<attention min="unknown">
 		<actions>
@@ -74,11 +33,15 @@
 			<do_if value="this.$jlpUniMiningRun" exact="true" negate="true">
 				<return />
 			</do_if>
-			<set_command command="command.searchresources" param="this.ship.cluster" />
-			<wait exact="this.$jlp_unitrader_waittime" sinceversion="1" />
+
 
 			<!-- safety check -->
-			<do_if value="not this.ship.cluster.exists">
+			<do_if value="not $collectZone.cluster.exists">
+				<set_value name="$failreason" exact="'ERR_NO_CLUSTER'" />
+				<set_value name="$failreason2" exact="'Good bye cruel world! ' + this.ship" />
+				<resume label="finish" />
+			</do_if>
+			<do_if value="not $homeSell.cluster.exists">
 				<set_value name="$failreason" exact="'ERR_NO_CLUSTER'" />
 				<set_value name="$failreason2" exact="'Good bye cruel world! ' + this.ship" />
 				<resume label="finish" />
@@ -94,42 +57,65 @@
 			<do_if value="this.ship.units.collect.count" exact="0">
 				<debug_text text="'mining ship does not have any units for collecting!'" chance="$debugchance" />
 				<set_value name="$failreason" exact="'ERR_NO_COLLECT'" />
-				<set_value name="$failreason2" exact="'Macro: %1, Job: %2'.[this.ship.macro.name, this.ship.job]" />
 				<resume label="finish" />
 			</do_if>
-			<do_if value="not $basketoverride">
-				<do_if value="this.ship.warebasket.count" exact="0">
-					<debug_text text="'mining without warebasket defined in jobs not supported!'"
-						chance="$debugchance" />
-					<set_value name="$failreason" exact="'ERR_NO_WAREBASKET'" />
-					<set_value name="$failreason2" exact="'Job: ' + this.ship.job" />
-					<resume label="finish" />
-				</do_if>
-				<set_value name="$warebasket" exact="this.ship.warebasket.list" />
-			</do_if>
-			<do_else>
-				<set_value name="$warebasket" exact="$basketoverride" />
-			</do_else>
+
 
 			<!-- store startsector as preferred sector for selling -->
-			<set_value name="$startsector" exact="this.sector" />
+			<set_value name="$startsector" exact="$homeSell.sector" />
+
+			<set_value name="$warebasket" exact="$basketoverride" />
 
 			<!-- find mineable wares within the cluster -->
 			<create_list name="$availablewares" exact="0" />
 			<debug_text text="player.age + ' searching for wares...'" chance="$debugchance" />
 			<do_all exact="$warebasket.count" counter="$i">
 				<set_value name="$ware" exact="$warebasket.{$i}" />
-				<find_resource ware="$ware" refobject="this.ship" zone="$zone" />
+				<find_resource ware="$ware" refobject="$collectZone.cluster" zone="$zone" />
 				<do_if value="$zone.exists">
-					<do_if value="this.ship.cluster" exact="$zone.cluster">
-						<append_to_list name="$availablewares" exact="$ware" />
-						<debug_text text="player.age + ' there is %1 in this cluster'.[$ware]" chance="$debugchance" />
+					<do_if value="$rangeCollect" exact="'zone'">
+
+						<do_if value="$collectZone" exact="$zone">
+							<append_to_list name="$availablewares" exact="$ware" />
+							<debug_text text="player.age + ' there is %1 in this zone'.[$ware]" chance="$debugchance" />
+						</do_if>
 					</do_if>
+					<do_elseif value="$rangeCollect" exact="'sector'">
+						<do_if value="$collectZone.sector" exact="$zone.sector">
+							<append_to_list name="$availablewares" exact="$ware" />
+							<debug_text text="player.age + ' there is %1 in this sector'.[$ware]" chance="$debugchance" />
+						</do_if>
+					</do_elseif>
+					<do_elseif value="$rangeCollect" exact="'cluster'">
+						<do_if value="$collectZone.cluster" exact="$zone.cluster">
+							<append_to_list name="$availablewares" exact="$ware" />
+							<debug_text text="player.age + ' there is %1 in this cluster'.[$ware]" chance="$debugchance" />
+						</do_if>
+					</do_elseif>
+					<do_elseif value="$rangeCollect" exact="'ranged'">
+						<!-- TODO: support galaxy collecting -->
+						<set_value name="$colrange" exact="[$additionalparams.{3}, $additionalparams.{4}]" />
+						<do_if value="$collectZone.cluster" exact="$zone.cluster">
+							<append_to_list name="$availablewares" exact="$ware" />
+							<debug_text text="player.age + ' there is %1 in this cluster'.[$ware]" chance="$debugchance" />
+						</do_if>
+					</do_elseif>
 				</do_if>
 			</do_all>
 			<do_if value="$availablewares.count" exact="0">
 				<debug_text text="'unable to find any ware that can be collected by this ship in this cluster!'"
 					chance="$debugchance" />
+				<substitute_text text="$notiDears" source="{8570,10}">
+					<replace string="'$ENTITYTYPE$'" with="this.typename" />
+					<replace string="'$ENTITYNAME$'" with="this.name" />
+					<replace string="'$OBJECTNAME$'" with="this.ship.name" />
+					<replace string="'$SECTOR$'" with="this.sector.name" />
+				</substitute_text>
+
+				<show_notification caption="Failure"
+					details="'unable to find any ware that can be collected by this ship in this cluster!'" />
+				<write_to_logbook category="general"
+					text="'%1\n %2\n'.[$notiDears, 'unable to find any ware that can be collected by this ship in this cluster!']" />
 				<set_value name="$failreason" exact="'ERR_NO_WARES'" />
 				<resume label="finish" />
 			</do_if>
@@ -137,17 +123,56 @@
 			<!-- primary loop start -->
 			<label name="loop" />
 
+
+			<!-- safety check -->
+			<do_if value="this.$jlpUniMiningRun" exact="true" negate="true">
+				<return />
+			</do_if>
+			<!-- initial -->
+			<set_command_action commandaction="commandaction.calculating" />
+			<wait exact="this.$jlp_unitrader_searchtime" />
+
+			<do_if value="not $homeSell.cluster.exists">
+				<set_value name="$failreason" exact="'ERR_NO_CLUSTER'" />
+				<set_value name="$failreason2" exact="'Good bye cruel world! ' + this.ship" />
+				<resume label="finish" />
+			</do_if>
+
 			<do_if value="not $nextbuyoffercheck? or $nextbuyoffercheck le player.age">
 				<set_value name="$sellablewares" exact="[]" />
-				<find_sector space="this.ship.cluster" multiple="true" name="$sectors" />
+				<find_sector space="$homeSell.cluster" multiple="true" name="$sectors" />
 				<do_while value="$sectors.count gt 0">
 					<set_value name="$s" min="1" max="$sectors.count" />
 					<find_buy_offer tradepartner="this.ship" space="$sectors.{$s}" multiple="true"
 						result="$buyoffers" wares="$availablewares" excludeempty="false" />
 					<do_all exact="$buyoffers.count" counter="$b">
-						<do_if value="$warebasket.indexof.{$buyoffers.{$b}.ware} gt 0">
-							<do_if value="$sellablewares.indexof.{$buyoffers.{$b}.ware} == 0">
-								<append_to_list name="$sellablewares" exact="$buyoffers.{$b}.ware" />
+						<!-- Check Restriction from config -->
+						<set_value name="$offerAdd" exact="false" />
+						<set_value name="$offer" exact="$buyoffers.{$b}" />
+						<do_if
+							value="@this.$jlp_unitrader_home_sell_find  and @this.$jlp_unitrader_home_sell_find != 'allTrader'"
+						>
+							<do_if value="@this.$jlp_unitrader_home_sell_find == 'onlyForeignTrader'">
+								<do_if value="$offer.owner.isplayerowned" negate="true">
+									<set_value name="$offerAdd" exact="true" />
+								</do_if>
+							</do_if>
+							<do_elseif value="@this.$jlp_unitrader_home_sell_find == 'onlySelfTrader'">
+								<do_if value="$offer.owner.isplayerowned">
+									<set_value name="$offerAdd" exact="true" />
+								</do_if>
+							</do_elseif>
+						</do_if>
+						<do_else>
+							<set_value name="$offerAdd" exact="true" />
+						</do_else>
+
+						<do_if value="$offerAdd" exact="true">
+
+							<do_if value="$warebasket.indexof.{$offer.ware} gt 0">
+								<do_if value="$sellablewares.indexof.{$offer.ware} == 0">
+									<append_to_list name="$sellablewares" exact="$offer.ware" />
+								</do_if>
 							</do_if>
 						</do_if>
 					</do_all>
@@ -168,7 +193,7 @@
 			</do_else>
 
 			<!-- safety check -->
-			<do_if value="not this.ship.cluster.exists">
+			<do_if value="not $homeSell.cluster.exists">
 				<set_value name="$failreason" exact="'ERR_NO_CLUSTER'" />
 				<set_value name="$failreason2" exact="'Good bye cruel world! ' + this.ship" />
 				<resume label="finish" />
@@ -180,16 +205,49 @@
 			<!-- find a buyoffer for the mineable wares in this cluster, split into sector searches to keep the
 				spikes lower
 				go to a random sector in the cluster and look for offers there, then a random matching offer is chosen -->
-			<find_sector space="this.ship.cluster" multiple="true" name="$sectors" />
+			<find_sector space="$homeSell.cluster" multiple="true" name="$sectors" />
+
 			<do_while value="$sectors.count gt 0">
 				<set_value name="$s" min="1" max="$sectors.count" />
-				<find_buy_offer tradepartner="this.ship" space="$sectors.{$s}" result="$buyoffer"
-					wares="$availablewares"
+
+				<!-- Check Restriction from config -->
+				<do_if
+					value="@this.$jlp_unitrader_home_sell_find and @this.$jlp_unitrader_home_sell_find != 'allTrader'"
 				>
-					<offeramount min="this.ship.cargo.capacity / 20" entity="this" />
-					<!-- NOTE: relevant ware volumes are range from 14 to 18 so this fills at least 70% of our cargo -->
-				</find_buy_offer>
-				<do_if value="$buyoffer.available">
+					<do_if value="@this.$jlp_unitrader_home_sell_find == 'onlyForeignTrader'">
+						<find_buy_offer tradepartner="this.ship" space="$sectors.{$s}" result="$buyoffer"
+							wares="$availablewares"
+						>
+							<match_buyer>
+								<match_relation relation="self" negate="true" object="this" />
+							</match_buyer>
+							<offeramount min="this.ship.cargo.capacity / 20" entity="this" />
+							<!-- NOTE: relevant ware volumes are range from 14 to 18 so this fills at least 70% of our cargo -->
+						</find_buy_offer>
+					</do_if>
+					<do_elseif value="@this.$jlp_unitrader_home_sell_find == 'onlySelfTrader'">
+						<find_buy_offer tradepartner="this.ship" space="$sectors.{$s}" result="$buyoffer"
+							wares="$availablewares"
+						>
+							<match_buyer>
+								<match_relation relation="self" object="this" />
+							</match_buyer>
+							<offeramount min="this.ship.cargo.capacity / 20" entity="this" />
+							<!-- NOTE: relevant ware volumes are range from 14 to 18 so this fills at least 70% of our cargo -->
+						</find_buy_offer>
+					</do_elseif>
+				</do_if>
+				<do_else>
+					<find_buy_offer tradepartner="this.ship" space="$sectors.{$s}" result="$buyoffer"
+						wares="$availablewares"
+					>
+						<offeramount min="this.ship.cargo.capacity / 20" entity="this" />
+						<!-- NOTE: relevant ware volumes are range from 14 to 18 so this fills at least 70% of our cargo -->
+					</find_buy_offer>
+				</do_else>
+
+
+				<do_if value="$buyoffer.available" exact="true">
 					<break />
 				</do_if>
 				<remove_value name="$sectors.{$s}" />
@@ -210,7 +268,7 @@
 			<do_else>
 				<debug_text text="player.age + ' could not find any buyoffer, waiting...'" chance="$debugchance" />
 				<wait chance="0" />
-				<set_value name="$idletime" min="50s" max="70s" />
+				<set_value name="$idletime" exact="this.$jlp_unitrader_waittime" />
 				<run_script name="'move.idle'" sinceversion="3">
 					<param name="TimeOut" value="$idletime" />
 				</run_script>
@@ -218,9 +276,11 @@
 			</do_else>
 
 			<label name="findware" />
+
+			<wait exact="this.$jlp_unitrader_searchtime" />
 			<!-- now check if we can find a deposit of the needed resource nearby -->
 			<debug_text text="player.age + ' now looking for %1...'.[$ware]" chance="$debugchance" />
-			<find_resource ware="$ware" refobject="this.ship" zone="$zone" wares="$secwares"
+			<find_resource ware="$ware" refobject="$collectZone.cluster" zone="$zone" wares="$secwares"
 				minamount="this.ship.cargo.{$ware}.free" />
 			<do_if value="not $zone.exists">
 				<debug_text text="player.age + ' failed finding %1!'.[$ware]" chance="$debugchance" />
@@ -247,6 +307,8 @@
 			<!-- TODO: pre-flight check, calculate jump energy for trip to resource and back home, ensure we have
 				enough fuel -->
 			<!-- TODO: don't just go to the zone center, find an asteroid/gas cloud... and go there -->
+
+
 			<run_script name="'move.generic'">
 				<param name="destination" value="$zone" />
 				<param name="endintargetzone" value="true" />
@@ -287,6 +349,7 @@
 			</do_if>
 
 			<set_command_action commandaction="commandaction.searchingtrades" />
+			<wait exact="this.$jlp_unitrader_searchtime" />
 			<debug_text text="player.age + ' trying to sell wares...'" chance="$debugchance" />
 
 			<do_if value="@$capacityfactor lt 1">
@@ -308,9 +371,16 @@
 						<set_value name="$amount" exact="this.ship.cargo.{$possibleware}.count" />
 						<drop_cargo object="this.ship" ware="$possibleware" min="($amount * 0.2f)i" max="($amount * 0.8f)i"
 							amounts="$droppedamounts" wares="$droppedwares" />
-						<do_all exact="$droppedwares.count" counter="$d" chance="$debugchance">
-							<debug_text
-								text="'%1 (%2) dropped %3 %4 because that ware is unsellable in %5'.[this.ship.knownname, this.ship, $droppedamounts.{$d}, $droppedwares.{$d}, this.cluster.knownname]" />
+						<substitute_text text="$notiDearsPilot" source="{8570,2}">
+							<replace string="'$ENTITYTYPE$'" with="this.typename" />
+							<replace string="'$ENTITYNAME$'" with="this.name" />
+							<replace string="'$OBJECTNAME$'" with="this.ship.name" />
+							<replace string="'$SECTOR$'" with="this.sector.name" />
+						</substitute_text>
+
+						<do_all exact="$droppedwares.count" counter="$d">
+							<set_value name="$detail1" exact="{8570,10001}.[$droppedamounts.{$d}, $droppedwares.{$d}]" />
+							<write_to_logbook category="squad" text="'%1\n %2\n'.[$notiDearsPilot, $detail1]" />
 						</do_all>
 					</do_if>
 				</do_all>
@@ -326,11 +396,13 @@
 
 			<!-- find a buyoffer for the mineable wares in this cluster, split into sector searches to keep the
 				spikes lower -->
-			<set_command_action commandaction="commandaction.searchingtrades" />
 			<set_value name="$preferredsector" exact="$startsector" />
-			<do_if value="this.ship.isclass.ship_s or this.ship.isclass.ship_m">
+
+			<!--
+				<do_if value="this.ship.isclass.ship_s or this.ship.isclass.ship_m">
 				<set_value name="$preferredsector" exact="this.sector" />
-			</do_if>
+				</do_if>
+			-->
 			<do_all exact="$Possible_Wares.count" counter="$w">
 				<set_value name="$Ware" exact="$Possible_Wares.{$w}" />
 				<!-- Set the amount to sell (on first attempt, all of them) -->
@@ -339,24 +411,54 @@
 				<debug_text
 					text="this.name + ' trying to sell ' + $Amount_To_Sell + ' of ' + $Ware + ' in ' + $preferredsector.knownname"
 					chance="$debugchance" />
-				<find_buy_offer tradepartner="this.ship" space="$preferredsector" result="$buyoffer"
-					wares="$Ware"
+				<!-- Check Restriction from config -->
+				<do_if
+					value="@this.$jlp_unitrader_home_sell_find and @this.$jlp_unitrader_home_sell_find != 'allTrader'"
 				>
-					<offeramount min="$Amount_To_Sell" entity="this" />
-				</find_buy_offer>
+					<do_if value="@this.$jlp_unitrader_home_sell_find == 'onlyForeignTrader'">
+						<find_buy_offer tradepartner="this.ship" space="$preferredsector" result="$buyoffer"
+							wares="$Ware"
+						>
+							<match_buyer>
+								<match_relation relation="self" negate="true" object="this" />
+							</match_buyer>
+							<offeramount min="$Amount_To_Sell" entity="this" />
+						</find_buy_offer>
+					</do_if>
+					<do_elseif value="@this.$jlp_unitrader_home_sell_find == 'onlySelfTrader'">
+						<find_buy_offer tradepartner="this.ship" space="$preferredsector" result="$buyoffer"
+							wares="$Ware"
+						>
+							<match_buyer>
+								<match_relation relation="self" object="this" />
+							</match_buyer>
+							<offeramount min="$Amount_To_Sell" entity="this" />
+						</find_buy_offer>
+					</do_elseif>
+				</do_if>
+				<do_else>
+					<find_buy_offer tradepartner="this.ship" space="$preferredsector" result="$buyoffer"
+						wares="$Ware"
+					>
+						<offeramount min="$Amount_To_Sell" entity="this" />
+					</find_buy_offer>
+				</do_else>
+
 				<do_if value="$buyoffer.available">
 					<break />
 				</do_if>
 				<wait min="2s" max="5s" sinceversion="6" />
 				<do_if value="not $preferredsector?">
 					<!-- in case we saved in the above wait, this will initialise the variable -->
-					<set_value name="$preferredsector" exact="this.sector" />
+					<set_value name="$preferredsector" exact="$startsector" />
 				</do_if>
 			</do_all>
 			<do_if value="not @$buyoffer.available">
-				<find_sector space="this.ship.cluster" multiple="true" name="$sectors" />
+				<find_sector space="$homeSell.cluster" multiple="true" name="$sectors" />
 				<set_value name="$sectorindex" exact="$sectors.indexof.{$preferredsector}" />
-				<remove_value name="$sectors.{$sectorindex}" />
+				<do_if value="$sectorindex">
+					<remove_value name="$sectors.{$sectorindex}" />
+				</do_if>
 				<remove_value name="$sectorindex" />
 
 				<do_while value="$sectors.count gt 0">
@@ -371,12 +473,44 @@
 							text="this.name + ' trying to sell ' + $Amount_To_Sell + ' of ' + $Ware + ' in ' + $sectors.{$s}.knownname"
 							chance="$debugchance" />
 
-						<find_buy_offer tradepartner="this.ship" space="$sectors.{$s}" result="$buyoffer"
-							wares="$Ware"
+						<!-- Check Restriction from config -->
+						<set_value name="$offerAdd" exact="false" />
+						<do_if
+							value="@this.$jlp_unitrader_home_sell_find and @this.$jlp_unitrader_home_sell_find != 'allTrader'"
 						>
-							<offeramount min="$Amount_To_Sell" entity="this" />
+							<do_if value="@this.$jlp_unitrader_home_sell_find == 'onlyForeignTrader'">
+								<do_if value="$buyoffer.owner.isplayerowned" negate="true">
+									<find_buy_offer tradepartner="this.ship" space="$sectors.{$s}" result="$buyoffer"
+										wares="$Ware"
+									>
+										<match_buyer>
+											<match_relation relation="self" negate="true" object="this" />
+										</match_buyer>
+										<offeramount min="$Amount_To_Sell" entity="this" />
+									</find_buy_offer>
+								</do_if>
+							</do_if>
+							<do_elseif value="@this.$jlp_unitrader_home_sell_find == 'onlySelfTrader'">
+								<do_if value="$buyoffer.owner.isplayerowned">
+									<find_buy_offer tradepartner="this.ship" space="$sectors.{$s}" result="$buyoffer"
+										wares="$Ware"
+									>
+										<match_buyer>
+											<match_relation relation="self" object="this" />
+										</match_buyer>
+										<offeramount min="$Amount_To_Sell" entity="this" />
+									</find_buy_offer>
+								</do_if>
+							</do_elseif>
+						</do_if>
+						<do_else>
+							<find_buy_offer tradepartner="this.ship" space="$sectors.{$s}" result="$buyoffer"
+								wares="$Ware"
+							>
+								<offeramount min="$Amount_To_Sell" entity="this" />
+							</find_buy_offer>
+						</do_else>
 
-						</find_buy_offer>
 						<do_if value="$buyoffer.available">
 							<break />
 						</do_if>
@@ -393,6 +527,8 @@
 				<set_value name="$ware" exact="$buyoffer.ware" />
 				<set_value name="$buyer" exact="$buyoffer.buyer" />
 				<set_command command="command.trade" param="$buyoffer.buyer" param2="$buyoffer.ware" />
+				<set_value name="this.$jlp_unitrader_currentbuyoffer" exact="[$buyoffer, $buyoffer.buyerentity]" />
+
 				<debug_text
 					text="player.age + ' %1 in zone %2 wants %3 units of %4'.[$buyer.knownname, $buyer.zone.knownname, $buyoffer.amount, $buyoffer.ware.name]"
 					chance="$debugchance" />
@@ -419,14 +555,15 @@
 			</do_else>
 			<remove_value name="$capacityfactor" />
 
-			<!-- TODO: pre-flight check, calculate jump energy for trip to resource and back home, ensure we have
-				enough fuel -->
-			<run_script name="'move.generic'">
-				<param name="destination" value="$buyer" />
-				<param name="debugchance" value="$debugchance" />
-			</run_script>
 			<wait min="1s" max="3s" />
 			<do_if value="@$buyer.exists">
+				<!-- TODO: pre-flight check, calculate jump energy for trip to resource and back home, ensure we
+					have
+					enough fuel -->
+				<run_script name="'move.generic'">
+					<param name="destination" value="$buyer" />
+					<param name="debugchance" value="$debugchance" />
+				</run_script>
 				<do_if value="(this.zone == $buyer.zone) or (this.ship.distanceto.{$buyer} lt ($buyer.size * 2f))">
 					<debug_text text="player.age + ' destination reached'" chance="$debugchance" />
 				</do_if>
@@ -507,19 +644,41 @@
 						<do_if value="not $offer.available">
 							<continue />
 						</do_if>
-						<set_value name="$currentware" exact="$offer.ware" />
-						<set_value name="$amount" exact="$offer.offeramount.{this}" />
-						<do_if value="this.ship.cargo.{$currentware}.count lt $amount">
-							<set_value name="$amount" exact="this.ship.cargo.{$currentware}.count" />
+						<!-- Check Restriction from config -->
+						<set_value name="$offerAdd" exact="false" />
+						<do_if
+							value="@this.$jlp_unitrader_home_sell_find and @this.$jlp_unitrader_home_sell_find != 'allTrader'"
+						>
+							<do_if value="@this.$jlp_unitrader_home_sell_find == 'onlyForeignTrader'">
+								<do_if value="$offer.owner.isplayerowned" negate="true">
+									<set_value name="$offerAdd" exact="true" />
+								</do_if>
+							</do_if>
+							<do_elseif value="@this.$jlp_unitrader_home_sell_find == 'onlySelfTrader'">
+								<do_if value="$offer.owner.isplayerowned">
+									<set_value name="$offerAdd" exact="true" />
+								</do_if>
+							</do_elseif>
 						</do_if>
-						<do_if value="$amount gt 0">
-							<add_ware_reservation type="sell" ware="$currentware" amount="$amount"
-								entity="this" object="$buyer" replace="true" result="$reserved" />
-							<do_if value="$reserved gt 0">
-								<debug_text
-									text="player.age + ': reserved %1 %2 for unloading at buyer %5(%6) (have %3, buyer has room for %4)'.[$reserved, $currentware, this.ship.cargo.{$currentware}.count, $buyer.cargo.{$currentware}.free, $buyer.knownname, $buyer]"
-									chance="$debugchance" />
-								<append_to_list name="$unloadlist" exact="[$currentware, $reserved, $offer]" />
+						<do_else>
+							<set_value name="$offerAdd" exact="true" />
+						</do_else>
+
+						<do_if value="$offerAdd">
+							<set_value name="$currentware" exact="$offer.ware" />
+							<set_value name="$amount" exact="$offer.offeramount.{this}" />
+							<do_if value="this.ship.cargo.{$currentware}.count lt $amount">
+								<set_value name="$amount" exact="this.ship.cargo.{$currentware}.count" />
+							</do_if>
+							<do_if value="$amount gt 0">
+								<add_ware_reservation type="sell" ware="$currentware" amount="$amount"
+									entity="this" object="$buyer" replace="true" result="$reserved" />
+								<do_if value="$reserved gt 0">
+									<debug_text
+										text="player.age + ': reserved %1 %2 for unloading at buyer %5(%6) (have %3, buyer has room for %4)'.[$reserved, $currentware, this.ship.cargo.{$currentware}.count, $buyer.cargo.{$currentware}.free, $buyer.knownname, $buyer]"
+										chance="$debugchance" />
+									<append_to_list name="$unloadlist" exact="[$currentware, $reserved, $offer]" />
+								</do_if>
 							</do_if>
 						</do_if>
 					</do_all>
@@ -533,6 +692,7 @@
 						<set_value name="$tradeoffer" exact="$unloadlist.{$u}.{3}" />
 						<set_value name="$Buyer" exact="$tradeoffer.buyer" />
 						<set_value name="$BuyerEntity" exact="$tradeoffer.buyerentity" />
+
 						<debug_text
 							text="player.age + ' unloading %1 units of %2 to %3...'.[$amount, $currentware, $buyer.knownname]"
 							chance="$debugchance" />
@@ -544,6 +704,7 @@
 								chance="$debugchance" />
 						</do_if>
 						<do_else>
+							<set_value name="this.$jlp_unitrader_currentbuyoffer" exact="null" />
 							<do_if
 								value="not $BuyerEntity.container.isplayerowned and not $BuyerEntity.container.hastradesubscription"
 							>
@@ -558,6 +719,19 @@
 							<wait exact="50ms" />
 							<set_known object="this.ship.zone" known="true" />
 							<wait exact="50ms" />
+							<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl" negate="true">
+								<set_value name="$CommissionAmount"
+									exact="10*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
+								<set_value name="$CommissionTime"
+									exact="1h*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
+							</do_if>
+							<do_else>
+								<set_value name="$CommissionAmount"
+									exact="20*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
+								<set_value name="$CommissionTime"
+									exact="2h*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
+							</do_else>
+
 							<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl" negate="true">
 								<set_value name="$CommissionAmount"
 									exact="10*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
@@ -606,7 +780,7 @@
 										<set_value name="$chance" exact="100" />
 									</do_if>
 									<add_faction_relation faction="faction.player" otherfaction="$Buyer.owner"
-										value="this.$jlp_unitrader_extrafaction/100000f" chance="$chance" />
+										value="this.$jlp_unitrader_extrafaction" chance="$chance" />
 									<wait min="4s" max="9s" />
 
 									<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction-40)" />
@@ -651,22 +825,6 @@
 									</do_if>
 								</do_if>
 							</do_if>
-
-
-							<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl" negate="true">
-								<set_value name="$CommissionAmount"
-									exact="10*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
-								<set_value name="$CommissionTime"
-									exact="1h*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
-							</do_if>
-							<do_else>
-								<set_value name="$CommissionAmount"
-									exact="20*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
-								<set_value name="$CommissionTime"
-									exact="2h*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
-							</do_else>
-
-
 							<debug_text
 								text="player.age + ' %1(job: \'%5\') unloaded %2 units of \'%3\' at \'%4\', traderesult: %5'.[this.ship.knownname, $amount, $currentware, $buyer.knownname, this.ship.job, $traderesult]"
 								chance="$debugchance2" />
@@ -714,7 +872,6 @@
 			</run_script>
 
 			<debug_text text="player.age + ' starting new mining run'" chance="$debugchance" />
-			<return />
 
 			<label name="finish" />
 			<debug_text
@@ -726,6 +883,7 @@
 				<debug_text text="player.age + ' un-parking...'" chance="$debugchance" />
 				<run_script name="'move.undock'" />
 			</do_if>
+
 		</actions>
 	</attention>
 	<on_abort>

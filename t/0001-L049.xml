@@ -19,55 +19,61 @@
 			
 			<t id="100">Unbekannt</t>
 			
+            <t id="500">Universums Versorger Software</t>
+            <t id="501">Universums Versorger Beschreibung</t>
+			
             <t id="1000">Universums Versorger</t>
-            <t id="1010">Händler starten</t>
-            <t id="1011">Händler stoppen</t>
-			<t id="2010">Schürfer starten</t>
-			<t id="2011">Schürfer stoppen</t>
+            <t id="1001">Modus</t>
+            <t id="1010">Händler</t>
+
+			<t id="2010">Schürfer</t>
+
 			<t id="3010">Talente anzeigen</t>
-			<t id="4010">Nachrichten on</t>
-			<t id="4011">Nachrichten off</t>
+
+			<t id="4010">Nachrichten senden</t>
+			<t id="4012">Eingeschaltet</t>
+			<t id="4013">Ausgeschaltet</t>
+
+			<t id="4020">Start</t>
+			<t id="4021">Stop</t>
 
 			<t id="4110">Handel</t>
-			<t id="4111">Kaufstation</t>
-			<t id="4112">Verkaufstation</t>
-			<t id="4121">nur {20204, 10027} (Stationtrader)</t>
-			<t id="4122">nur Bekannte</t>
-			<t id="4123">alle</t>
+			<t id="4111">Kaufgebiet</t>
+			<t id="4112">Verkaufgebiet</t>
+			<t id="4113">Abbaugebiet</t>
+			<t id="4120">Stations-Einschränkung</t>
+			<t id="4121">nur {20204, 10027} Stationen</t>
+			<t id="4122">nur Bekannte Stationen</t>
+			<t id="4123">keine</t>
+
+			<t id="4130">Suche-Einschränkung</t>
+			<t id="4131">nur fremde Stationen</t>
+			<t id="4132">nur eigene Stationen</t>
+			<t id="4133">keine</t>
 			
 			<t id="5000">Einstellungen</t>
 			<t id="5100">Konto</t>
 			<t id="5111">Maximal</t>
 			<t id="5112">Minimal</t>
-			<t id="5120">0 Cr</t>
-			<t id="5121">100 Million</t>
-			<t id="5122">50 Million</t>
-			<t id="5123">10 Million</t>
-			<t id="5124">5 Million</t>
-			<t id="5125">1 Million</t>
-			<t id="5126">500 Tausend</t>
 			
 			<t id="5200">Reichweite</t>
+			<t id="5201">Startzone</t>
 			<t id="5210">Reichweite ändern</t>
-			<t id="5211">Max Kaufreichweite</t>
-			<t id="5212">Min Kaufreichweite</t>
-			<t id="5213">Max Verkaufsreichweite</t>
-			<t id="5214">Min Verkaufsreichweite</t>
-			<t id="5220">0 {20001,102}</t>
-			<t id="5221">2 {20001,101}</t>
-			<t id="5222">4 {20001,102}</t>
-			<t id="5223">8 {20001,102}</t>
-			<t id="5224">16 {20001,102}</t>
-			<t id="5225">24 {20001,102}</t>
+			<t id="5211">Max. Kaufreichweite</t>
+			<t id="5212">Min. Kaufreichweite</t>
+			<t id="5213">Max. Verkaufsreichweite</t>
+			<t id="5214">Min. Verkaufsreichweite</t>
 
 			<t id="5300">Verhalten</t>
 
 			<t id="10000">%1: '%2' Ich konnte keine Ware in diesen Cluster zum Schürfen finden!</t>
+			<t id="10001">Versuche etwas Ladungsraum freizugeben, werfe heraus: %1 %2</t>
+			
 			
 			<t id="50000">%1: '%2' Verkaufte '%3' von '%4' vorhandene Lagermenge %5 für %6 %7Cr Stückpreis. Verkaufte an '%8' gewünschte Lagermenge%9 für %10Cr %11Cr Stückpreis.</t>
-            <t id="50100">%1: '%2' Ich überweise mein halbes maximales Budget über %3 Cr.</t>
+            <t id="50100">%1: '%2' Ich überweise mein Überschuss über %3 Cr.</t>
             <t id="50200">%1: '%2' Ich habe beim %3 Skill um 1 Stern dazugelernt \(%4 Sterne\).</t>
-            <t id="50210">Organisationtalent:     '$WAITTIME$s'\n Technisches Talent:'  '$SEARCHTIME$s'\n Austrahlungsbonus:  '$EXTRAFACTION$%'\n Mut:                              '$COURAGE$%'\n Effektivität:                     '$EFFICIENCY$%'.\n {8570,50211}</t>
+            <t id="50210">Organisationtalent: '%ss'\nTechnisches Talent: '%ss'\nAustrahlungsbonus: '%s%%'\nMut: '%s%%'\nEffektivität: '%s%%'.</t>
 			<t id="50211">Reichweite: $RANGE$ \('$HOME$'\) \n Max Budget: $MAXBUDGET$ Cr</t>
 			<t id="50300">Ich habe ein Handel gefunden.\n Ware: '$TRADEWARE$  \('$WAREPRICEMIN$ Cr' - '$WAREPRICEMAX$ Cr'\)'    Volumen: '$TRADEWAREVOLUME$'.\n Kaufpreis: '$WAREPRICESELLOFFER$ Cr' Verkaufspreis: '$WAREPRICEBUYOFFER$ Cr'</t>
 			<t id="50301">'$TRADESOURCE$ \(max: $TRADESOURCEAMOUNT$\)' mit\n '$TRADEDESTINATION$  \(max: '$TRADEDESTAMOUNT$'\)'</t>
@@ -80,6 +86,21 @@
 			
 			<t id="50400">$SHIP$\n Ich habe erfolgreich ein Handel getätigt.\n Ware: $WARE$\n gekaufte Menge: $AMOUNTBUY$   Einkaufspreis: $PRICEBUY$ Cr\n verkaufte Menge: $AMOUNTSELL$  Verkaufspreis: $PRICESELL$ Cr\n Profit: $PROFIT$ Cr</t>
 			<t id="50500">Herzlichen Glückwunsch.\nIch konnte ein dauerhaften Vertrag mit der folgenden Station aushandeln.\n"$STATION$"\n\nSie werden nun Ihre Handelsdaten regelmäßig an uns übersenden. </t>
+
+			<t id="55000">Wähle die Zone in der die Handelssuche beginnen soll</t>
+			<t id="55001">Wähle den Modus wie weit die Handelssuche gehen soll</t>
+			<t id="55002">Wähle die Anzahl der erlaubten Sprünge von System zu System</t>
+			<t id="55003">Wähle zwischen Händler und Schurfer</t>
+			<t id="55004">Wähle ob die Nachrichten ans Logbuch gesendet wird</t>
+			<t id="55005">Wähle die Einschränkung, welche die angeflogene Station haben soll</t>
+			<t id="55006">Wähle die Einschränkung, welche die angeflogene Station haben soll</t>
+
+			<t id="100000">Deinstallieren</t>
+			<t id="100001">Deinstallation erfolgreich abgeschlossen. Deaktiviere den Mod im Hauptmenü nun!</t>
+			<t id="100010">Installation</t>
+			<t id="100011">Installationn erfolgreich abgeschlossen. Nun kannst du die Handelssoftware MK4 beim Mechaniker kaufen!</t>
+
+
 		</page>
     </add>
 </diff>

@@ -1,23 +1,52 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
-<aiscript name="jlp.unitrader.mining.ship.ranged" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="1">
-    <params>
-        <param name="PageId" default="8570"/>
-        <param name="basket" default="null" />
+<aiscript name="jlp.unitrader.mining.ship.ranged" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="1"
+>
+	<params>
+		<param name="PageId" default="8570" />
+		<param name="basket" default="null" />
+		<param name="collectZone" default="this.ship.zone" />
+		<param name="homeSell" default="this.ship.zone" />
+		<param name="rangeCollect" default="'sector'" />
+		<param name="rangeSell" default="'sector'" />
+		<param name="minCol" default="null" />
+		<param name="maxCol" default="null" />
+		<param name="minSell" default="null" />
+		<param name="maxSell" default="null" />
+		<param name="debugchance" default="0" />
+	</params>
+	<init>
+		<do_if value="this.ship.commander">
+			<set_command command="command.mining" param="this.ship.commander" />
+		</do_if>
+		<do_else>
+			<set_command command="command.freemining" />
+		</do_else>
+		<!-- Main action for waiting times -->
+		<set_command_action commandaction="commandaction.searchingresources" />
+	</init>
+	<attention min="unknown">
+		<actions>
 
-        <param name="debugchance" default="0"/>
-    </params>
-   <attention min="unknown">
-        <actions>
- 
-			<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 800">
+		<wait exact="2s"/>
+
+
+			<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 1000">
 				<run_script name="'jlp.unitrader.move.refuel'" />
 			</do_if>
-	 		
-            <run_script name="'jlp.unitrader.mining.ship.free'">
-                <param name="PageId" value="$PageId"/>
-                <param name="basketoverride" value="$basket" />
-                <param name="debugchance" value="$debugchance" />
-            </run_script>
-        </actions>
-    </attention>
+			<run_script name="'jlp.unitrader.mining.ship.free'">
+				<param name="PageId" value="$PageId" />
+				<param name="basketoverride" value="$basket" />
+				<param name="debugchance" value="$debugchance" />
+				<param name="collectZone" value="$collectZone" />
+				<param name="rangeCollect" value="$rangeCollect" />
+				<param name="homeSell" value="$homeSell" />
+				<param name="rangeSell" value="$rangeSell" />
+				<param name="minCol" value="$minCol" />
+				<param name="maxCol" value="$maxCol" />
+				<param name="minSell" value="$minSell" />
+				<param name="maxSell" value="$maxSell" />
+			</run_script>
+		</actions>
+	</attention>
 </aiscript>

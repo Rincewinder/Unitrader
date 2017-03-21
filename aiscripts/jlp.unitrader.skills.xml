@@ -89,13 +89,13 @@
 				<!-- calculate the modifier -->
 				<set_value name="$waittime"
 					exact="30s + $waittimeC - $waittimeC * ($combat*0.4/$maxSkillValue + $morale*1.0/$maxSkillValue + $engineering*1.0/$maxSkillValue + $leadership*0.8/$maxSkillValue + $management*0.8/$maxSkillValue + $navigation*0.8/$maxSkillValue + $science*0.4/$maxSkillValue)/(0.4+1+1+0.8+0.8+0.8+0.4)" />
-				<set_value name="$Entity.$jlp_unitrader_waittime" exact="($waittime)s" />
+				<set_value name="$Entity.$jlp_unitrader_waittime" exact="(($waittime)i/1i)s" />
 				<debug_text chance="$debugchance"
 					text="'%1: %2\n modifier wait %3'.[$Entity.ship.knownname, $Entity.knownname, $Entity.$jlp_unitrader_waittime]" />
 
 				<set_value name="$searchtime"
 					exact="5s + $searchtimeC - $searchtimeC * ($combat*0.4/$maxSkillValue + $morale*0.6/$maxSkillValue + $engineering*1.0/$maxSkillValue + $leadership*1.0/$maxSkillValue + $management*0.8/$maxSkillValue + $navigation*1.0/$maxSkillValue + $science*0.8/$maxSkillValue)/(0.4+0.6+1+1+0.8+1+0.8)" />
-				<set_value name="$Entity.$jlp_unitrader_searchtime" exact="($searchtime)s" />
+				<set_value name="$Entity.$jlp_unitrader_searchtime" exact="(($searchtime)i/1i)s" />
 				<debug_text chance="$debugchance"
 					text="'%1: %2\n modifier searchtime %3'.[$Entity.ship.knownname, $Entity.knownname, $Entity.$jlp_unitrader_searchtime]" />
 
@@ -211,54 +211,6 @@
 						</do_if>
 					</do_if>
 				</do_all>
-
-
-			</do_elseif>
-			<do_elseif value="$Mode" exact="'show'">
-				<!-- ################ Show Skills with Notifcation and logbook ################################## -->
-				<do_if value="@$Entity.$jlp_unitrader_range == 'ranged'">
-					<set_value name="$HomeText"
-						exact="$Entity.$jlp_unitrader_home.cluster.knownname + ' / ' + $Entity.$jlp_unitrader_home.sector.knownname + ' / ' + $Entity.$jlp_unitrader_home.knownname" />
-					<set_value name="$RangeText"
-						exact="'Buy -%5- ( %1 - %2) Sell -%6- ( %3 - %4)\n'.[($Entity.$jlp_unitrader_jump_buy_min)i, ($Entity.$jlp_unitrader_jump_buy_max)i, ($Entity.$jlp_unitrader_jump_sell_min)i, ($Entity.$jlp_unitrader_jump_sell_max)i, $Entity.$jlp_unitrader_trade_stations_buy, $Entity.$jlp_unitrader_trade_stations_sell]" />
-				</do_if>
-				<do_elseif value="@$Entity.$jlp_unitrader_range == 'cluster'">
-					<set_value name="$HomeText" exact="$Entity.$jlp_unitrader_home.cluster.knownname" />
-					<set_value name="$RangeText" exact="readtext.{20001}.{101}" />
-				</do_elseif>
-				<do_elseif value="@$Entity.$jlp_unitrader_range == 'sector'">
-					<set_value name="$HomeText"
-						exact="$Entity.$jlp_unitrader_home.cluster.knownname + ' / ' + $Entity.$jlp_unitrader_home.sector.knownname" />
-					<set_value name="$RangeText" exact="readtext.{20001}.{201}" />
-				</do_elseif>
-				<do_elseif value="@$Entity.$jlp_unitrader_range == 'zone'">
-					<set_value name="$HomeText"
-						exact="$Entity.$jlp_unitrader_home.cluster.knownname + ' / ' + $Entity.$jlp_unitrader_home.sector.knownname + ' / ' + $Entity.$jlp_unitrader_home.knownname" />
-					<set_value name="$RangeText" exact="readtext.{20001}.{301}" />
-				</do_elseif>
-
-				<substitute_text text="$notiDears" source="{8570,10}">
-					<replace string="'$ENTITYTYPE$'" with="$Entity.typename" />
-					<replace string="'$ENTITYNAME$'" with="$Entity.name" />
-					<replace string="'$OBJECTNAME$'" with="$Entity.ship.name" />
-					<replace string="'$SECTOR$'" with="$Entity.sector.name" />
-				</substitute_text>
-				<substitute_text text="$detail1" source="{8570,50210}">
-					<replace string="'$WAITTIME$'" with="$Entity.$jlp_unitrader_waittime.formatted.default" />
-					<replace string="'$SEARCHTIME$'" with="$Entity.$jlp_unitrader_searchtime.formatted.default" />
-					<replace string="'$EXTRAFACTION$'" with="$Entity.$jlp_unitrader_extrafaction" />
-					<replace string="'$COURAGE$'" with="$Entity.$jlp_unitrader_courage" />
-					<replace string="'$EFFICIENCY$'" with="$Entity.$jlp_unitrader_efficiency" />
-					<replace string="'$RANGE$'" with="$RangeText" />
-					<replace string="'$HOME$'" with="$HomeText" />
-					<replace string="'$MAXBUDGET$'" with="($Entity.$jlp_unitrader_budgetmax).formatted.default" />
-				</substitute_text>
-				<show_notification timeout="10s" relationeffect="true" object="$Entity"
-					caption="{8570,1000}" icon="achievement_capitalshipkill_1" queued="true" sound="notification_generic"
-					details="$detail1" />
-				<do_if value="@$Entity.$jlp_unitrader_show_extendedlogbook">
-					<write_to_logbook object="$Entity" category="squad" text="'%1\n %2'.[$notiDears, $detail1]" />
-				</do_if>
 			</do_elseif>
 		</actions>
 	</attention>

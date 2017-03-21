@@ -19,58 +19,60 @@
 			
 			<t id="100">Unknown</t>
 			
+            <t id="500">Universe Provider Software </t>
+            <t id="501">Universe Provider Description</t>
+			
 			<t id="1000">Universe Provider</t>
-            <t id="1010">Start Trader</t>
-            <t id="1011">Stop Trader</t>
-			<t id="2010">Start Miner</t>
-			<t id="2011">Stop Miner</t>
-			<t id="3010">Show Talents</t>
-			<t id="4010">Notes on</t>
-			<t id="4011">Notes off</t>
-			
-			<t id="4110">Trade</t>
-			<t id="4111">Buy station</t>
-			<t id="4112">Sell station</t>
-			<t id="4121">only {20204, 10027} (Stationtrader)</t>
-			<t id="4122">only known</t>
-			<t id="4123">all</t>
-			
+			<t id="1001">Mode</t>
+            <t id="1010">Trader</t>
+  
+  			<t id="2010">Prospectors</t>
 
+			<t id="3010">Show Talents</t>
+
+			<t id="4010">Send notes</t>
+			<t id="4012">On</t>
+			<t id="4013">Off</t>
+			<t id="4020">Start</t>
+			<t id="4021">Stop</t>
+			<t id="4110">Trade</t>
+			<t id="4111">Purchase Area</t>
+			<t id="4112">Sale Reserve</t>
+			<t id="4113">Mining Area</t>
+			<t id="4120">Stations Restriction</t>
+			<t id="4121">only {20204, 10027} Stations(Stationtrader)</t>
+			<t id="4122">only known Stations</t>
+			<t id="4123">none</t>
+
+			<t id="4130">Search restriction</t>
+			<t id="4131">only Strange stations</t>
+			<t id="4132">only Own stations</t>
+			<t id="4133">none</t>
+	
 			<t id="5000">Config</t>
 
 			<t id="5100">Account</t>
 			<t id="5111">Maximal</t>
 			<t id="5112">Minimal</t>
-			<t id="5120">0 Cr</t>
-			<t id="5121">100 Million</t>
-			<t id="5122">50 Million</t>
-			<t id="5123">10 Million</t>
-			<t id="5124">5 Million</t>
-			<t id="5125">1 Million</t>
-			<t id="5126">500 Tausend</t>
 			
 			<t id="5200">Range</t>
+			<t id="5201">Start zone</t>
 			<t id="5210">Change range</t>
-			<t id="5211">Max buyrange</t>
-			<t id="5212">Min buyrange</t>
-			<t id="5213">Max sellrange</t>
-			<t id="5214">Min sellrange</t>
-			<t id="5220">0 {20001,102}</t>
-			<t id="5221">1 {20001,101}</t>
-			<t id="5222">4 {20001,102}</t>
-			<t id="5223">8 {20001,102}</t>
-			<t id="5224">16 {20001,102}</t>
-			<t id="5225">24 {20001,102}</t>
+			<t id="5211">Max. buyrange</t>
+			<t id="5212">Min. buyrange</t>
+			<t id="5213">Max. sellrange</t>
+			<t id="5214">Min. sellrange</t>
 
 
 			<t id="5300">Behavior</t>			
 
 			<t id="10000">%1: '%2' unable to find any ware that can be collected by this ship in this cluster!</t>
+			<t id="10001">Try to free up some cargo space by dropping %1 %2</t>
 			
 			<t id="50000">%1: '%2' Trade '%3'  from '%4' \(available amount: %5 \) for '%6'\(%7Cr price per unit\).  Sell to '%8' \(wanted amount %9\) for '%10' \(%11Cr price per unit\)</t>
-            <t id="50100">%1: '%2' Transfer the half differences from my max Budget by %3 Cr.</t>
+            <t id="50100">%1: '%2' I transfer my surplus over %3 Cr.</t>
             <t id="50200">%1: '%2' I trained following skills %3 \(Stars:%4\).</t>
-			<t id="50210">arrangement talent:    '$WAITTIME$s'\n technical understand: '$SEARCHTIME$s'\n Charisma:                '$EXTRAFACTION$%'\n Courage:                      '$COURAGE$%'\n Efficiency:                       '$EFFICIENCY$'.</t>
+			<t id="50210">arrangement talent:    '%ss'\n technical understand: '%ss'\n Charisma:                '%s%%'\n Courage:                      '%s%%'\n Efficiency:                       '%s%%'.</t>
 			<t id="50211">Range: $RANGE$ \('$HOME$'\) \n Max Budget: $MAXBUDGET$ Cr</t>
 			<t id="50300">I found a deal. I want to buy ware '$TRADEWARE$  \($WAREPRICEMIN$ Cr - $WAREPRICEMAX$ Cr\)'    Volume: '$TRADEWAREVOLUME$'.\n Buy price '$WAREPRICESELLOFFER$ Cr' Sell Price '$WAREPRICEBUYOFFER$ Cr'</t>
 			<t id="50301">'$TRADESOURCE$ \(max: $TRADESOURCEAMOUNT$\)' with\n '$TRADEDESTINATION$  \(max: '$TRADEDESTAMOUNT$'\)</t>
@@ -84,6 +86,20 @@
 			
 			<t id="50400">$SHIP$\n I'm successfully make a Deal.\n Ware: $WARE$\n buyed amount: $AMOUNTBUY$  Buy price: $PRICEBUY$ Cr\nSellamount: $AMOUNTSELL$  Selled price: $PRICESELL$ Cr \n Profit: $PROFIT$ Cr</t>
 			<t id="50500">Congratulations.\nI was able to negotiate a permanent contract with the following station:\n"$STATION$"\nThey are now regularly sent to us the trade data.</t>
+			
+			<t id="55000">Choose the zone in which to start trading search</t>
+			<t id="55001">Choose the mode how far to go commercial search</t>
+			<t id="55002">Choose the number of allowed jumps from system to system</t>
+			<t id="55003">Choose between traders and prospectors</t>
+			<t id="55004">Select whether the messages are sent to the logbook</t>
+			<t id="55005">Select the restriction to which the station is to be allowed</t>
+			<t id="55006">Select the restriction to which the station is to be allowed</t>
+
+			<t id="100000">Uninstall</t>
+			<t id="100001">Uninstall successfully completed. Disable the mod in the main menu now!</t>
+			<t id="100010">Installation</t>
+			<t id="100011">Successfully completed installation. Now you can buy the mechanic trading software MK 4!</t>
+
         </page>
     </add>
 </diff>

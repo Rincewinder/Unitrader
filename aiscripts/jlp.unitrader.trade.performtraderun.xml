@@ -15,64 +15,9 @@
 		<param name="debugchance2" default="0" />
 	</params>
 	<init>
-		<set_command_action commandaction="commandaction.searchingtrades" />
+		<!-- Main action for waiting times -->
+		<set_command_action commandaction="commandaction.flying" />
 	</init>
-	<patch sinceversion="1">
-		<set_value name="$simple" exact="null" />
-	</patch>
-	<patch sinceversion="2">
-		<do_if value="$buyoffer.exists">
-			<set_value name="$buyer" exact="$buyoffer.buyer" />
-		</do_if>
-	</patch>
-	<patch sinceversion="3">
-		<set_value name="$lasttrade" exact="[@$isbuyoffer, @$tradeware, @$targetobject]" />
-	</patch>
-	<patch sinceversion="4">
-		<!-- all reservations have been wiped as of 4.0, restore reservations we need, but only for L or XL
-			ships, since smaller traders didn't do reservations before -->
-		<do_if value="this.ship.isclass.ship_xl or this.ship.isclass.ship_l">
-			<debug_text
-				text="'try to restore reservations for %1(%2)\n  $isbuyoffer? = %3\n  $tradeoffer.exists = %4\n  $amount = %5\n  $targetobject.isoperational = %6\n  $tradeware = %7\n  $reservation_removed? = %8'.[this.name, this, $isbuyoffer?, $tradeoffer.exists, $amount, $targetobject.isoperational, $tradeware, $reservation_removed?]"
-				chance="$debugchance" />
-			<do_if value="$isbuyoffer? and $amount gt 0 and $targetobject.isoperational and $tradeware">
-				<do_if value="not $tradeoffer.exists">
-					<do_if value="$isbuyoffer">
-						<find_buy_offer result="$tradeoffer" buyer="$targetobject" wares="$tradeware"
-							tradepartner="this.ship" />
-					</do_if>
-					<do_else>
-						<find_sell_offer result="$tradeoffer" seller="$targetobject" wares="$tradeware"
-							tradepartner="this.ship" />
-					</do_else>
-				</do_if>
-				<do_if value="$tradeoffer.exists">
-					<set_value name="$reserve_amount" exact="[$amount, $tradeoffer.amount].min" />
-					<do_if value="$reserve_amount gt 0">
-						<do_if value="$isbuyoffer">
-							<debug_text
-								text="'restore sell reservation for %1 %2(virtual: %3) at %4(%5) by %6(%7)'.[$reserve_amount, $tradeware, $tradeoffer.unbundle, $targetobject.knownname, $targetobject, this.knownname, this]"
-								chance="$debugchance" />
-							<add_ware_reservation object="$targetobject" type="sell" entity="this"
-								ware="$tradeware" amount="$reserve_amount" virtual="@$tradeoffer.unbundle" />
-						</do_if>
-						<do_elseif value="not $reservation_removed? and $reserve_amount gt 0">
-							<debug_text
-								text="'restore buy reservation for %1 %2(virtual: %3) at %4(%5) by %6(%7)'.[$reserve_amount, $tradeware, $tradeoffer.rebundle, $targetobject.knownname, $targetobject, this.knownname, this]"
-								chance="$debugchance" />
-							<add_ware_reservation object="$targetobject" type="buy" entity="this"
-								ware="$tradeware" amount="$reserve_amount" virtual="@$tradeoffer.rebundle" />
-						</do_elseif>
-					</do_if>
-					<remove_value name="$reserve_amount" />
-				</do_if>
-			</do_if>
-		</do_if>
-		<do_else>
-			<debug_text text="'skip restoring reservations for %1(%2) - not L or XL trader'.[this.name, this]"
-				chance="$debugchance" />
-		</do_else>
-	</patch>
 	<attention min="unknown">
 		<actions>
 			<!-- debugging -->
@@ -318,7 +263,7 @@
 			</do_if>
 
 			<set_command command="command.trade" param="$targetobject" />
-			<set_value name="this.$trade_failedfindruns" exact="0" />
+<!--			<set_value name="this.$trade_failedfindruns" exact="0" /> -->
 			<label name="move to target object" />
 			<do_if value="this.zone != $targetobject.zone">
 				<run_script name="'move.generic'">

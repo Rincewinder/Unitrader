@@ -28,7 +28,7 @@
         <!-- If player clear the shopping list -->
         <debug_text text="'clearing reservation'" chance="$debugoutputchance" />
         <get_trade_from_shoppinglist object="this.ship" multiple="true" result="$shoppinglist" />
-
+		
         <do_all exact="$shoppinglist.count" counter="$i" reverse="true">
           <do_if value="@$shoppinglist.{$i}.buyer.isoperational and @$shoppinglist.{$i}.seller.isoperational">
             <debug_text text="'skipping trade: ' + $shoppinglist.{$i} + ' as both buyer and seller are valid and the trade is in progress.'" />

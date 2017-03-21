@@ -1,152 +1,331 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
-<aiscript name="jlp.unitrader.trading" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="1"
+<aiscript name="jlp.unitrader.main" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="2"
 >
 	<params>
 		<param name="PageId" default="8570" />
-		<param name="maxBudget" default="100000000ct" />
-		<param name="range" default="'ranged'" />
-		<param name="homeStart" default="this.ship.zone" />
+		<param name="Mode" default="'trader'" />
 	</params>
 	<interrupts>
 		<handler ref="JLPUnitraderTargetInvalidHandler" />
 		<handler ref="JLPUnitraderShipOwnedAttackedHandler" />
 		<handler ref="JLPUnitraderScannedHandler" />
+		<handler comment="handler kept local since it modifies a value local to this script">
+			<conditions>
+				<event_object_signalled object="this" param="'range_setting_updated'" />
+			</conditions>
+			<actions>
+				<!-- <do_if value="@event.param2">
+					<set_value name="$range" exact="event.param2" />
+					</do_if>
+					<do_elseif value="@this.ship.commanderentity.$config_subordinate_range">
+					<set_value name="$range" exact="this.ship.commanderentity.$config_subordinate_range" />
+					</do_elseif>
+					<do_if value="not @$range.isclass.space">
+					<do_if value="$range" exact="'zone'">
+					<set_value name="$range" exact="$home.zone" />
+					</do_if>
+					<do_elseif value="$range" exact="'sector'">
+					<set_value name="$range" exact="$home.sector" />
+					</do_elseif>
+					<do_elseif value="$range" exact="'cluster'">
+					<set_value name="$range" exact="$home.cluster" />
+					</do_elseif>
+					<do_else>
+					<do_if
+					value="(@this.ship.commander.maxradarrange gt 30km) and (this.ship.isclass.ship_l or this.ship.isclass.ship_xl)"
+					>
+					<set_value name="$range" exact="$home.cluster" />
+					</do_if>
+					<do_else>
+					<set_value name="$range" exact="$home.sector" />
+					</do_else>
+					</do_else>
+					</do_if>
+					<debug_text
+					text="'updated operational range for %1(%2) to %3(%4)'.[this.ship.knownname, this.ship, $range.knownname,
+					$range]"
+					chance="$debugchance" />
+				-->
+			</actions>
+		</handler>
+
 	</interrupts>
+
+	<init>
+		<set_command_action commandaction="commandaction.standingby" />
+	</init>
 	<attention min="unknown">
 		<actions>
+
 			<!-- trade loop start -->
 			<label name="start" />
+			<do_if value="@this.$jlpUniTraderRun">
+				<set_value name="$Mode" exact="'trader'" />
+			</do_if>
+			<do_elseif value="@this.$jlpUniMiningRun">
+				<set_value name="$Mode" exact="'miner'" />
+			</do_elseif>
+
 			<wait chance="0" exact="0s" /> <!-- Reset script if new -->
 
-			<do_if value="@this.$jlpUniTraderRun" exact="true">
-				<!-- initial -->
-
+			<do_if value="@this.$jlpUniTraderRun or @this.$jlpUniMiningRun" exact="true">
 				<run_script name="'jlp.unitrader.skills'" sinceversion="1">
 					<param name="Mode" value="'init'" />
 				</run_script>
 
 				<!-- ############## read from config ###################### -->
-				<do_if value="typeof @this.$jlp_unitrader_budgetmax == datatype.money">
+				<do_if value="typeof @this.$jlp_unitrader_budgetmin" exact="datatype.money">
+					<set_value name="$maxBudget" exact="this.$jlp_unitrader_budgetmin" />
+				</do_if>
+				<do_else>
+					<do_if value="$Mode" exact="'miner'">
+						<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl">
+							<set_value name="$minBudget" exact="5000000ct" />
+						</do_if>
+						<do_else>
+							<set_value name="$minBudget" exact="500000ct" />
+						</do_else>
+					</do_if>
+					<do_else>
+						<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl">
+							<set_value name="$minBudget" exact="1000000000ct" />
+						</do_if>
+						<do_else>
+							<set_value name="$minBudget" exact="100000000ct" />
+						</do_else>
+
+					</do_else>
+					<set_value name="this.$jlp_unitrader_budgetmin" exact="$minBudget" />
+				</do_else>
+				<do_if value="typeof @this.$jlp_unitrader_budgetmax" exact="datatype.money">
 					<set_value name="$maxBudget" exact="this.$jlp_unitrader_budgetmax" />
 				</do_if>
 				<do_else>
-					<do_if value="typeof $maxBudget != datatype.money">
+					<do_if value="$Mode" exact="'miner'">
+						<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl">
+							<set_value name="$maxBudget" exact="5000000ct" />
+						</do_if>
+						<do_else>
+							<set_value name="$maxBudget" exact="500000ct" />
+						</do_else>
+					</do_if>
+					<do_else>
 						<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl">
 							<set_value name="$maxBudget" exact="1000000000ct" />
 						</do_if>
 						<do_else>
 							<set_value name="$maxBudget" exact="100000000ct" />
 						</do_else>
-						<set_value name="this.$jlp_unitrader_budgetmax" exact="$maxBudget" />
-					</do_if>
+
+					</do_else>
+					<set_value name="this.$jlp_unitrader_budgetmax" exact="$maxBudget" />
 				</do_else>
-				<!-- Range -->
-				<do_if value="@this.$jlp_unitrader_range != null">
-					<set_value name="$range" exact="this.$jlp_unitrader_range" />
+				<!-- ############################# Range ################################## -->
+				<do_if value="@this.$jlp_unitrader_range_buy != null">
+					<set_value name="$rangeBuy" exact="this.$jlp_unitrader_range_buy" />
 				</do_if>
 				<do_else>
-					<do_if value="$range == null">
-						<set_value name="$range" exact="'ranged'" />
-					</do_if>
-					<set_value name="this.$jlp_unitrader_range" exact="$range" />
+					<set_value name="$rangeBuy" exact="'ranged'" />
+					<set_value name="this.$jlp_unitrader_range_buy" exact="$rangeBuy" />
 				</do_else>
-				<do_if value="@this.$jlp_unitrader_home != null">
-					<set_value name="$homeStart" exact="this.$jlp_unitrader_home" />
+				<do_if value="@this.$jlp_unitrader_range_sell != null">
+					<set_value name="$rangeSell" exact="this.$jlp_unitrader_range_sell" />
 				</do_if>
 				<do_else>
-					<do_if value="$homeStart == null">
-						<set_value name="$homeStart" exact="this.ship.zone" />
-					</do_if>
-					<set_value name="this.$jlp_unitrader_home" exact="$homeStart" />
+					<set_value name="$rangeSell" exact="'ranged'" />
+					<set_value name="this.$jlp_unitrader_range_sell" exact="$rangeSell" />
 				</do_else>
-				<do_if value="$range == 'ranged'">
+				<!-- ################################# Home ############################## -->
+				<do_if value="@this.$jlp_unitrader_home_buy != null and @this.$jlp_unitrader_home_buy.exists and @this.$jlp_unitrader_home_buy.isclass.zone">
+					<set_value name="$homeBuy" exact="this.$jlp_unitrader_home_buy" />
+				</do_if>
+				<do_else>
+					<set_value name="$homeBuy" exact="this.ship.zone" />
+					<set_value name="this.$jlp_unitrader_home_buy" exact="$homeBuy" />
+				</do_else>
+				<do_if value="@this.$jlp_unitrader_home_sell != null and @this.$jlp_unitrader_home_sell.exists and @this.$jlp_unitrader_home_sell.isclass.zone">
+					<set_value name="$homeSell" exact="this.$jlp_unitrader_home_sell" />
+				</do_if>
+				<do_else>
+					<set_value name="$homeSell" exact="this.ship.zone" />
+					<set_value name="this.$jlp_unitrader_home_sell" exact="$homeSell" />
+				</do_else>
+				<!-- ################################# Range Home ############################## -->
+				<do_if value="$rangeBuy == 'ranged'">
 					<!-- Jump -->
-					<do_if value="typeof @this.$jlp_unitrader_jump_buy_min == datatype.integer">
+					<do_if value="typeof @this.$jlp_unitrader_jump_buy_min" exact="datatype.integer">
 						<set_value name="$minbuy" exact="this.$jlp_unitrader_jump_buy_min" />
 					</do_if>
 					<do_else>
 						<set_value name="this.$jlp_unitrader_jump_buy_min" exact="0" />
 						<set_value name="$minbuy" exact="this.$jlp_unitrader_jump_buy_min" />
 					</do_else>
-					<do_if value="typeof @this.$jlp_unitrader_jump_buy_max == datatype.integer">
-						<set_value name="$maxbuy"
-							exact="this.$jlp_unitrader_jump_buy_max * this.$jlp_unitrader_courage/100i" />
+					<do_if value="typeof @this.$jlp_unitrader_jump_buy_max" exact="datatype.integer">
+						<set_value name="$maxbuy" exact="this.$jlp_unitrader_jump_buy_max" />
 					</do_if>
 					<do_else>
-						<set_value name="this.$jlp_unitrader_jump_buy_max" exact="8" />
-						<set_value name="$maxbuy"
-							exact="this.$jlp_unitrader_jump_buy_max * this.$jlp_unitrader_courage/100i" />
+						<set_value name="this.$jlp_unitrader_jump_buy_max" exact="24" />
+						<set_value name="$maxbuy" exact="this.$jlp_unitrader_jump_buy_max" />
 					</do_else>
-					<do_if value="typeof @this.$jlp_unitrader_jump_sell_min == datatype.integer">
+				</do_if>
+				<do_else>
+					<set_value name="$minbuy" exact="null" />
+					<set_value name="$maxbuy" exact="null" />
+				</do_else>
+				<do_if value="$rangeSell == 'ranged'">
+					<do_if value="typeof @this.$jlp_unitrader_jump_sell_min" exact="datatype.integer">
 						<set_value name="$minsell" exact="this.$jlp_unitrader_jump_sell_min" />
 					</do_if>
 					<do_else>
 						<set_value name="this.$jlp_unitrader_jump_sell_min" exact="0" />
 						<set_value name="$minsell" exact="this.$jlp_unitrader_jump_sell_min" />
 					</do_else>
-					<do_if value="typeof @this.$jlp_unitrader_jump_sell_max == datatype.integer">
-						<set_value name="$maxsell"
-							exact="this.$jlp_unitrader_jump_sell_max * this.$jlp_unitrader_courage/100i" />
+					<do_if value="typeof @this.$jlp_unitrader_jump_sell_max" exact="datatype.integer">
+						<set_value name="$maxsell" exact="this.$jlp_unitrader_jump_sell_max" />
 					</do_if>
 					<do_else>
-						<set_value name="this.$jlp_unitrader_jump_sell_max" exact="8" />
-						<set_value name="$maxsell"
-							exact="this.$jlp_unitrader_jump_sell_max * this.$jlp_unitrader_courage/100i" />
+						<set_value name="this.$jlp_unitrader_jump_sell_max" exact="24" />
+						<set_value name="$maxsell" exact="this.$jlp_unitrader_jump_sell_max" />
 					</do_else>
 				</do_if>
 				<do_else>
-					<remove_value name="this.$jlp_unitrader_jump_sell_max" />
-					<remove_value name="this.$jlp_unitrader_jump_sell_min" />
-					<remove_value name="this.$jlp_unitrader_jump_buy_max" />
-					<remove_value name="this.$jlp_unitrader_jump_buy_min" />
+					<set_value name="$minsell" exact="null" />
+					<set_value name="$maxsell" exact="null" />
 				</do_else>
 				<!-- Set parameters -->
-				<set_actor_min_budget actor="this" amount="0ct" />
-				<set_actor_max_budget actor="this" amount="$maxBudget*10ct" />
-
+				<!-- <set_actor_min_budget actor="this" amount="0ct" />
+					<set_actor_max_budget actor="this" amount="$maxBudget*10ct" />
+				-->
 
 				<!--<set_actor_max_budget actor="this" amount="$MaxBudget"/> -->
-				<!-- check maxbudget and give the 20% of maxbudget to player -->
+				<!-- check maxbudget and to keep 50% of maxbudget to myself -->
 				<do_if value="this.money" min="$maxBudget">
-					<set_value name="$transferMoney" exact="$maxBudget / 2" />
+					<set_value name="$transferMoney" exact="this.money - $maxBudget / 2" />
 					<wait min="4s" max="9s" />
 					<do_if value="$transferMoney" min="1">
 						<transfer_money from="this" to="player.entity" amount="$transferMoney" result="$result" />
 						<add_npc_line speaker="this" line="1164" comment="More Money as max, tranfer the rest" />
 						<write_to_logbook category="squad"
-							text="{8570,50100}.[this.ship.knownname, this.knownname, $transferMoney.formatted.default]" />
+							text="{8570,50100}.[this.ship.knownname, this.knownname, ($result*-1).formatted.default]" />
 						<wait min="4s" max="9s" />
 					</do_if>
 				</do_if>
-				<do_if value="$range == 'ranged'">
-					<run_script name="'jlp.unitrader.trade.ship.ranged'" sinceversion="1">
-						<param name="range" value="$range" />
-						<param name="home" value="$homeStart" />
+				<!-- ########################################## Trader start ########################################## -->
+				<do_if value="$Mode" exact="'trader'">
+					<run_script name="'jlp.unitrader.trade.ship.ranged'">
 						<param name="PageId" value="$PageId" />
+						<param name="homeBuy" value="$homeBuy" />
+						<param name="homeSell" value="$homeSell" />
+						<param name="rangeBuy" value="$rangeBuy" />
+						<param name="rangeSell" value="$rangeSell" />
 						<param name="minbuy" value="$minbuy" />
 						<param name="maxbuy" value="$maxbuy" />
 						<param name="minsell" value="$minsell" />
 						<param name="maxsell" value="$maxsell" />
 					</run_script>
 				</do_if>
+				<!-- ########################################## Miner start ########################################## -->
+				<do_elseif value="$Mode" exact="'miner'">
+					<!-- TODO: change to check ship tags instead of cargo, so we can deal
+						with count = 0 cases; needs adding of ?? -->
+					<create_list name="$orelist" />
+
+					<do_if value="this.ship.units.{unitcategory.gascollector}.count">
+
+						<set_value name="$ware" exact="ware.hydrogen" />
+						<do_if value="this.ship.cargo.{$ware}.max" min="1">
+							<append_to_list name="$orelist" exact="$ware" />
+						</do_if>
+
+						<set_value name="$ware" exact="ware.ions" />
+						<do_if value="this.ship.cargo.{$ware}.max" min="1">
+							<append_to_list name="$orelist" exact="$ware" />
+						</do_if>
+						<set_value name="$ware" exact="ware.plasma" />
+						<do_if value="this.ship.cargo.{$ware}.max" min="1">
+							<append_to_list name="$orelist" exact="$ware" />
+						</do_if>
+						<set_value name="$ware" exact="ware.plasma" />
+						<do_if value="this.ship.cargo.{$ware}.max" min="1">
+							<append_to_list name="$orelist" exact="$ware" />
+						</do_if>
+
+					</do_if>
+
+					<do_if value="this.ship.units.{unitcategory.orecollector}.count">
+						<set_value name="$ware" exact="ware.ore" />
+						<do_if value="this.ship.cargo.{$ware}.max" min="1">
+							<append_to_list name="$orelist" exact="$ware" />
+						</do_if>
+						<set_value name="$ware" exact="ware.silicon" />
+						<do_if value="this.ship.cargo.{$ware}.max" min="1">
+							<append_to_list name="$orelist" exact="$ware" />
+						</do_if>
+						<set_value name="$ware" exact="ware.crystals" />
+						<do_if value="this.ship.cargo.{$ware}.max" min="1">
+							<append_to_list name="$orelist" exact="$ware" />
+						</do_if>
+						<set_value name="$ware" exact="ware.nividium" />
+						<do_if value="this.ship.cargo.{$ware}.max" min="1">
+							<append_to_list name="$orelist" exact="$ware" />
+						</do_if>
+						<set_value name="$ware" exact="ware.ice" />
+						<do_if value="this.ship.cargo.{$ware}.max" min="1">
+							<append_to_list name="$orelist" exact="$ware" />
+						</do_if>
+					</do_if>
+					<do_if value="$orelist.count" min="1">
+
+						<run_script name="'jlp.unitrader.mining.ship.ranged'">
+							<param name="PageId" value="$PageId" />
+							<param name="basket" value="$orelist" />
+							<param name="collectZone" value="$homeBuy" />
+							<param name="homeSell" value="$homeSell" />
+							<param name="rangeCollect" value="$rangeBuy" />
+							<param name="rangeSell" value="$rangeSell" />
+							<param name="minCol" value="$minbuy" />
+							<param name="maxCol" value="$maxbuy" />
+							<param name="minSell" value="$minsell" />
+							<param name="maxSell" value="$maxsell" />
+						</run_script>
+					</do_if>
+					<do_else>
+						<set_value name="this.$jlpUniTraderRun" exact="false" />
+						<set_value name="this.$jlpUniMiningRun" exact="false" />
+						<run_script name="'move.undock'" />
+						<add_npc_line speaker="this" line="1058" comment="Ready for new orders, Sir." />
+					</do_else>
+
+				</do_elseif>
 				<do_else>
-					<run_script name="'jlp.unitrader.trade.ship.ranged'" sinceversion="1">
-						<param name="range" value="$range" />
-						<param name="home" value="$homeStart" />
-						<param name="PageId" value="$PageId" />
-					</run_script>
+					<set_value name="this.$jlpUniTraderRun" exact="false" />
+					<set_value name="this.$jlpUniMiningRun" exact="false" />
+					<run_script name="'move.undock'" />
+					<add_npc_line speaker="this" line="1058" comment="Ready for new orders, Sir." />
+					<return />
 				</do_else>
+
+				<!-- Take a break -->
+				<wait chance="0" />
+				<set_value name="$idletime" exact="this.$jlp_unitrader_waittime" />
+				<run_script name="'move.idle'" sinceversion="1">
+					<param name="TimeOut" value="$idletime" />
+				</run_script>
+
 
 				<resume label="start" />
 			</do_if>
 			<do_else>
-				<!-- Finished trade and follow player -->
+				<!-- Finished trade -->
+				<set_value name="this.$jlpUniTraderRun" exact="false" />
+				<set_value name="this.$jlpUniMiningRun" exact="false" />
 				<add_npc_line speaker="this" line="1058" comment="Ready for new orders, Sir." />
 			</do_else>
 		</actions>
 	</attention>
 	<on_abort>
-		<set_value name="this.$jlpUniTraderRun" exact="false" />
+		<remove_value name="this.$jlpUniTraderRun" />
+		<set_value name="this.$jlpUniMiningRun" />
 	</on_abort>
 </aiscript>

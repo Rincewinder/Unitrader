@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <macros>
-  <macro name="software_jlp_unitrader_trade_mk3_macro" class="software">
+  <macro name="software_jlp_unitrader_trade_mk4_macro" class="software">
     <component ref="generic_software" />
     <properties>
-      <identification name="{27041992,11}" description="{27041992,12}" unique="0" />
-      <software type="unitradermk3" />
+      <identification name="{8570,500}" description="{8570,501}" unique="0" />
+      <software type="unitradermk4" />
     </properties>
   </macro>
 </macros>

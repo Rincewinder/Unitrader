@@ -133,9 +133,7 @@
 				</do_if>
 				<!-- find out who has got the money -->
 				<set_value name="$accountholder" exact="this" />
-				<set_value name="$usecommandermoney" exact="false" />
 				<do_if value="this.ship.commander.exists">
-					<set_value name="$usecommandermoney" exact="true" />
 					<do_if value="this.ship.commander == player.primaryship">
 						<set_value name="$accountholder" exact="player.entity" />
 					</do_if>
@@ -143,6 +141,14 @@
 						<set_value name="$accountholder" exact="this.ship.commanderentity" />
 					</do_elseif>
 				</do_if>
+				<do_elseif value="this.ship.isplayerowned">
+					<do_if value="this.ship.commanderentity.exists">
+						<set_value name="$accountholder" exact="this.ship.commanderentity" />
+					</do_if>
+					<do_else>
+						<set_value name="$accountholder" exact="player.entity" />
+					</do_else>
+				</do_elseif>
 
 				<!-- check if whoever needs to pay can afford all of this -->
 				<do_if value="$tradeoffer.unitprice * $amount gt $accountholder.money">
@@ -155,16 +161,38 @@
 				<debug_text text="'%1 trying to buy %2 units of \'%3\'...'.[player.age, $amount, ware.fuelcells]"
 					chance="$debugchance" />
 
-				<do_if value="$usecommandermoney">
-					<execute_custom_trade buyer="this.ship" seller="$tradeoffer.seller" ware="$tradeoffer.ware"
-						amount="$amount" price="$tradeoffer.unitprice" usecommandermoney="true" result="$traderesult"
-						sinceversion="3" />
+				<do_if value="$accountholder == player.entity">
+					<!-- send notification that money is being used for re-fueling -->
+					<set_value name="$moneytext" exact="($tradeoffer.unitprice * $amount).formatted.default" />
+					<show_notification caption="{1015,34}" comment="Transferring funds for refueling"
+						sound="notification_generic"
+						details="[
+                                        [ null, this.ship.name, this.sector.name ],
+                                        [ ware.fuelcells.icon, ware.fuelcells.name, {1001,1202} + {1001,120}, null, null, $amount ],
+                                        [ null, {1001,2000}, {1001,1202} + {1001,120}, null, null, $moneytext + ' ' + {1001,101} ]
+                                      ]" />
+					<substitute_text text="$logtext" source="{1016,15}"
+						comment="Transferred $MONEY$ Cr to $ENTITY$ to buy $AMOUNT$ Fuel Cells.\nLocation: $SHIP$ in sector $SECTOR$"
+					>
+						<replace string="'$MONEY$'" with="$moneytext" />
+						<replace string="'$ENTITY$'" with="this.name" />
+						<replace string="'$AMOUNT$'" with="$amount" />
+						<replace string="'$SHIP$'" with="this.ship.name" />
+						<replace string="'$SECTOR$'" with="this.sector.name" />
+					</substitute_text>
+					<write_to_logbook category="upkeep" text="$logtext" />
+					<remove_value name="$logtext" />
+					<remove_value name="$moneytext" />
 				</do_if>
-				<do_else>
-					<execute_custom_trade buyer="this.ship" seller="$tradeoffer.seller" ware="$tradeoffer.ware"
-						amount="$amount" price="$tradeoffer.unitprice" usecommandermoney="false" result="$traderesult"
-						sinceversion="3" />
-				</do_else>
+
+				<execute_trade tradeoffer="$tradeoffer" tradepartner="this.ship" amount="$amount"
+					result="$traderesult" />
+<!--				<execute_trade tradeoffer="$tradeoffer" tradepartner="this.ship" amount="$amount"
+					result="$traderesult" chance="0" />
+				 <execute_custom_trade buyer="this.ship" seller="$tradeoffer.seller" ware="$tradeoffer.ware"
+					amount="$amount" price="$tradeoffer.unitprice" usecommandermoney="true" result="$traderesult"
+					sinceversion="3" />
+				-->
 				<do_if value="$traderesult" negate="true">
 					<set_value name="$failreason" exact="'ERR_EXECUTE_TRADE_FAILED'" />
 					<detach_from_masstraffic object="this.ship" wait="true" />
