@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<diff>
+  <add sel="/index/entry[@name='software_trading_computer_macro']" pos="after">
+    <entry name="software_jlp_unitrader_trade_mk4_macro" value="extensions\unitrader\assets\props\surfaceelements\macros\jlp_unitrader_trade_mk4_macro.xml"/>
+  </add>
+</diff>

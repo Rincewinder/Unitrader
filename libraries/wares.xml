@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<diff>
+  <add sel="/wares">
+    <ware id="upg_pla_software_jlp_unitrader_trade_mk4" name="{8570,500}" description="{8570,501}" transport="equipment" size="medium" volume="1">
+      <price min="170320000" average="180040000" max="190381000" />
+      <component ref="software_jlp_unitrader_trade_mk4_makro" amount="1" />
+    </ware>
+  </add>
+</diff>
