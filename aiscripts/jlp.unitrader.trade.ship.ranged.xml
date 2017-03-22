@@ -6,6 +6,8 @@
 		<param name="PageId" default="8570" />
 		<param name="homeBuy" default="@this.$jlp_unitrader_home_buy" />
 		<param name="homeSell" default="@this.$jlp_unitrader_home_sell" />
+		<param name="homeBuyFind" default="@this.$jlp_unitrader_home_buy_find" />
+		<param name="homeSellFind" default="@this.$jlp_unitrader_home_sell_find" />
 		<param name="rangeBuy" default="@this.$jlp_unitrader_range_buy" />
 		<param name="rangeSell" default="@this.$jlp_unitrader_range_sell" />
 		<param name="minbuy" default="null" />
@@ -76,33 +78,14 @@
 				<param name="PageId" value="$PageId" />
 				<param name="homeBuy" value="$homeBuy" />
 				<param name="homeSell" value="$homeSell" />
+				<param name="homeBuyFind" value="@this.$jlp_unitrader_home_buy_find" />
+				<param name="homeSellFind" value="@this.$jlp_unitrader_home_sell_find" />
 				<param name="rangeBuy" value="$rangeBuy" />
 				<param name="rangeSell" value="$rangeSell" />
 				<param name="warelist" value="$basket" />
 				<param name="additionalparams" value="[$minsell, $maxsell, $minbuy, $maxbuy]" />
 				<param name="debugchance" value="$debugchance" />
 			</run_script>
-			<!-- TODO: read from config -->
-			<!-- Switch home <-> sell -->
-			<do_if value="this.$trade_failedfindruns" min="11">
-				<set_value name="this.$trade_failedfindruns" exact="0" />
-			
-				<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 1000">
-					<run_script name="'jlp.unitrader.move.refuel'" />
-				</do_if>
-
-				<wait exact="this.$jlp_unitrader_searchtime" />
-				<run_script name="'jlp.unitrader.trade.ship.free'">
-					<param name="PageId" value="$PageId" />
-					<param name="homeBuy" value="$homeSell" />
-					<param name="homeSell" value="$homeBuy" />
-					<param name="rangeBuy" value="$rangeSell" />
-					<param name="rangeSell" value="$rangeBuy" />
-					<param name="warelist" value="$basket" />
-					<param name="additionalparams" value="[$minbuy, $maxbuy, $minsell, $maxsell]" />
-					<param name="debugchance" value="$debugchance" />
-				</run_script>
-			</do_if>
 
 			<!-- if we are still failing to sell our cargo after 10 failed attemps, dump some of it -->
 			<set_value name="$currentcargo" exact="this.ship.cargo.list" />
@@ -126,6 +109,46 @@
 						</do_all>
 					</do_if>
 				</do_all>
+			</do_if>
+			
+			<!-- if we are still nothing found, fly to another cluster if ranged -->
+			<do_if value="this.$trade_failedfindruns" min="10">
+				<do_if value="$rangeBuy" exact="'ranged'">
+					<do_if value="this.$traderange_buyclusters?">
+						<do_if value="this.$traderange_buyclusters.count" min="2">
+							<!--Go to a new cluster for a new chance -->
+							<set_value name="$currentCluster" exact="this.ship.cluster" />
+							<do_all exact="this.$traderange_buyclusters.count" counter="$Counter">
+								<set_value name="$newCluster" exact="this.$traderange_buyclusters.{$Counter}" />
+								<do_if value="$newCluster" exact="$currentCluster">
+									<continue />
+								</do_if>
+								<do_else>
+									<debug_text text="'No trade was found. Flying back to random buy range cluster.'"
+										chance="$debugchance" />
+									<get_jump_cost ship="this.ship" start="this.ship.sector" end="$newCluster.random"
+										result="$trip" />
+									<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 100">
+										<run_script name="'jlp.unitrader.move.refuel'" />
+									</do_if>
+									<run_script name="'move.generic'" sinceversion="2">
+										<param name="destination" value="$newCluster.random" />
+										<param name="endintargetzone" value="true" />
+									</run_script>
+									<set_known object="this.ship.cluster" known="true" />
+									<wait exact="1s" />
+									<set_known object="this.ship.sector" known="true" />
+									<wait exact="1s" />
+									<set_known object="this.ship.zone" known="true" />
+									<wait exact="1s" />
+									<break />
+								</do_else>
+							</do_all>
+						</do_if>
+					</do_if>
+				</do_if>
+				<!--No good trade find able. return the script and go from the start -->
+				<return />
 			</do_if>
 
 		</actions>

@@ -8,6 +8,8 @@
 		<param name="homeSell" default="@this.$jlp_unitrader_home_sell" />
 		<param name="rangeBuy" default="@this.$jlp_unitrader_range_buy" />
 		<param name="rangeSell" default="@this.$jlp_unitrader_range_sell" />
+		<param name="homeBuyFind" default="@this.$jlp_unitrader_home_buy_find" />
+		<param name="homeSellFind" default="@this.$jlp_unitrader_home_sell_find" />
 		<param name="sellrange" default="null"
 			comment="list: [$mingates, $maxgates] amount of jumpgates from rangeSell the ship can sell wares (null == only sell in $homeSell)" />
 		<param name="buyrange" default="null"
@@ -557,14 +559,14 @@
 
 						<!-- Check Restriction from config -->
 						<do_if
-							value="@this.$jlp_unitrader_home_buy_find and @this.$jlp_unitrader_home_buy_find != 'allTrader'"
+							value="$homeBuyFind and $homeBuyFind != 'allTrader'"
 						>
-							<do_if value="@this.$jlp_unitrader_home_buy_find == 'onlyForeignTrader'">
+							<do_if value="$homeBuyFind == 'onlyForeignTrader'">
 								<do_if value="$selloffers.{$Counter}.owner.isplayerowned" negate="true">
 									<set_value name="$offerAdd" exact="true" />
 								</do_if>
 							</do_if>
-							<do_elseif value="@this.$jlp_unitrader_home_buy_find == 'onlySelfTrader'">
+							<do_elseif value="$homeBuyFind == 'onlySelfTrader'">
 								<do_if value="$selloffers.{$Counter}.owner.isplayerowned">
 									<set_value name="$offerAdd" exact="true" />
 								</do_if>
@@ -784,14 +786,14 @@
 
 									<!-- Check Restriction from config -->
 									<do_if
-										value="@this.$jlp_unitrader_home_sell_find  and @this.$jlp_unitrader_home_sell_find != 'allTrader'"
+										value="$homeSellFind  and $homeSellFind != 'allTrader'"
 									>
-										<do_if value="@this.$jlp_unitrader_home_sell_find == 'onlyForeignTrader'">
+										<do_if value="$homeSellFind == 'onlyForeignTrader'">
 											<do_if value="$buyoffers.{$Counter2}.owner.isplayerowned" negate="true">
 												<set_value name="$offerAdd" exact="true" />
 											</do_if>
 										</do_if>
-										<do_elseif value="@this.$jlp_unitrader_home_sell_find == 'onlySelfTrader'">
+										<do_elseif value="$homeSellFind == 'onlySelfTrader'">
 											<do_if value="$buyoffers.{$Counter2}.owner.isplayerowned">
 												<set_value name="$offerAdd" exact="true" />
 											</do_if>
@@ -993,14 +995,14 @@
 
 								<!-- Check Restriction from config -->
 								<do_if
-									value="@this.$jlp_unitrader_home_sell_find and @this.$jlp_unitrader_home_sell_find != 'allTrader'"
+									value="$homeSellFind and $homeSellFind != 'allTrader'"
 								>
-									<do_if value="@this.$jlp_unitrader_home_sell_find == 'onlyForeignTrader'">
+									<do_if value="$homeSellFind == 'onlyForeignTrader'">
 										<do_if value="$buyoffers.{$Counter}.owner.isplayerowned" negate="true">
 											<set_value name="$offerAdd" exact="true" />
 										</do_if>
 									</do_if>
-									<do_elseif value="@this.$jlp_unitrader_home_sell_find == 'onlySelfTrader'">
+									<do_elseif value="$homeSellFind == 'onlySelfTrader'">
 										<do_if value="$buyoffers.{$Counter}.owner.isplayerowned">
 											<set_value name="$offerAdd" exact="true" />
 										</do_if>

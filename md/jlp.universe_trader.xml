@@ -158,7 +158,7 @@
 					<set_value name="$Captain.$jlpUniTraderRun" exact="true" />
 					<set_value name="$Captain.$jlpUniMiningRun" exact="false" />
 
-
+					<set_actor_account actor="$Captain"/>
 					<start_script object="$Captain" name="'jlp.unitrader.main'">
 						<param name="PageId" value="8570i" />
 						<param name="Mode" value="'trader'" />
@@ -189,7 +189,7 @@
 					<set_value name="$Captain.$jlpUniTraderRun" exact="false" />
 					<set_value name="$Captain.$jlpUniMiningRun" exact="false" />
 					<add_npc_line speaker="$Captain" line="1058" comment="Ready for new orders, Sir." />
-					<start_script object="$Captain" name="'player.default'" />
+					<start_script object="$Captain" name="'jlp.interrupt.stoporder'" />
 					<add_conversation_view view="closeupdetailmonitor" />
 					<open_conversation_menu menu="jlp_unitrader_ConfigMenu" param="[0, 0, event.object]"
 						param2="$param2" />
@@ -208,6 +208,7 @@
 						comment="Affirmative. Our drones will start to collect." />
 					<set_value name="$Captain.$jlpUniMiningRun" exact="true" />
 					<set_value name="$Captain.$jlpUniTraderRun" exact="false" />
+					<set_actor_account actor="$Captain"/>
 					<start_script object="$Captain" name="'jlp.unitrader.main'">
 						<param name="PageId" value="8570i" />
 						<param name="Mode" value="'miner'" />
@@ -237,7 +238,7 @@
 					<set_value name="$Captain.$jlpUniMiningRun" exact="false" />
 					<set_value name="$Captain.$jlpUniTraderRun" exact="false" />
 					<add_npc_line speaker="$Captain" line="1058" comment="Ready for new orders, Sir." />
-					<start_script object="$Captain" name="'player.default'" />
+					<start_script object="$Captain" name="'jlp.interrupt.stoporder'" />
 					<add_conversation_view view="closeupdetailmonitor" />
 					<open_conversation_menu menu="jlp_unitrader_ConfigMenu" param="[0, 0, event.object]"
 						param2="$param2" />

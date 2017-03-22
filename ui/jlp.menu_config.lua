@@ -849,9 +849,9 @@ function menu.onUpdate()
 		if GetComponentData(menu.entity, "isdocked")  and GetComponentData(menu.entity, "isdocking")  then
 			menu.stopAllowed = false
 		end
-		Helper.updateCellText(menu.infotable,3,3, menu.buildInfoString())
-		menu.displayMenu(false)
+    menu.displayMenu(false)
 	end
+  Helper.updateCellText(menu.infotable,3,3, menu.buildInfoString())
 end
 
 function menu.onRowChanged(row, rowdata)

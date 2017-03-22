@@ -137,6 +137,7 @@
 					<set_value name="this.$jlp_unitrader_range_sell" exact="$rangeSell" />
 				</do_else>
 				<!-- ################################# Home ############################## -->
+				<!--  Startzone -->
 				<do_if value="@this.$jlp_unitrader_home_buy != null and @this.$jlp_unitrader_home_buy.exists and @this.$jlp_unitrader_home_buy.isclass.zone">
 					<set_value name="$homeBuy" exact="this.$jlp_unitrader_home_buy" />
 				</do_if>
@@ -150,6 +151,21 @@
 				<do_else>
 					<set_value name="$homeSell" exact="this.ship.zone" />
 					<set_value name="this.$jlp_unitrader_home_sell" exact="$homeSell" />
+				</do_else>
+				<!-- Station Ristriction -->
+				<do_if value="@this.$jlp_unitrader_home_buy_find != null and @this.$jlp_unitrader_home_buy_find != ''">
+					<set_value name="$homeBuyFind" exact="this.$jlp_unitrader_home_buy_find" />
+				</do_if>
+				<do_else>
+					<set_value name="$homeBuyFind" exact="'allTrader'" />
+					<set_value name="this.$jlp_unitrader_home_buy_find" exact="$homeBuyFind" />
+				</do_else>
+				<do_if value="@this.$jlp_unitrader_home_sell_find != null and @this.$jlp_unitrader_home_sell_find != ''">
+					<set_value name="$homeSellFind" exact="this.$jlp_unitrader_home_sell" />
+				</do_if>
+				<do_else>
+					<set_value name="$homeSellFind" exact="'allTrader'" />
+					<set_value name="this.$jlp_unitrader_home_sell_find" exact="$homeSellFind" />
 				</do_else>
 				<!-- ################################# Range Home ############################## -->
 				<do_if value="$rangeBuy == 'ranged'">
@@ -217,6 +233,8 @@
 						<param name="PageId" value="$PageId" />
 						<param name="homeBuy" value="$homeBuy" />
 						<param name="homeSell" value="$homeSell" />
+						<param name="homeBuyFind" value="$homeBuyFind" />
+						<param name="homeSellFind" value="$homeSellFind" />
 						<param name="rangeBuy" value="$rangeBuy" />
 						<param name="rangeSell" value="$rangeSell" />
 						<param name="minbuy" value="$minbuy" />

@@ -1,101 +1,116 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<aiscript name="jlp.interrupt.stoporder" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="1">
-  <!--  Interrupt handler to Stop a current order, of a player ship
-        Author: Adrian
-        Modified: JohnLukePicard
-  -->
-  <params>
-    <param name="prevcommand" default="null" />
-    <param name="debugoutputchance" default="0" />
-  </params>
-  <attention min="unknown">
-    <actions>
+<aiscript name="jlp.interrupt.stoporder" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="1"
+>
+	<!-- Interrupt handler to Stop a current order, of a player ship
+		Author: Adrian
+		Modified: JohnLukePicard
+	-->
+	<params>
+		<param name="prevcommand" default="null" />
+		<param name="debugoutputchance" default="0" />
+	</params>
+	<attention min="unknown">
+		<actions>
 
-      <!-- Clean all the actions -->
-      <set_value name="this.$ship_parking" exact="true" />
-      <set_value name="$movesafepos" exact="false" />
+			<!-- Clean all the actions -->
+			<set_value name="this.$ship_parking" exact="true" />
+			<set_value name="$movesafepos" exact="false" />
 
-      <cease_fire object="this.ship" />
-      <abort_jump object="this.ship" />
-      <remove_actor_account actor="this" transfer="true" />
-      <stop_moving object="this.ship" immediate="false" />
-      <set_to_default_flight_control_model object="this.ship" />
+			<cease_fire object="this.ship" />
+			<abort_jump object="this.ship" />
+			<remove_actor_account actor="this" transfer="true" />
+			<stop_moving object="this.ship" immediate="false" />
+			<set_to_default_flight_control_model object="this.ship" />
 
-      <!-- Catch every different command -->
-      <do_if value="$prevcommand" exact="command.freetrade">
-        <!-- <detach_from_masstraffic object="this.ship" /> -->
+			<!-- Catch every different command -->
+			<do_if value="$prevcommand" exact="command.freetrade">
+				<!-- <detach_from_masstraffic object="this.ship" /> -->
 
-        <!-- If player clear the shopping list -->
-        <debug_text text="'clearing reservation'" chance="$debugoutputchance" />
-        <get_trade_from_shoppinglist object="this.ship" multiple="true" result="$shoppinglist" />
-		
-        <do_all exact="$shoppinglist.count" counter="$i" reverse="true">
-          <do_if value="@$shoppinglist.{$i}.buyer.isoperational and @$shoppinglist.{$i}.seller.isoperational">
-            <debug_text text="'skipping trade: ' + $shoppinglist.{$i} + ' as both buyer and seller are valid and the trade is in progress.'" />
-          </do_if>
-          <do_else>
-            <!-- we need to clean up our ware reservations -->
-            <do_if value="@$shoppinglist.{$i}.buyer.isoperational">
-              <remove_ware_reservation object="$shoppinglist.{$i}.buyer" ware="$shoppinglist.{$i}.ware" amount="$shoppinglist.{$i}.amount" mission="$shoppinglist.{$i}.ismission"/>
-            </do_if>
-            <do_elseif value="@$shoppinglist.{$i}.seller.isoperational">
-              <remove_ware_reservation object="$shoppinglist.{$i}.seller" ware="$shoppinglist.{$i}.ware" amount="$shoppinglist.{$i}.amount" mission="$shoppinglist.{$i}.ismission"/>
-            </do_elseif>
-            <remove_trade_order object="this.ship" trade="$shoppinglist.{$i}" />
-          </do_else>
-        </do_all>
-		<remove_ware_reservation object="this" />
-		<!-- TODO what we do with $currentoffer.seller.tradenpc.$reservedtrades?  -->
-        <debug_text text="'is trading'" chance="$debugoutputchance" />
-        <set_value name="$movesafepos" exact="true" />
+				<!-- If player clear the shopping list -->
+				<debug_text text="'clearing reservation'" chance="$debugoutputchance" />
+				<get_trade_from_shoppinglist object="this.ship" multiple="true"
+					result="$shoppinglist" />
 
-      </do_if>
-      <do_elseif value="$prevcommand"  exact="command.freemining">
+				<do_all exact="$shoppinglist.count" counter="$i" reverse="true">
+					<do_if value="@$shoppinglist.{$i}.buyer.isoperational and @$shoppinglist.{$i}.seller.isoperational">
+						<debug_text
+							text="'skipping trade: ' + $shoppinglist.{$i} + ' as both buyer and seller are valid and the trade is in progress.'" />
+					</do_if>
+					<do_else>
+						<!-- we need to clean up our ware reservations -->
+						<do_if value="@$shoppinglist.{$i}.buyer.isoperational">
+							<remove_ware_reservation object="$shoppinglist.{$i}.buyer" ware="$shoppinglist.{$i}.ware"
+								amount="$shoppinglist.{$i}.amount" mission="$shoppinglist.{$i}.ismission" />
+						</do_if>
+						<do_elseif value="@$shoppinglist.{$i}.seller.isoperational">
+							<remove_ware_reservation object="$shoppinglist.{$i}.seller" ware="$shoppinglist.{$i}.ware"
+								amount="$shoppinglist.{$i}.amount" mission="$shoppinglist.{$i}.ismission" />
+						</do_elseif>
+						<remove_trade_order object="this.ship" trade="$shoppinglist.{$i}" />
+					</do_else>
+				</do_all>
+				<remove_ware_reservation object="this" />
+				<!-- TODO what we do with $currentoffer.seller.tradenpc.$reservedtrades? -->
+				<debug_text text="'is trading'" chance="$debugoutputchance" />
+				<set_value name="$movesafepos" exact="true" />
 
-        <debug_text text="'was minning'" chance="$debugoutputchance" />
-        
-        <set_value name="$drones" exact="this.ship.subordinates" />
-        <do_all exact="$drones.count" counter="$i">
-          <start_script name="'move.dockat.drone'" object="$drones.{$i}.pilot">
-            <param name="destination" value="this.ship" />
-          </start_script>
-        </do_all>
-        
-      </do_elseif>
-      <do_elseif value="$prevcommand"  exact="command.refuel">
-        <set_value name="$movesafepos" exact="true" />
-      </do_elseif>
-      <do_elseif value="$prevcommand"  exact="command.dockat">
-        <set_value name="$movesafepos" exact="true" />
-      </do_elseif>
+			</do_if>
+			<do_elseif value="$prevcommand" exact="command.freemining">
 
-      <!-- Move to a safe position -->
-      <do_if value="$movesafepos">     
-        <get_safe_pos object="this.ship" zone="this.ship.zone" radius="this.ship.size" result="$safepos" directionobject="this.ship" direction="quadrant.front" angle="45deg" ignored="this.ship" />
+				<debug_text text="'was minning'" chance="$debugoutputchance" />
 
-        <move_to object="this.ship" destination="this.zone" finishonapproach="true" usehighways="false" forceposition="false" sinceversion="1">
-          <position value="$safepos" />
-          <interrupt_after_time time="30s" />
-        </move_to>
-      </do_if>
+				<set_value name="$drones" exact="this.ship.subordinates" />
+				<do_all exact="$drones.count" counter="$i">
+					<start_script name="'move.dockat.drone'" object="$drones.{$i}.pilot">
+						<param name="destination" value="this.ship" />
+					</start_script>
+				</do_all>
 
-      <!-- Remove blackboard variable to check if is in the middle of parking -->
-      <remove_value name="this.$ship_parking" />
-      <remove_value name="this.$trade_failedfindruns" />
-      <remove_value name="this.$jlp_unitrader_waittime" />
-      <remove_value name="this.$jlp_unitrader_searchtime" />
-      <remove_value name="this.$jlp_unitrader_extrafaction" />
-      <remove_value name="this.$jlp_unitrader_courage" />
-      <remove_value name="this.$jlp_unitrader_efficiency" />
-      <remove_value name="this.$traderange_buyclusters" />
-      <remove_value name="this.$traderange_sellclusters" />
+			</do_elseif>
+			<do_elseif value="$prevcommand" exact="command.refuel">
+				<set_value name="$movesafepos" exact="true" />
+			</do_elseif>
+			<do_elseif value="$prevcommand" exact="command.dockat">
+				<set_value name="$movesafepos" exact="true" />
+			</do_elseif>
 
-    </actions>
-  </attention>
-  <on_abort>
-    <!-- Remove blackboard variable to check if is in the middle of parking -->
-    <remove_value name="this.$ship_parking" />
-  </on_abort>
+			<!-- Move to a safe position -->
+			<do_if value="$movesafepos">
+				<get_safe_pos object="this.ship" zone="this.ship.zone" radius="this.ship.size"
+					result="$safepos" directionobject="this.ship" direction="quadrant.front" angle="45deg" ignored="this.ship" />
+
+				<move_to object="this.ship" destination="this.zone" finishonapproach="true" usehighways="false"
+					forceposition="false" sinceversion="1"
+				>
+					<position value="$safepos" />
+					<interrupt_after_time time="30s" />
+				</move_to>
+			</do_if>
+
+			<!-- Remove blackboard variable to check if is in the middle of parking -->
+			<remove_value name="this.$ship_parking" />
+			<remove_value name="this.$trade_failedfindruns" />
+			<remove_value name="this.$jlp_unitrader_waittime" />
+			<remove_value name="this.$jlp_unitrader_searchtime" />
+			<remove_value name="this.$jlp_unitrader_extrafaction" />
+			<remove_value name="this.$jlp_unitrader_courage" />
+			<remove_value name="this.$jlp_unitrader_efficiency" />
+			<remove_value name="this.$traderange_buyclusters" />
+			<remove_value name="this.$traderange_sellclusters" />
+			<remove_value name="this.$jlp_unitrader_currentbuyoffer" />
+			<remove_value name="this.$jlp_unitrader_currentselloffer" />
+			<remove_value name="this.$jlpUniTraderRun" />
+			<remove_value name="this.$jlpUniMiningRun" />
+
+			<!-- <start_script object="this" name="'player.default'" />
+			-->
+		</actions>
+	</attention>
+	<on_abort>
+		<!-- Remove blackboard variable to check if is in the middle of parking -->
+		<remove_value name="this.$ship_parking" />
+	</on_abort>
 
 
 
