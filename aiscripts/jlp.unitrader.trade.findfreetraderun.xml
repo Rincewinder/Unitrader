@@ -40,6 +40,28 @@
 			<do_if value="@this.$jlpUniTraderRun" exact="false">
 				<resume label="finish" />
 			</do_if>
+			<do_if value="$homeSell.exists" exact="false">
+				<substitute_text text="$notiDears" source="{8570,10}">
+					<replace string="'$ENTITYTYPE$'" with="this.typename" />
+					<replace string="'$ENTITYNAME$'" with="this.name" />
+					<replace string="'$OBJECTNAME$'" with="this.ship.name" />
+					<replace string="'$SECTOR$'" with="this.sector.name" />
+				</substitute_text>
+				
+				<write_to_logbook category="squad" text="'%1\n %2\n %3'.[$notiDears, 'no homesell given:',$homeSell.name]"/>
+				<resume label="finish" />
+			</do_if>
+			<do_if value="$homeBuy.exists" exact="false">
+				<substitute_text text="$notiDears" source="{8570,10}">
+					<replace string="'$ENTITYTYPE$'" with="this.typename" />
+					<replace string="'$ENTITYNAME$'" with="this.name" />
+					<replace string="'$OBJECTNAME$'" with="this.ship.name" />
+					<replace string="'$SECTOR$'" with="this.sector.name" />
+				</substitute_text>
+				
+				<write_to_logbook category="squad" text="'%1\n %2\n %3'.[$notiDears, 'no homebuy given:',$homeBuy.name]"/>
+				<resume label="finish" />
+			</do_if>
 
 			<set_value name="$currentcargo" exact="this.ship.cargo.list" />
 			<set_value name="$fuelindex" exact="$currentcargo.indexof.{ware.fuelcells}" />
@@ -90,7 +112,7 @@
 					<debug_text text="'using find_cluster to populate the blackboards list of clusters to sell to'"
 						chance="$debugchance2" />
 					<find_cluster name="this.$traderange_sellclusters" multiple="true" presentation="false">
-						<match_gate_distance object="$homeSell.cluster" min="$sellrange.{1}" max="$sellrange.{2}" />
+						<match_gate_distance object="$homeSell" min="$sellrange.{1}" max="$sellrange.{2}" />
 					</find_cluster>
 				</do_if>
 				<set_value name="$sellclusters" exact="this.$traderange_sellclusters.clone"
@@ -335,7 +357,7 @@
 					<debug_text text="'using find_cluster to populate the blackboards list of clusters to buy to'"
 						chance="$debugchance2" />
 					<find_cluster name="this.$traderange_buyclusters" multiple="true" presentation="false">
-						<match_gate_distance object="$homeBuy.cluster" min="$buyrange.{1}" max="$buyrange.{2}" />
+						<match_gate_distance object="$homeBuy" min="$buyrange.{1}" max="$buyrange.{2}" />
 
 					</find_cluster>
 				</do_if>
