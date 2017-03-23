@@ -76,7 +76,7 @@
 
 				<!-- ############## read from config ###################### -->
 				<do_if value="typeof @this.$jlp_unitrader_budgetmin" exact="datatype.money">
-					<set_value name="$maxBudget" exact="this.$jlp_unitrader_budgetmin" />
+					<set_value name="$minBudget" exact="this.$jlp_unitrader_budgetmin" />
 				</do_if>
 				<do_else>
 					<do_if value="$Mode" exact="'miner'">
