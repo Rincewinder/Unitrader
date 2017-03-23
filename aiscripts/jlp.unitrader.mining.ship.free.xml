@@ -790,8 +790,8 @@
 									<do_if value="$chance" min="100">
 										<set_value name="$chance" exact="100" />
 									</do_if>
-									<add_discount name="$notiDearsShip" amount="$CommissionAmount" entity="$BuyerEntity"
-										faction="faction.player" time="$CommissionTime" target="faction.player" chance="$chance" />
+									<add_player_discount name="$notiDearsShip" amount="$CommissionAmount" entity="$BuyerEntity"
+										time="$CommissionTime" id="this.name" chance="$chance" />
 
 									<do_if value="$BuyerEntity.container.hastradesubscription" negate="true">
 										<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction-80)" />
