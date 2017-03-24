@@ -75,30 +75,30 @@
 				</run_script>
 
 				<!-- ############## read from config ###################### -->
-				<do_if value="typeof @this.$jlp_unitrader_budgetmin" exact="datatype.integer">
+				<do_if value="typeof @this.$jlp_unitrader_budgetmin" exact="datatype.money">
 					<set_value name="$minBudget" exact="this.$jlp_unitrader_budgetmin" />
 				</do_if>
 				<do_else>
 					<do_if value="$Mode" exact="'miner'">
 						<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl">
-							<set_value name="$minBudget" exact="5000000ct" />
+							<set_value name="$minBudget" exact="500000ct" />
 						</do_if>
 						<do_else>
-							<set_value name="$minBudget" exact="500000ct" />
+							<set_value name="$minBudget" exact="50000ct" />
 						</do_else>
 					</do_if>
 					<do_else>
 						<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl">
-							<set_value name="$minBudget" exact="1000000000ct" />
+							<set_value name="$minBudget" exact="100000000ct" />
 						</do_if>
 						<do_else>
-							<set_value name="$minBudget" exact="100000000ct" />
+							<set_value name="$minBudget" exact="10000000ct" />
 						</do_else>
 
 					</do_else>
 					<set_value name="this.$jlp_unitrader_budgetmin" exact="$minBudget" />
 				</do_else>
-				<do_if value="typeof @this.$jlp_unitrader_budgetmax" exact="datatype.integer">
+				<do_if value="typeof @this.$jlp_unitrader_budgetmax" exact="datatype.money">
 					<set_value name="$maxBudget" exact="this.$jlp_unitrader_budgetmax" />
 				</do_if>
 				<do_else>
