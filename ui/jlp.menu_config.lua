@@ -607,8 +607,8 @@ function menu.displayMenu(firsttime)
 
 	setup:addSimpleRow({Helper.getEmptyCellDescriptor(),
 		Helper.createFontString(ReadText(1001, 2003) .. ": ", false, "left", 255, 255, 255, 100, Helper.standardFont),
-		Helper.createFontString(ConvertMoneyString(managerMoney , false, true, 0, true) .. menu.strings.cr .. " (min: " .. ConvertMoneyString(menu.jlp_unitrader_budgetmin , false, true, 0, true) .. menu.strings.cr ..  " max: " .. ConvertMoneyString(menu.jlp_unitrader_budgetmax , false, true, 0, true) .. menu.strings.cr .. ")", false, "left", 255, 255, 255, 100, Helper.standardFont)
-	}, "maxBudget", {1,1,4})
+		Helper.createFontString(ConvertMoneyString(managerMoney , false, true, 0, true) .. menu.strings.cr .. " (min: " .. ConvertMoneyString(menu.jlp_unitrader_budgetmin , false, true, 2, false) .. menu.strings.cr ..  " max: " .. ConvertMoneyString(menu.jlp_unitrader_budgetmax , false, true, 2, false) .. menu.strings.cr .. ")", false, "left", 255, 255, 255, 100, Helper.standardFont)
+	}, "setBudget", {1,1,4})
 
 	-- setup Range
 	setup:addTitleRow({
@@ -990,7 +990,7 @@ function menu.onRowChanged(row, rowdata)
 			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(name, "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, active, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_X", true), nil, true and mot_details or nil), 1, 8)
 			Helper.setButtonScript(menu, nil, menu.buttontable, 1, 8, chooseMenu)
 
-		elseif rowdata == "maxBudget" then
+		elseif rowdata == "setBudget" then
 			-- TODO: to check
 			if true  then
 				active = true
@@ -1154,7 +1154,7 @@ function menu.saveConfigDatas()
 	
 
 	SetMaxBudget(menu.entity, menu.jlp_unitrader_budgetmax*10)
-	SetMinBudget(menu.entity,  menu.jlp_unitrader_budgetmin)
+	SetMinBudget(menu.entity,  0)
 
 end
 

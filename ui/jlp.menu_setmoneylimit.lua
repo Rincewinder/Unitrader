@@ -1,5 +1,5 @@
--- max Budget for Account menu
--- set a maximal Budget of a NPC manager account
+-- Budget for Account menu
+-- set a maximal/minmal Budget of a NPC manager account
 
 -- section == gJLPUniTrader_uiconfig_setBudget
 -- param == { 0, 0, entity, "setmin" | "setmax" [, suggestedminAmount, suggestedmaxAmount] }
@@ -35,7 +35,7 @@ function menu.buttonOK()
 	-- print("Slidervalue = "..(value1 or "NIL")..(value2 or "NIL")..(value3 or "NIL")..(value4 or "NIL"))
 	if menu.task == "setmin" then
 		SetNPCBlackboard(menu.entity, "$jlp_unitrader_budgetmin", value1)  
-		SetMinBudget(menu.entity, value1)
+		SetMinBudget(menu.entity, 0)
 	elseif menu.task == "setmax" then
 		SetNPCBlackboard(menu.entity, "$jlp_unitrader_budgetmax", value1)  
 		SetMaxBudget(menu.entity, value1*10)
@@ -53,7 +53,7 @@ function menu.onShowMenu()
 	menu.title = ReadText(1001, 2100)
 	menu.entity = menu.param[3]
 	menu.task = menu.param[4]
-	local budgetmin = menu.param[5]
+	local budgetmin = menu.param[5] or 0
 	local budgetmax = menu.param[6] or 5000000
 	
 	
@@ -61,14 +61,23 @@ function menu.onShowMenu()
 	local sliderMax
 	local slidercurrent
 	
+	if budgetmin > budgetmax then
+	 local temp = budgetmax
+	 budgetmax = budgetmin
+	 budgetmin = temp
+	end
+  if budgetmin == budgetmax then
+    budgetmax = budgetmax + budgetmax
+  end
+	
 	if menu.task == "setmin" then
 		slidermin =  0
-		slidermax =  math.max(100000, budgetmax / 10) 
+		slidermax =  math.max(budgetmin * 10, budgetmax / 10) 
 		slidercurrent =   math.max(budgetmin, 50000)
 	else
 		slidermin = math.max(budgetmin, 0)
-		slidermax = math.max(100000, budgetmax * 10)
-		slidercurrent =  math.max(100000, budgetmax)
+		slidermax = math.max(budgetmin * 10, budgetmax * 10)
+		slidercurrent =  math.max(50000, budgetmax)
 	end
 	
 	local sliderinfo = {
@@ -76,7 +85,7 @@ function menu.onShowMenu()
 		["captionLeft"] = tostring(slidermin) .. " " .. ReadText(1001, 101), 
 		["captionCenter"] = menu.task == "setmin" and ReadText(1001, 2101) or ReadText(1001, 2102), 
 		["captionRight"] = tostring(slidermax) .. " " .. ReadText(1001, 101), 
-		["min"]= 0, 
+		["min"]= slidermin, 
 		["max"] = slidermax,
 		["zero"] = 0, 
 		["start"] = slidercurrent

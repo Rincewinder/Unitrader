@@ -167,7 +167,7 @@
 					<!-- check and send minbudget -->
 					<set_value name="$minBudget" exact="$Captain.$jlp_unitrader_budgetmin" />
 					<do_if value="$Captain.money" max="$minBudget">
-						<set_value name="$transferMoney" exact="$Captain.money - $minBudget" />
+						<set_value name="$transferMoney" exact="$minBudget - $Captain.money" />
 						<do_if value="$transferMoney" min="1">
 							<do_if value="$transferMoney" min="player.entity.money">
 								<transfer_money from="player.entity" to="$Captain" amount="$transferMoney"
@@ -216,7 +216,7 @@
 					<!-- check and send minbudget -->
 					<set_value name="$minBudget" exact="$Captain.$jlp_unitrader_budgetmin" />
 					<do_if value="$Captain.money" max="$minBudget">
-						<set_value name="$transferMoney" exact="$Captain.money - $minBudget" />
+						<set_value name="$transferMoney" exact="$minBudget - $Captain.money" />
 
 						<do_if value="$transferMoney" min="1">
 							<do_if value="$transferMoney" min="player.entity.money">
