@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<addon name="jlp_detailmonitorHelper" viewtype="detailmonitor">
-    <file name="ui/jlp.menu_moneytransfer.lua" />
-    <file name="ui/jlp.menu_setmoneylimit.lua" />
-    <file name="ui/jlp.menu_setjumplimit.lua" />
-    <file name="ui/jlp.menu_trading_details.lua" />
-</addon>

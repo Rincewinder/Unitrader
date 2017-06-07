@@ -75,7 +75,7 @@
 				</run_script>
 
 				<!-- ############## read from config ###################### -->
-				<do_if value="typeof @this.$jlp_unitrader_budgetmin" exact="datatype.money">
+				<do_if value="typeof @this.$jlp_unitrader_budgetmin" exact="datatype.integer">
 					<set_value name="$minBudget" exact="this.$jlp_unitrader_budgetmin" />
 				</do_if>
 				<do_else>
@@ -98,7 +98,7 @@
 					</do_else>
 					<set_value name="this.$jlp_unitrader_budgetmin" exact="$minBudget" />
 				</do_else>
-				<do_if value="typeof @this.$jlp_unitrader_budgetmax" exact="datatype.money">
+				<do_if value="typeof @this.$jlp_unitrader_budgetmax" exact="datatype.integer">
 					<set_value name="$maxBudget" exact="this.$jlp_unitrader_budgetmax" />
 				</do_if>
 				<do_else>
@@ -161,7 +161,7 @@
 					<set_value name="this.$jlp_unitrader_home_buy_find" exact="$homeBuyFind" />
 				</do_else>
 				<do_if value="@this.$jlp_unitrader_home_sell_find != null and @this.$jlp_unitrader_home_sell_find != ''">
-					<set_value name="$homeSellFind" exact="this.$jlp_unitrader_home_sell" />
+					<set_value name="$homeSellFind" exact="this.$jlp_unitrader_home_sell_find" />
 				</do_if>
 				<do_else>
 					<set_value name="$homeSellFind" exact="'allTrader'" />
@@ -186,8 +186,8 @@
 					</do_else>
 				</do_if>
 				<do_else>
-					<set_value name="$minbuy" exact="null" />
-					<set_value name="$maxbuy" exact="null" />
+					<set_value name="$minbuy" exact="0" />
+					<set_value name="$maxbuy" exact="0" />
 				</do_else>
 				<do_if value="$rangeSell == 'ranged'">
 					<do_if value="typeof @this.$jlp_unitrader_jump_sell_min" exact="datatype.integer">
@@ -206,11 +206,11 @@
 					</do_else>
 				</do_if>
 				<do_else>
-					<set_value name="$minsell" exact="null" />
-					<set_value name="$maxsell" exact="null" />
+					<set_value name="$minsell" exact="0" />
+					<set_value name="$maxsell" exact="0" />
 				</do_else>
 				<!-- Set actor account -->
- 				<set_actor_min_budget actor="this" amount="$minBudget" />
+ 				<set_actor_min_budget actor="this" amount="0" />
 				<set_actor_max_budget actor="this" amount="$maxBudget*10ct" />
 				
 
@@ -325,7 +325,6 @@
 				</do_else>
 
 				<!-- Take a break -->
-				<wait chance="0" />
 				<set_value name="$idletime" exact="this.$jlp_unitrader_waittime" />
 				<run_script name="'move.idle'" sinceversion="1">
 					<param name="TimeOut" value="$idletime" />

@@ -127,26 +127,18 @@ function menu.onShowMenu()
 	
   if menu.ship ~= nil then
     menu.ship = GetTradeShipData(menu.ship)
-    if menu.ship and IsComponentOperational(menu.ship.shipid) then
-      SetVirtualCargoMode(menu.ship.shipid, true)
-    end
-  end
+ end
 
 	menu.displayMenu(true)
 end
 
 function menu.cleanup()
 
-	if menu.ship and IsComponentOperational(menu.ship.shipid) then
-		SetVirtualCargoMode(menu.ship.shipid, false)
-	end
-	menu.entity = nil
+menu.entity = nil
 	menu.container = nil
 	menu.title = nil
 	menu.lastupdate = nil
 	menu.strings = nil
-	menu.skillText = nil
-	menu.infoText = nil
 
 	cleanupConfigData ()
 
@@ -566,21 +558,22 @@ function menu.displayMenu(firsttime)
 	local shipzone = GetContextByClass(menu.ship.shipid, "zone", false)
 	local zoneName, sectorName, clusterName
 	= GetComponentData(shipzone, "uiname", "sector", "cluster")
+  if menu.jlp_unitrader_mode == "trader" then
+	 if menu.jlp_unitrader_currentselloffer ~= nil and IsValidComponent(menu.jlp_unitrader_currentselloffer.station) then
+		  local name, zoneid, sectorid, clusterid, tradesubscription
+		  = GetComponentData(menu.jlp_unitrader_currentselloffer.station, "uiname", "zoneid" , "sectorid", "clusterid", "tradesubscription")
 
-	if menu.jlp_unitrader_currentselloffer ~= nil and IsValidComponent(menu.jlp_unitrader_currentselloffer.station) then
-		local name, zoneid, sectorid, clusterid, tradesubscription
-		= GetComponentData(menu.jlp_unitrader_currentselloffer.station, "uiname", "zoneid" , "sectorid", "clusterid", "tradesubscription")
-
-		setup:addSimpleRow({
-			Helper.createFontString(ReadText(1001, 2931) .. ": ", false, "left", 255, 255, 255, 100, Helper.standardFont),
-			Helper.createFontString(GetComponentData(clusterid, "mapshortname") .. " // " .. GetComponentData(sectorid, "mapshortname") .. " // " .. GetComponentData(zoneid, "mapshortname") .. "//" .. name, false, "left", 255, 255, 255, 100, Helper.standardFont),
-			tradesubscription and Helper.createIcon("menu_eye", false, 255, 255, 255, 100, 0, 0, Helper.standardTextHeight, Helper.standardButtonWidth) or Helper.getEmptyCellDescriptor()
-		}, "showTradedetailsBuy", {2,3,1})
-	else
-		setup:addSimpleRow({
-			Helper.createFontString(ReadText(1001, 2931) .. ": ", false, "left", 255, 255, 255, 100, Helper.standardFont),
-			Helper.createFontString(ReadText(1001, 2973), false, "left", 255, 255, 255, 100, Helper.standardFont)
-		}, "showTradedetailsBuy", {2,4})
+		  setup:addSimpleRow({
+			 Helper.createFontString(ReadText(1001, 2931) .. ": ", false, "left", 255, 255, 255, 100, Helper.standardFont),
+			 Helper.createFontString(GetComponentData(clusterid, "mapshortname") .. " // " .. GetComponentData(sectorid, "mapshortname") .. " // " .. GetComponentData(zoneid, "mapshortname") .. " // " .. name, false, "left", 255, 255, 255, 100, Helper.standardFont),
+			 tradesubscription and Helper.createIcon("menu_eye", false, 255, 255, 255, 100, 0, 0, Helper.standardTextHeight, Helper.standardButtonWidth) or Helper.getEmptyCellDescriptor()
+		  }, "showTradedetailsBuy", {2,3,1})
+	 else
+		  setup:addSimpleRow({
+			 Helper.createFontString(ReadText(1001, 2931) .. ": ", false, "left", 255, 255, 255, 100, Helper.standardFont),
+			 Helper.createFontString(ReadText(1001, 2973), false, "left", 255, 255, 255, 100, Helper.standardFont)
+		  }, "showTradedetailsBuy", {2,4})
+	 end
 	end
 	if menu.jlp_unitrader_currentbuyoffer ~= nil  and IsValidComponent(menu.jlp_unitrader_currentbuyoffer.station) then
 		local name, zoneid, sectorid, clusterid, tradesubscription
@@ -588,7 +581,7 @@ function menu.displayMenu(firsttime)
 
 		setup:addSimpleRow({
 			Helper.createFontString(ReadText(1001, 2932) .. ": ", false, "left", 255, 255, 255, 100, Helper.standardFont),
-			Helper.createFontString(GetComponentData(clusterid, "mapshortname") .. " // " .. GetComponentData(sectorid, "mapshortname") .. " // " .. GetComponentData(zoneid, "mapshortname") .. "//" .. name, false, "left", 255, 255, 255, 100, Helper.standardFont),
+			Helper.createFontString(GetComponentData(clusterid, "mapshortname") .. " // " .. GetComponentData(sectorid, "mapshortname") .. " // " .. GetComponentData(zoneid, "mapshortname") .. " // " .. name, false, "left", 255, 255, 255, 100, Helper.standardFont),
 			tradesubscription and Helper.createIcon("menu_eye", false, 255, 255, 255, 100, 0, 0, Helper.standardTextHeight, Helper.standardButtonWidth) or Helper.getEmptyCellDescriptor()
 		}, "showTradedetailsSell", {2,3,1})
 	else
@@ -752,7 +745,7 @@ function menu.displayMenu(firsttime)
 		Helper.createFontString(text, false, "left", 255, 255, 255, 100, Helper.standardFont)
 	}, "setRangeModusSell", {1,1,4})
 	
-	if menu.jlp_unitrader_mode == "trader" and menu.jlp_unitrader_range_sell == "ranged" then
+	if menu.jlp_unitrader_range_sell == "ranged" then
 		setup:addSimpleRow({
 			Helper.getEmptyCellDescriptor(),
 			Helper.createFontString(ReadText(8570, 5214), false, "left", 255, 255, 255, 100, Helper.standardFont),
@@ -788,7 +781,7 @@ function menu.displayMenu(firsttime)
 		Helper.getEmptyCellDescriptor(),
 		Helper.createButton(Helper.createButtonText(ReadText(1002, 1202), "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, true, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_B", true)),
 		Helper.getEmptyCellDescriptor(),
-		Helper.createButton(Helper.createButtonText(text, "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, menu.stopAllowed, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_0", true)),
+		Helper.createButton(Helper.createButtonText(text, "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, menu.stopAllowed, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_A", true)),
 		Helper.getEmptyCellDescriptor(),
 		Helper.getEmptyCellDescriptor(),
 		Helper.getEmptyCellDescriptor(),
@@ -816,7 +809,7 @@ function menu.displayMenu(firsttime)
 	Helper.releaseDescriptors()
 end
 
-menu.updateInterval = 1.0
+menu.updateInterval = 2.0
 
 
 
@@ -836,14 +829,14 @@ function menu.onCloseElement(dueToClose)
 end
 
 function menu.onUpdate()
-	if menu.lastupdate + 20 < GetCurTime() then
+	if menu.lastupdate and menu.lastupdate + 20 < GetCurTime() then
 		menu.toprow = GetTopRow(menu.selecttable)
 		menu.selectrow = Helper.currentDefaultTableRow
 		if menu.selectrow < 1  then 
 			menu.selectrow = 1
 		end
-		if menu.selectrow >= #menu.rowDataMap then
-			menu.selectrow = #menu.rowDataMap
+		if menu.selectrow > #menu.rowDataMap then
+			menu.selectrow = #menu.rowDataMap -1
 		end
 		menu.stopAllowed = true
 		if GetComponentData(menu.entity, "isdocked")  and GetComponentData(menu.entity, "isdocking")  then
@@ -852,6 +845,7 @@ function menu.onUpdate()
     menu.displayMenu(false)
 	end
   Helper.updateCellText(menu.infotable,3,3, menu.buildInfoString())
+  
 end
 
 function menu.onRowChanged(row, rowdata)
@@ -871,11 +865,11 @@ function menu.onRowChanged(row, rowdata)
 		-- Start button
 		if menu.jlp_unitrader_isminerrun == 1 or menu.jlp_unitrader_istraderrun == 1 then
 			Helper.removeButtonScripts(menu, menu.buttontable, 1, 4)
-			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(ReadText(8570, 4021), "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, menu.stopAllowed, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_0", true)), 1, 4)
+			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(ReadText(8570, 4021), "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, menu.stopAllowed, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_A", true)), 1, 4)
 			Helper.setButtonScript(menu, nil, menu.buttontable, 1, 4, menu.buttonStop)
 		else
 			Helper.removeButtonScripts(menu, menu.buttontable, 1, 4)
-			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(ReadText(8570, 4020), "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, menu.stopAllowed, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_0", true)), 1, 4)
+			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(ReadText(8570, 4020), "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, menu.stopAllowed, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_A", true)), 1, 4)
 			Helper.setButtonScript(menu, nil, menu.buttontable, 1, 4, menu.buttonStart)
 		end
 		Helper.removeButtonScripts(menu, menu.buttontable, 1, 6)
@@ -1012,7 +1006,7 @@ function menu.onRowChanged(row, rowdata)
 			local npcname = GetComponentData(menu.entity, "name")
 			mot_details  = string.format(string.gsub(mot_details,'$NPC$','%s'),  npcname)
 
-			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(name, "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, active, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_0", true), nil, active and mot_details or nil), 1, 4)
+			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(name, "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, active, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_A", true), nil, active and mot_details or nil), 1, 4)
 			Helper.setButtonScript(menu, nil, menu.buttontable, 1, 4, menu.buttonTransferMoney)
 
 		elseif rowdata == "tradewares" then
@@ -1034,7 +1028,7 @@ function menu.onRowChanged(row, rowdata)
 		end
 	else
 		Helper.removeButtonScripts(menu, menu.buttontable, 1, 8)
-		SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(ReadText(1001, 3105), "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, false, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_0", true)), 1, 8)
+		SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(ReadText(1001, 3105), "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, false, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_A", true)), 1, 8)
 	end
 
 end
@@ -1190,8 +1184,6 @@ function cleanupConfigData ()
 	menu.jlp_unitrader_trade_stations_sell = nil
 	menu.jlp_unitrader_currentbuyoffer = nil
 	menu.jlp_unitrader_currentselloffer = nil
-	menu.sortCargo = nil
-	
 
 end
 
@@ -1199,6 +1191,9 @@ end
 -- ############################################## Helpers ########################################################
 -- ###############################################################################################################
 function menu.buildInfoString()
+  if menu.ship and IsComponentOperational(menu.ship.shipid) then
+    SetVirtualCargoMode(menu.ship.shipid, true)
+  end
 
 	local aicommand = GetComponentData(menu.entity, "aicommand") or ""
 	local aicommandParam1 = GetComponentData(menu.entity, "aicommandparam") or ""	
@@ -1213,22 +1208,26 @@ function menu.buildInfoString()
 	--		end
 	--	end
 
-  if aicommand ~= "" and IsValidComponent(aicommand) then
-    aicommand = GetComponentData(aicommand,"uiname")
+  if aicommand ~= nil and aicommand ~= "" and IsComponentClass(aicommand, "component") and IsValidComponent(aicommand) then
+    aicommand =  ffi.string(C.GetComponentName(ConvertIDTo64Bit(aicommand)))
+    --GetComponentData(aicommand,"uiname")
   end
-	if aicommandParam1 ~= "" and IsValidComponent(aicommandParam1) then
-		aicommandParam1 = GetComponentData(aicommandParam1,"uiname")
+	if aicommandParam1 ~= nil and aicommandParam1 ~= "" and IsComponentClass(aicommandParam1, "component") and IsValidComponent(aicommandParam1) then
+		aicommandParam1 = ffi.string(C.GetComponentName(ConvertIDTo64Bit(aicommandParam1)))
+		--GetComponentData(aicommandParam1,"uiname")
 	end
---  if aicommandParam2 ~= "" and IsValidComponent(aicommandParam2) then
+--  if aicommandParam2 ~= nil and IsValidComponent(aicommandParam2) then
 --    aicommandParam2 = GetComponentData(aicommandParam2,"uiname")
 --  end
-  if aicommandAction ~= "" and IsValidComponent(aicommandAction) then
-    aicommandAction = GetComponentData(aicommandAction,"uiname")
+  if aicommandAction ~= nil and aicommandAction ~= "" and IsComponentClass(aicommandAction, "component") and IsValidComponent(aicommandAction) then
+    aicommandAction = ffi.string(C.GetComponentName(ConvertIDTo64Bit(aicommandAction)))
+    --GetComponentData(aicommandAction,"uiname")
   end
-	if aicommandActionParam1 ~= "" and IsValidComponent(aicommandActionParam1) then
-		aicommandActionParam1 = GetComponentData(aicommandActionParam1,"uiname")
+	if aicommandActionParam1 ~= nil  and aicommandActionParam1 ~= "" and IsComponentClass(aicommandActionParam1, "component") and IsValidComponent(aicommandActionParam1) then
+		aicommandActionParam1 =  ffi.string(C.GetComponentName(ConvertIDTo64Bit(aicommandActionParam1)))
+		--GetComponentData(aicommandActionParam1,"uiname")
 	end
-	local cargolist
+	
 	local clusterid, sectorid, zone, zoneid = GetComponentData(menu.ship.shipid, "clusterid", "sectorid", "zone", "zoneid")
 	local cargo = GetCargoAfterShoppingList(menu.ship.shipid)
 	local line1, line2, line3 = "", "", ""
@@ -1258,7 +1257,7 @@ function menu.buildInfoString()
 			else
 				temp = line3
 			end
-
+			
 			local newwarestring = "   " .. GetWareData(entry.ware, "name") .. ReadText(1001, 120) .. " " .. ConvertIntegerString(entry.amount, true, 0, true)
 			if i ~= count then
 				newwarestring = newwarestring .. ", "
@@ -1288,12 +1287,14 @@ function menu.buildInfoString()
 	else
 		line1 = line1 .. "-"
 	end
-	cargolist = line1 .. "\n" .. line2 .. "\n" .. line3
-	local commandText = string.format(aicommand, aicommandParam1) .. " "  .. "\n" .. string.format(aicommandAction,aicommandActionParam1)
-
-	menu.infoText =  menu.ship.name ..  " - " .. GetComponentData(clusterid, "mapshortname") .. (sectorid and ("." .. GetComponentData(sectorid, "mapshortname") .. "." .. GetComponentData(zoneid, "mapshortname")) or "") .. ReadText(1001, 120) .. " " .. zone .. "\n" ..  menu.strings.capacity .. ReadText(1001, 120) .. " " .. ConvertIntegerString(menu.ship.cargocurrent , true, 3, true) .. " / " .. ConvertIntegerString( menu.ship.cargomax, true, 3, true) .. "\n" .. ReadText(1001, 78) .. ": " .. commandText .. "\n" .. cargolist
-	return menu.infoText
-
+	local cargolist = line1 .. "\n" .. line2 .. "\n" .. line3
+	
+	local commandText = string.format(aicommand, aicommandParam1) .. "\n" .. string.format(aicommandAction, aicommandActionParam1)
+  if menu.ship and IsComponentOperational(menu.ship.shipid) then
+    SetVirtualCargoMode(menu.ship.shipid, false)
+  end
+ 
+	return  menu.ship.name ..  " - " .. GetComponentData(clusterid, "mapshortname") .. (sectorid and ("." .. GetComponentData(sectorid, "mapshortname") .. "." .. GetComponentData(zoneid, "mapshortname")) or "") .. ReadText(1001, 120) .. " " .. zone .. "\n" ..  menu.strings.capacity .. ReadText(1001, 120) .. " " .. ConvertIntegerString(menu.ship.cargocurrent , true, 3, true) .. " / " .. ConvertIntegerString( menu.ship.cargomax, true, 3, true) .. "\n" .. ReadText(1001, 78) .. ": " .. commandText .. "\n" .. cargolist
 end
 
 function menu.buildSkillString()
@@ -1313,8 +1314,7 @@ function menu.buildSkillString()
 --	detail = string.gsub(detail, '$COURAGE$',"%s")
 --	detail = string.gsub(detail, '$EFFICIENCY$',"%s")
 	detail = string.format (detail, jlp_unitrader_waittime, jlp_unitrader_searchtime,	jlp_unitrader_extrafaction,	jlp_unitrader_courage, jlp_unitrader_efficiency)
-	menu.skillText =  uiname ..  "\n" .. detail 
-	return menu.skillText
+ 	return  uiname ..  "\n" .. detail 
 
 end
 

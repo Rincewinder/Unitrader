@@ -102,6 +102,9 @@
 			<remove_value name="this.$jlp_unitrader_currentselloffer" />
 			<remove_value name="this.$jlpUniTraderRun" />
 			<remove_value name="this.$jlpUniMiningRun" />
+			<remove_value name="this.$traderangeBuy_nexttime" />
+			<remove_value name="this.$traderangeSell_nexttime" />
+			@
 
 			<!-- <start_script object="this" name="'player.default'" />
 			-->

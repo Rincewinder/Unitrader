@@ -39,11 +39,12 @@
 			<set_value name="$selloffer" exact="null" />
 
 
+			
 			<!-- TODO: we should check for things like broken jump drive, so we can go in for repairs instead
 				of endlessly trying to jump to a trade -->
 
-			<set_value name="$sellrange" exact="null" />
-			<set_value name="$buyrange" exact="null" />
+			<set_value name="$sellrange" exact="false" />
+			<set_value name="$buyrange" exact="false" />
 			<do_if value="$rangeBuy" exact="'ranged'">
 				<set_value name="$buyrange" exact="[$additionalparams.{3}, $additionalparams.{4}]" />
 				<remove_value name="this.$traderangeBuy_nexttime" />
@@ -71,11 +72,11 @@
 			</do_else>
 
 			<!-- Take a break -->
-<!-- 			<set_value name="$idletime" exact="this.$jlp_unitrader_waittime" />
-			<run_script name="'move.idle'" sinceversion="1">
+			<!-- <set_value name="$idletime" exact="this.$jlp_unitrader_waittime" />
+				<run_script name="'move.idle'" sinceversion="1">
 				<param name="TimeOut" value="$idletime" />
-			</run_script>
- -->
+				</run_script>
+			-->
 			<run_script name="'jlp.unitrader.trade.findfreetraderun'">
 				<param name="warelist" value="$warelist" />
 				<param name="homeBuy" value="$homeBuy" />
@@ -87,18 +88,16 @@
 				<param name="sellrange" value="$sellrange" />
 				<param name="buyrange" value="$buyrange" />
 				<param name="lasttrade" value="@$lasttrade" />
-				<param name="debugchance" value="$debugchance" />
-				<param name="debugchance2" value="$debugchance2" />
 				<save_retval name="selloffer" variable="$selloffer" />
 				<save_retval name="buyoffer" variable="$buyoffer" />
 			</run_script>
-
+			<set_value name="this.$trade_failedfindruns" exact="0" />
 			<!-- <write_to_logbook category="general"
 				text="'%1\n%2\n%3\n%4\n%5\n%6\n%7\n%8\n%9\n'.[this.$trade_failedfindruns, $range.name, $homeBuy.name
 				, $selloffer.sellerentity.container.zone.name , $selloffer.ware, $selloffer.offeramount.{this}, $buyoffer.entity.container.zone.name
 				, $buyoffer.ware, $buyoffer.offeramount.{this} ] " />
 			-->
-			<!-- TODO: read from config and switch intellegent depend from current ship zone -->
+			<!-- TODO: read from config and switch intelligent depend from current ship zone -->
 			<!-- Switch home <-> sell -->
 			<do_if value="not $selloffer.available and not $buyoffer.available">
 				<wait exact="this.$jlp_unitrader_searchtime" />
@@ -113,17 +112,21 @@
 					<param name="buyrange" value="$sellrange" />
 					<param name="sellrange" value="$buyrange" />
 					<param name="lasttrade" value="@$lasttrade" />
-					<param name="debugchance" value="$debugchance" />
-					<param name="debugchance2" value="$debugchance2" />
 					<save_retval name="selloffer" variable="$selloffer" />
 					<save_retval name="buyoffer" variable="$buyoffer" />
 				</run_script>
 			</do_if>
 
+			<!-- No trades found after 5 tries -->
+			<do_if value="@this.$trade_failedfindruns" min="5">
+<!-- 				<wait exact="this.$jlp_unitrader_searchtime" /> -->
+				<return />
+			</do_if>
+
 			<!--If no trade was found then at least fly back to the buy area before checking again -->
 			<do_if value="not $selloffer.available and not $buyoffer.available">
-				<set_value name="this.$trade_failedfindruns" operation="add" />
-				<!--If the buyclusters are saved to the blackboard, fly to one of them -->
+<!-- 				<set_value name="this.$trade_failedfindruns" operation="add" />
+ -->				<!--If the buyclusters are saved to the blackboard, fly to one of them -->
 				<do_if value="this.$traderange_buyclusters?">
 					<set_value name="$moveto" exact="true" />
 					<do_if value="this.$traderange_buyclusters.count">
@@ -147,15 +150,26 @@
 					</do_if>
 				</do_if>
 				<do_else>
+					<do_if value="$rangeBuy == 'sector'">
+						<set_value name="$destination" exact="$homeBuy.random" />
+					</do_if>
+					<do_elseif value="$rangeBuy == 'cluster'">
+						<set_value name="$destination" exact="$homeBuy.random" />
+					</do_elseif>
+					<do_elseif value="$rangeBuy == 'ranged'">
+						<set_value name="$destination" exact="$homeBuy.random" />
+					</do_elseif>
+
 					<run_script name="'move.generic'" sinceversion="2">
-						<param name="destination" value="$homeBuy" />
+						<param name="destination" value="$destination" />
 						<param name="endintargetzone" value="true" />
 					</run_script>
 				</do_else>
 
-				<wait exact="this.$jlp_unitrader_searchtime" />
+<!-- 				<wait exact="this.$jlp_unitrader_searchtime" /> -->
 				<resume label="find trade run" />
 			</do_if>
+
 
 			<label name="perform trade run" />
 
@@ -308,8 +322,8 @@
 						<do_if value="$chance" min="100">
 							<set_value name="$chance" exact="100" />
 						</do_if>
-						<add_player_discount name="$notiDearsShip" amount="$CommissionAmount" entity="$BuyerEntity"
-							 time="$CommissionTime" id="this.name" chance="$chance" />
+						<add_player_discount name="$notiDearsShip" amount="$CommissionAmount"
+							entity="$BuyerEntity" time="$CommissionTime" id="this.name" chance="$chance" />
 
 						<do_if value="$BuyerEntity.container.hastradesubscription" negate="true">
 							<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction-80)" />
@@ -375,8 +389,8 @@
 						<do_if value="$chance" min="100">
 							<set_value name="$chance" exact="100" />
 						</do_if>
-						<add_player_commission name="$notiDearsShip" amount="$CommissionAmount" entity="$SellerEntity"
-							 time="$CommissionTime" id="this.name" chance="$chance" />
+						<add_player_commission name="$notiDearsShip" amount="$CommissionAmount"
+							entity="$SellerEntity" time="$CommissionTime" id="this.name" chance="$chance" />
 
 						<do_if value="$SellerEntity.container.hastradesubscription" negate="true">
 							<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction-80)" />

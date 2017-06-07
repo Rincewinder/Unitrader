@@ -73,23 +73,101 @@
 				<run_script name="'jlp.unitrader.move.refuel'" />
 			</do_if>
 
-			<wait exact="this.$jlp_unitrader_searchtime" />
+			<!-- Check if in buy or sell range -->
+			<set_value name="$ValidDistance" exact="true" />
+			<do_if value="$rangeSell == 'zone'">
+				<do_if value="this.ship.zone != $homeSell">
+					<set_value name="$ValidDistance" exact="false" />
+				</do_if>
+			</do_if>
+			<do_elseif value="$rangeSell == 'sector'">
+				<do_if value="this.ship.sector != $homeSell.sector">
+					<set_value name="$ValidDistance" exact="false" />
+				</do_if>
+			</do_elseif>
+			<do_elseif value="$rangeSell == 'cluster'">
+				<do_if value="this.ship.cluster != $homeSell.cluster">
+					<set_value name="$ValidDistance" exact="false" />
+				</do_if>
+			</do_elseif>
+			<do_else>
+				<set_value name="$GateDistance" exact="this.ship.sector.gatedistance.{$homeSell}" />
+				<set_value name="$ValidDistance" exact="true" />
+				<do_if value="$minsell ge 0">
+					<do_if value="$GateDistance lt $minsell">
+						<set_value name="$ValidDistance" exact="false" />
+					</do_if>
+				</do_if>
+
+				<do_if value=" $maxsell ge 0">
+					<do_if value="$GateDistance gt  $maxsell">
+						<set_value name="$ValidDistance" exact="false" />
+					</do_if>
+				</do_if>
+			</do_else>
+			<do_if value="not $ValidDistance">
+				<set_value name="$ValidDistance" exact="true" />
+				<do_if value="$rangeBuy == 'zone'">
+					<do_if value="this.ship.zone != $homeBuy">
+						<set_value name="$ValidDistance" exact="false" />
+					</do_if>
+				</do_if>
+				<do_elseif value="$rangeBuy == 'sector'">
+					<do_if value="this.ship.sector != $homeBuy.sector">
+						<set_value name="$ValidDistance" exact="false" />
+					</do_if>
+				</do_elseif>
+				<do_elseif value="$rangeBuy == 'cluster'">
+					<do_if value="this.ship.cluster != $homeBuy.cluster">
+						<set_value name="$ValidDistance" exact="false" />
+					</do_if>
+				</do_elseif>
+				<do_else>
+					<set_value name="$GateDistance" exact="this.ship.sector.gatedistance.{$homeBuy}" />
+					<set_value name="$ValidDistance" exact="true" />
+					<do_if value="$minbuy ge 0">
+						<do_if value="$GateDistance lt $minbuy">
+							<set_value name="$ValidDistance" exact="false" />
+						</do_if>
+					</do_if>
+					<do_if value=" $maxbuy ge 0">
+						<do_if value="$GateDistance gt  $maxbuy">
+							<set_value name="$ValidDistance" exact="false" />
+						</do_if>
+					</do_if>
+				</do_else>
+			</do_if>
+			<do_if value="not $ValidDistance">
+				<!-- Fly to a $homebuy, when not in buy or sell range -->
+				<get_jump_cost ship="this.ship" start="this.ship.sector" end="$homebuy" result="$trip" />
+				<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 100">
+					<run_script name="'jlp.unitrader.move.refuel'" />
+				</do_if>
+				<run_script name="'move.generic'" sinceversion="2">
+					<param name="destination" value="$homeBuy" />
+					<param name="endintargetzone" value="true" />
+				</run_script>
+
+			</do_if>
+
+
+
+<!-- 			<wait exact="this.$jlp_unitrader_searchtime" /> -->
 			<run_script name="'jlp.unitrader.trade.ship.free'">
 				<param name="PageId" value="$PageId" />
 				<param name="homeBuy" value="$homeBuy" />
 				<param name="homeSell" value="$homeSell" />
-				<param name="homeBuyFind" value="@this.$jlp_unitrader_home_buy_find" />
-				<param name="homeSellFind" value="@this.$jlp_unitrader_home_sell_find" />
+				<param name="homeBuyFind" value="$homeBuyFind" />
+				<param name="homeSellFind" value="$homeSellFind" />
 				<param name="rangeBuy" value="$rangeBuy" />
 				<param name="rangeSell" value="$rangeSell" />
 				<param name="warelist" value="$basket" />
 				<param name="additionalparams" value="[$minsell, $maxsell, $minbuy, $maxbuy]" />
-				<param name="debugchance" value="$debugchance" />
 			</run_script>
 
 			<!-- if we are still failing to sell our cargo after 10 failed attemps, dump some of it -->
 			<set_value name="$currentcargo" exact="this.ship.cargo.list" />
-			<do_if value="@this.$trade_failedfindruns" min="10">
+			<do_if value="@this.$trade_failedfindruns" min="5">
 				<do_all exact="$currentcargo.count" counter="$c">
 					<set_value name="$dropware" exact="$currentcargo.{$c}" />
 					<do_if value="$dropware" exact="ware.fuelcells" negate="true">
@@ -103,16 +181,15 @@
 						</substitute_text>
 
 						<do_all exact="$droppedwares.count" counter="$d">
-							<set_value name="$detail1"
-								exact="{8570,10001}.[$droppedamounts.{$d}, $droppedwares.{$d}]" />
+							<set_value name="$detail1" exact="{8570,10001}.[$droppedamounts.{$d}, $droppedwares.{$d}]" />
 							<write_to_logbook category="squad" text="'%1\n %2\n'.[$notiDearsPilot, $detail1]" />
 						</do_all>
 					</do_if>
 				</do_all>
 			</do_if>
-			
+
 			<!-- if we are still nothing found, fly to another cluster if ranged -->
-			<do_if value="this.$trade_failedfindruns" min="10">
+			<do_if value="this.$trade_failedfindruns" min="5">
 				<do_if value="$rangeBuy" exact="'ranged'">
 					<do_if value="this.$traderange_buyclusters?">
 						<do_if value="this.$traderange_buyclusters.count" min="2">
@@ -147,8 +224,6 @@
 						</do_if>
 					</do_if>
 				</do_if>
-				<!--No good trade find able. return the script and go from the start -->
-				<return />
 			</do_if>
 
 		</actions>

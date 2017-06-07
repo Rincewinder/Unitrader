@@ -94,11 +94,11 @@
 				<do_elseif value="@$param2.{3}.isclass.zone">
 					<do_if value="event.param" exact="'gJLPUniTrader_uiconfig_range_buy_home'">
 						<set_value name="$Captain.$jlp_unitrader_home_buy" exact="$param2.{3}" />
-						<set_value name="this.$traderangeBuy_nexttime" exact="player.age-30" />
+						<remove_value name="this.$traderangeBuy_nexttime"/>
 					</do_if>
 					<do_elseif value="event.param" exact="'gJLPUniTrader_uiconfig_range_sell_home'">
 						<set_value name="$Captain.$jlp_unitrader_home_sell" exact="$param2.{3}" />
-						<set_value name="this.$traderangeSell_nexttime" exact="player.age-30" />
+						<remove_value name="this.$traderangeSell_nexttime"/>
 					</do_elseif>
 					<add_npc_line speaker="$Captain" line="[1012, 1013, 1018, 1019].random" comment="Confirmation" />
 					<add_conversation_view view="closeupdetailmonitor" />
@@ -123,8 +123,8 @@
 					<open_conversation_menu menu="jlp_setJump" param="event.param2" param2="event.param3" />
 					<add_conversation_view view="closeupdetailmonitor" />
 					<add_npc_line speaker="$Captain" line="[4160, 4750].random" comment="How many do you want? OR How much?" />
-					<set_value name="this.$traderangeBuy_nexttime" exact="player.age-30" />
-					<set_value name="this.$traderangeSell_nexttime" exact="player.age-30" />
+						<remove_value name="this.$traderangeBuy_nexttime"/>
+						<remove_value name="this.$traderangeSell_nexttime"/>
 				</do_elseif>
 				<do_elseif value="event.param" exact="'gJLPUniTrader_uiconfig_setBudget'">
 					<add_conversation_view view="closeupdetailmonitor" />
@@ -142,8 +142,8 @@
 					<add_conversation_view view="closeupdetailmonitor" />
 					<open_conversation_menu menu="MapMenu" param="event.param2" param2="event.param3" />
 					<add_npc_line speaker="player.entity" line="1300" comment="give me the map" />
-					<set_value name="this.$traderangeBuy_nexttime" exact="player.age" />
-					<set_value name="this.$traderangeSell_nexttime" exact="player.age" />
+						<remove_value name="this.$traderangeBuy_nexttime"/>
+						<remove_value name="this.$traderangeSell_nexttime"/>
 				</do_elseif>
 				<do_elseif value="event.param" exact="'gJLPUniTrader_uiconfig_gTrade_details'">
 					<add_conversation_view view="closeupdetailmonitor" />

@@ -92,7 +92,7 @@
 					<remove_ware_reservation object="$buyer_reserved" entity="this"
 						virtual="true" />
 				</do_if>
-				<do_if value="(@$buyer_reserved != $targetobject) and @$targetobject.exists">
+				<do_if value="@$targetobject.exists and (@$buyer_reserved != $targetobject)">
 					<remove_ware_reservation object="$targetobject" entity="this" />
 					<remove_ware_reservation object="$targetobject" entity="this" virtual="true" />
 				</do_if>
@@ -263,7 +263,7 @@
 			</do_if>
 
 			<set_command command="command.trade" param="$targetobject" />
-<!--			<set_value name="this.$trade_failedfindruns" exact="0" /> -->
+			<set_value name="this.$trade_failedfindruns" exact="0" /> 
 			<label name="move to target object" />
 			<do_if value="this.zone != $targetobject.zone">
 				<run_script name="'move.generic'">
@@ -626,7 +626,7 @@
 			<remove_ware_reservation object="$buyer_reserved" entity="this" />
 			<remove_ware_reservation object="$buyer_reserved" entity="this" virtual="1" />
 		</do_if>
-		<do_if value="(@$buyer_reserved != $targetobject) and @$targetobject.exists">
+		<do_if value="@$targetobject.exists and (@$buyer_reserved != $targetobject) ">
 			<remove_ware_reservation object="$targetobject" entity="this" />
 			<remove_ware_reservation object="$targetobject" entity="this" virtual="1" />
 		</do_if>
