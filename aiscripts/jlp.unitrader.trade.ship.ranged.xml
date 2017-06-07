@@ -139,7 +139,7 @@
 			</do_if>
 			<do_if value="not $ValidDistance">
 				<!-- Fly to a $homebuy, when not in buy or sell range -->
-				<get_jump_cost ship="this.ship" start="this.ship.sector" end="$homebuy" result="$trip" />
+				<get_jump_cost ship="this.ship" start="this.ship.sector" end="$homeBuy" result="$trip" />
 				<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 100">
 					<run_script name="'jlp.unitrader.move.refuel'" />
 				</do_if>
