@@ -119,7 +119,7 @@
 			</do_if>
 
 			<!-- No trades found after 5 tries -->
-			<do_if value="@this.$trade_failedfindruns" min="5">
+			<do_if value="@this.$trade_failedfindruns" min="10">
 <!-- 				<wait exact="this.$jlp_unitrader_searchtime" /> -->
 				<return />
 			</do_if>

@@ -171,7 +171,7 @@
 			<!-- if we are still failing to sell our cargo after some failed attempts, dump some of it -->
 			<!-- TODO: Check if can load in a cargo while -->
 			<set_value name="$currentcargo" exact="this.ship.cargo.list" />
-			<do_if value="@this.$trade_failedfindruns" min="5">
+			<do_if value="@this.$trade_failedfindruns" min="10">
 				<do_all exact="$currentcargo.count" counter="$c">
 					<set_value name="$dropware" exact="$currentcargo.{$c}" />
 					<do_if value="$dropware" exact="ware.fuelcells" negate="true">
@@ -193,7 +193,7 @@
 			</do_if>
 
 			<!-- if we are still nothing found, fly to another cluster if ranged -->
-			<do_if value="this.$trade_failedfindruns" min="5">
+			<do_if value="this.$trade_failedfindruns" min="10">
 				<do_if value="$rangeBuy" exact="'ranged'">
 					<do_if value="this.$traderange_buyclusters?">
 						<do_if value="this.$traderange_buyclusters.count" min="2">
