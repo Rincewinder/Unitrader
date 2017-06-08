@@ -534,17 +534,17 @@
 							<find_sell_offer tradepartner="this.ship" space="$checkrangeBuy" result="$selloffers"
 								wares="$filteredwarelist" multiple="true" knowntoplayer="true"
 							>
-								<totalvolume min="$minvolume"
+<!-- 								<totalvolume min="$minvolume"
 									comment="we check minvolume even for the buildership trades to give smaller (faster) ships an advantage" />
-							</find_sell_offer>
+ -->							</find_sell_offer>
 						</do_if>
 						<do_else>
 							<find_sell_offer tradepartner="this.ship" space="$checkrangeBuy" result="$selloffers"
 								wares="$filteredwarelist" multiple="true"
 							>
-								<totalvolume min="$minvolume"
+	<!-- 							<totalvolume min="$minvolume"
 									comment="we check minvolume even for the buildership trades to give smaller (faster) ships an advantage" />
-							</find_sell_offer>
+	 -->						</find_sell_offer>
 						</do_else>
 						<debug_text text="player.age + ' found %1 selloffers for buildership check'.[$selloffers.count]"
 							chance="$debugchance" />
@@ -554,9 +554,9 @@
 							<find_sell_offer tradepartner="this.ship" space="$checkrangeBuy" result="$selloffers"
 								wares="$filteredwarelist" multiple="true" knowntoplayer="true"
 							>
-								<totalvolume min="$minvolume"
+		<!-- 						<totalvolume min="$minvolume"
 									comment="we check minvolume even for the buildership trades to give smaller (faster) ships an advantage" />
-								<!-- <relativeprice max="1.1f"
+		 -->						<!-- <relativeprice max="1.1f"
 									comment="filter trades out that are unlikely to yield profitable trade runs by ignoring anything
 									above average price" />
 								-->
@@ -566,9 +566,9 @@
 							<find_sell_offer tradepartner="this.ship" space="$checkrangeBuy" result="$selloffers"
 								wares="$filteredwarelist" multiple="true"
 							>
-								<totalvolume min="$minvolume"
+<!-- 								<totalvolume min="$minvolume"
 									comment="we check minvolume even for the buildership trades to give smaller (faster) ships an advantage" />
-								<!-- <relativeprice max="1.1f"
+ -->								<!-- <relativeprice max="1.1f"
 									comment="filter trades out that are unlikely to yield profitable trade runs by ignoring anything
 									above average price" />
 								-->
