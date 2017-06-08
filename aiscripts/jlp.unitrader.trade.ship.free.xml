@@ -77,6 +77,7 @@
 				<param name="TimeOut" value="$idletime" />
 				</run_script>
 			-->
+			<set_value name="this.$trade_failedfindruns" exact="0" />
 			<run_script name="'jlp.unitrader.trade.findfreetraderun'">
 				<param name="warelist" value="$warelist" />
 				<param name="homeBuy" value="$homeBuy" />
