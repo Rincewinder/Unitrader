@@ -33,7 +33,7 @@
 			<do_if value="$capship">
 				<set_value name="$reservetrades" exact="true" />
 			</do_if>
-			<set_value name="$minvolume" exact="this.ship.cargo.capacity/2" />
+			<set_value name="$minvolume" exact="this.ship.cargo.capacity/20" />
 			<debug_text text="'min trade volume for ' + this.ship.knownname + ': ' + $minvolume"
 				chance="$debugchance" />
 
@@ -1386,7 +1386,7 @@
 											text="'trip to buy %1 %2 at %3(%4) and sell to %5(%6) has potential profit of %7 Cr and costs %8 Cr. real profit: %9 Cr.'.[$checkamount, $checkoffer.ware, $selloffer.seller.knownname, $selloffer.seller, $checkoffer.buyer.knownname, $checkoffer.buyer, $profit/1Cr, $fuelcost/1Cr, ($profit - $fuelcost)/1Cr]"
 											chance="$debugchance" />
 										<do_if
-											value="$fuelcost ge ($profit - ($selloffer.unitprice * $checkamount * (0.02f*((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)f /200f))f)f)i"
+											value="$fuelcost ge ($profit - ($selloffer.unitprice * $checkamount * (0.2f*((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)f /200f))f)f)i"
 										>
 											<!-- if we don't make at least 2% of the ware price after expenses, this isn't worth our time -->
 											<debug_text
