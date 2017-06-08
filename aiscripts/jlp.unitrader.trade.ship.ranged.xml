@@ -46,32 +46,6 @@
 				</do_all>
 
 			-->
-			<!-- set range with home (mode range and zone need a zone) -->
-			<do_if value="$rangeBuy == 'sector'">
-				<set_value name="$homeBuy" exact="$homeBuy.sector" />
-			</do_if>
-			<do_elseif value="$rangeBuy == 'cluster'">
-				<set_value name="$homeBuy" exact="$homeBuy.cluster" />
-			</do_elseif>
-			<do_elseif value="$rangeBuy == 'ranged'">
-				<set_value name="$homeBuy" exact="$homeBuy.cluster" />
-			</do_elseif>
-
-			<do_if value="$rangeSell == 'sector'">
-				<set_value name="$homeSell" exact="$homeSell.sector" />
-			</do_if>
-			<do_elseif value="$rangeSell == 'cluster'">
-				<set_value name="$homeSell" exact="$homeSell.cluster" />
-			</do_elseif>
-			<do_elseif value="$rangeSell == 'ranged'">
-				<set_value name="$homeSell" exact="$homeSell.cluster" />
-			</do_elseif>
-
-			<set_value name="this.$trade_failedfindruns" exact="0" />
-
-			<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 1000">
-				<run_script name="'jlp.unitrader.move.refuel'" />
-			</do_if>
 
 			<!-- Check if in buy or sell range -->
 			<set_value name="$ValidDistance" exact="true" />
@@ -139,7 +113,7 @@
 			</do_if>
 			<do_if value="not $ValidDistance">
 				<!-- Fly to a $homebuy, when not in buy or sell range -->
-				<get_jump_cost ship="this.ship" start="this.ship.sector" end="$homeBuy" result="$trip" />
+				<get_jump_cost ship="this.ship" start="this.ship.sector" end="$homeBuy.sector" result="$trip" />
 				<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 100">
 					<run_script name="'jlp.unitrader.move.refuel'" />
 				</do_if>
@@ -148,6 +122,35 @@
 					<param name="endintargetzone" value="true" />
 				</run_script>
 
+			</do_if>
+
+
+
+			<!-- set range with home (mode range and zone need a zone) -->
+			<do_if value="$rangeBuy == 'sector'">
+				<set_value name="$homeBuy" exact="$homeBuy.sector" />
+			</do_if>
+			<do_elseif value="$rangeBuy == 'cluster'">
+				<set_value name="$homeBuy" exact="$homeBuy.cluster" />
+			</do_elseif>
+			<do_elseif value="$rangeBuy == 'ranged'">
+				<set_value name="$homeBuy" exact="$homeBuy.cluster" />
+			</do_elseif>
+
+			<do_if value="$rangeSell == 'sector'">
+				<set_value name="$homeSell" exact="$homeSell.sector" />
+			</do_if>
+			<do_elseif value="$rangeSell == 'cluster'">
+				<set_value name="$homeSell" exact="$homeSell.cluster" />
+			</do_elseif>
+			<do_elseif value="$rangeSell == 'ranged'">
+				<set_value name="$homeSell" exact="$homeSell.cluster" />
+			</do_elseif>
+
+ 			<set_value name="this.$trade_failedfindruns" exact="0" /> 
+
+			<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 1000">
+				<run_script name="'jlp.unitrader.move.refuel'" />
 			</do_if>
 
 
@@ -165,7 +168,8 @@
 				<param name="additionalparams" value="[$minsell, $maxsell, $minbuy, $maxbuy]" />
 			</run_script>
 
-			<!-- if we are still failing to sell our cargo after 10 failed attemps, dump some of it -->
+			<!-- if we are still failing to sell our cargo after some failed attempts, dump some of it -->
+			<!-- TODO: Check if can load in a cargo while -->
 			<set_value name="$currentcargo" exact="this.ship.cargo.list" />
 			<do_if value="@this.$trade_failedfindruns" min="5">
 				<do_all exact="$currentcargo.count" counter="$c">
