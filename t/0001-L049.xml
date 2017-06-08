@@ -72,7 +72,7 @@
 			
 			<t id="50000">%1: '%2' Verkaufte '%3' von '%4' vorhandene Lagermenge %5 für %6 %7Cr Stückpreis. Verkaufte an '%8' gewünschte Lagermenge%9 für %10Cr %11Cr Stückpreis.</t>
             <t id="50100">%1: '%2' Ich überweise mein Überschuss über %3 Cr.</t>
-            <t id="50200">%1: '%2' Ich habe beim %3 Skill um 1 Stern dazugelernt \(%4 Sterne\).</t>
+            <t id="50200">%1: '%2' Ich habe beim %3 Skill ein 1 Stern dazugelernt \(%4 Sterne\).</t>
             <t id="50210">Organisationtalent: '%ss'\nTechnisches Talent: '%ss'\nAustrahlungsbonus: '%s%%'\nMut: '%s%%'\nEffektivität: '%s%%'.</t>
 			<t id="50211">Reichweite: $RANGE$ \('$HOME$'\) \n Max Budget: $MAXBUDGET$ Cr</t>
 			<t id="50300">Ich habe ein Handel gefunden.\n Ware: '$TRADEWARE$  \('$WAREPRICEMIN$ Cr' - '$WAREPRICEMAX$ Cr'\)'    Volumen: '$TRADEWAREVOLUME$'.\n Kaufpreis: '$WAREPRICESELLOFFER$ Cr' Verkaufspreis: '$WAREPRICEBUYOFFER$ Cr'</t>
