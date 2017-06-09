@@ -1381,12 +1381,14 @@
 										<get_jump_cost ship="this.ship" start="$selloffer.seller.sector" end="$checkoffer.buyer.sector"
 											result="$trip2" />
 										<set_value name="$fuelcost" exact="($trip1 + $trip2) * ware.fuelcells.averageprice" />
-										<set_value name="$profit" exact="($checkoffer.unitprice - $selloffer.unitprice) * $checkamount" />
+										<!-- <set_value name="$profitSell" exact="(($checkoffer.unitprice - $selloffer.unitprice) * $checkamount)i" /> -->
+										<set_value name="$profitSell" exact="(($checkoffer.unitprice - $selloffer.unitprice) * $checkamount)i" />
+										<set_value name="$profitBuy" exact="($selloffer.unitprice * $checkamount * (0.03f*((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)f /200f)f)f)i" />
 										<debug_text
 											text="'trip to buy %1 %2 at %3(%4) and sell to %5(%6) has potential profit of %7 Cr and costs %8 Cr. real profit: %9 Cr.'.[$checkamount, $checkoffer.ware, $selloffer.seller.knownname, $selloffer.seller, $checkoffer.buyer.knownname, $checkoffer.buyer, $profit/1Cr, $fuelcost/1Cr, ($profit - $fuelcost)/1Cr]"
 											chance="$debugchance" />
 										<do_if
-											value="$fuelcost ge ($profit - ($selloffer.unitprice * $checkamount * (1.0f*((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)f /200f)f)f)f)i"
+											value="$fuelcost/1Cr ge ( $profitSell/1Cr - $profitBuy/1Cr )"
 										>
 											<!-- if we don't make at least 2% of the ware price after expenses, this isn't worth our time -->
 											<debug_text
