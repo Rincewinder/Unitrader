@@ -1474,7 +1474,7 @@
 				text="player.age + ' no good trade offer found. \'%1\'(job: \'%5\'), looking for offers in \'%2\', warelist: \'%3\', cargo: \'%4\''.[this.ship.knownname, $checkrangeBuy.knownname, $warelist, this.ship.cargo.list, this.ship.job]"
 				chance="$debugchance2" />
 
-			<set_value name="$idletime" exact="this.$jlp_unitrader_waittime" />
+			<set_value name="$idletime" exact="this.$jlp_unitrader_searchtime" />
 
 			<run_script name="'move.idle'" sinceversion="1">
 				<param name="TimeOut" value="$idletime" />
