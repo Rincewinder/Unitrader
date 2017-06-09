@@ -542,9 +542,9 @@
 							<find_sell_offer tradepartner="this.ship" space="$checkrangeBuy" result="$selloffers"
 								wares="$filteredwarelist" multiple="true"
 							>
-	<!-- 							<totalvolume min="$minvolume"
+	 							<totalvolume min="$minvolume"
 									comment="we check minvolume even for the buildership trades to give smaller (faster) ships an advantage" />
-	 -->						</find_sell_offer>
+	 						</find_sell_offer>
 						</do_else>
 						<debug_text text="player.age + ' found %1 selloffers for buildership check'.[$selloffers.count]"
 							chance="$debugchance" />
@@ -554,9 +554,9 @@
 							<find_sell_offer tradepartner="this.ship" space="$checkrangeBuy" result="$selloffers"
 								wares="$filteredwarelist" multiple="true" knowntoplayer="true"
 							>
-		<!-- 						<totalvolume min="$minvolume"
+		 						<totalvolume min="$minvolume"
 									comment="we check minvolume even for the buildership trades to give smaller (faster) ships an advantage" />
-		 -->						<!-- <relativeprice max="1.1f"
+		 						<!-- <relativeprice max="1.1f"
 									comment="filter trades out that are unlikely to yield profitable trade runs by ignoring anything
 									above average price" />
 								-->
@@ -566,9 +566,9 @@
 							<find_sell_offer tradepartner="this.ship" space="$checkrangeBuy" result="$selloffers"
 								wares="$filteredwarelist" multiple="true"
 							>
-<!-- 								<totalvolume min="$minvolume"
+ 								<totalvolume min="$minvolume"
 									comment="we check minvolume even for the buildership trades to give smaller (faster) ships an advantage" />
- -->								<!-- <relativeprice max="1.1f"
+								<!-- <relativeprice max="1.1f"
 									comment="filter trades out that are unlikely to yield profitable trade runs by ignoring anything
 									above average price" />
 								-->
@@ -1380,17 +1380,18 @@
 											result="$trip1" />
 										<get_jump_cost ship="this.ship" start="$selloffer.seller.sector" end="$checkoffer.buyer.sector"
 											result="$trip2" />
-										<set_value name="$fuelcost" exact="($trip1 + $trip2) * ware.fuelcells.averageprice" />
+										<set_value name="$fuelcost" exact="(($trip1 + $trip2) * ware.fuelcells.averageprice)/1Cr" />
 										<!-- <set_value name="$profitSell" exact="(($checkoffer.unitprice - $selloffer.unitprice) * $checkamount)i" /> -->
-										<set_value name="$profitSell" exact="(($checkoffer.unitprice - $selloffer.unitprice) * $checkamount)i" />
-										<set_value name="$profitBuy" exact="($selloffer.unitprice * $checkamount * (0.03f*((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)f /200f)f)f)i" />
+										<set_value name="$profitSell" exact="(($checkoffer.unitprice - $selloffer.unitprice) * $checkamount)/1Cr" />
+										<!-- if we don't make at least X% of the ware price after expenses, this isn't worth our time -->
+										<set_value name="$profitBuy" exact="($selloffer.unitprice * $checkamount * (0.03f*((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)f /200f)f)f)/1Cr" />
 										<debug_text
 											text="'trip to buy %1 %2 at %3(%4) and sell to %5(%6) has potential profit of %7 Cr and costs %8 Cr. real profit: %9 Cr.'.[$checkamount, $checkoffer.ware, $selloffer.seller.knownname, $selloffer.seller, $checkoffer.buyer.knownname, $checkoffer.buyer, $profit/1Cr, $fuelcost/1Cr, ($profit - $fuelcost)/1Cr]"
 											chance="$debugchance" />
 										<do_if
-											value="$fuelcost/1Cr ge ( $profitSell/1Cr - $profitBuy/1Cr )"
+											value="$fuelcost ge ( $profitSell - $profitBuy )"
 										>
-											<!-- if we don't make at least 2% of the ware price after expenses, this isn't worth our time -->
+											
 											<debug_text
 												text="'skip buy offer, reason: %1, %2, %3, %4 => %5'.[$fuelcost, $profit, $selloffer.unitprice, $checkamount, ($profit - ($selloffer.unitprice * $checkamount * 0.02f))]"
 												chance="$debugchance" />
@@ -1456,18 +1457,6 @@
 				-->
 				<resume label="check buy range" />
 			</do_if>
-			<!-- <do_if
-				value="$checkrangeSell != null and $checkrangeSell == this.ship.zone and $checkrangeSell != $homeSell"
-				>
-				<set_value name="$checkrangeSell" exact="$homeSell" />
-				<set_value name="$idletime" min="5s" max="10s" />
-				<run_script name="'move.idle'" sinceversion="1">
-				<param name="TimeOut" value="$idletime" />
-				</run_script>
-
-				<resume label="find trade run" />
-				</do_if>
-			-->
 
 			<!-- if other sell cluster available, search with one of this -->
 			<!-- <do_if value="@$buyrange and not @$sellrange and @$buyclusters.count ge 1">
@@ -1487,12 +1476,9 @@
 
 			<set_value name="$idletime" exact="this.$jlp_unitrader_waittime" />
 
-			<!-- <set_command_action commandaction="commandaction.standingby" /> -->
-			<!-- <run_script name="'move.idle'" sinceversion="1">
+			<run_script name="'move.idle'" sinceversion="1">
 				<param name="TimeOut" value="$idletime" />
-				</run_script>
-			-->
-			<!-- <set_command_action commandaction="commandaction.searchingtrades" /> -->
+			</run_script>
 
 			<do_if value="@this.$trade_failedfindruns" min="10">
 				<resume label="finish" />
