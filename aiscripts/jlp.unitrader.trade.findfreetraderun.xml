@@ -542,9 +542,9 @@
 							<find_sell_offer tradepartner="this.ship" space="$checkrangeBuy" result="$selloffers"
 								wares="$filteredwarelist" multiple="true"
 							>
-	 							<totalvolume min="$minvolume"
+<!-- 	 							<totalvolume min="$minvolume"
 									comment="we check minvolume even for the buildership trades to give smaller (faster) ships an advantage" />
-	 						</find_sell_offer>
+ -->	 						</find_sell_offer>
 						</do_else>
 						<debug_text text="player.age + ' found %1 selloffers for buildership check'.[$selloffers.count]"
 							chance="$debugchance" />
@@ -555,7 +555,7 @@
 								wares="$filteredwarelist" multiple="true" knowntoplayer="true"
 							>
 		 						<totalvolume min="$minvolume"
-									comment="we check minvolume even for the buildership trades to give smaller (faster) ships an advantage" />
+									comment="we check minvolume even for the ship trades to give smaller (faster) ships an advantage" />
 		 						<!-- <relativeprice max="1.1f"
 									comment="filter trades out that are unlikely to yield profitable trade runs by ignoring anything
 									above average price" />
