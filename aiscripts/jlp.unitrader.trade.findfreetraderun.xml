@@ -696,7 +696,7 @@
 							<do_if value="$offerAmount gt $shipAmount">
 								<set_value name="$offerAmount" exact="$shipAmount" />
 							</do_if>
-							<set_value name="$riskAmount" exact="(($offerAmount) * 90 / $shipAmount)" />
+							<set_value name="$riskAmount" exact="(($offerAmount) * 100 / $shipAmount)" />
 							<do_if
 								value="($riskAmount - 10 * this.$trade_failedfindruns) le 10+((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
 								exact="true"
@@ -865,7 +865,7 @@
 									<do_else>
 										<set_value name="$offerAdd" exact="true" />
 									</do_else>
-									<!-- Price risk: better skills - more price raange is used -->
+									<!-- Price risk: better skills - more price range is used -->
 									<do_if value="$offerAdd" exact="true">
 										<set_value name="$offerAdd" exact="false" />
 										<set_value name="$warePrice" exact="$buyoffers.{$Counter2}.unitprice" />
@@ -917,7 +917,7 @@
 										<set_value name="$offerAdd" exact="false" />
 										<set_value name="$offerAmount" exact="$buyoffers.{$Counter2}.offeramount.{this}" />
 										<set_value name="$stationAmount"
-											exact="$destination.tradenpc.container.cargo.{$buyoffers.{$Counter2}.ware}.free" />
+											exact="$destination.tradenpc.container.cargo.{$buyoffers.{$Counter2}.ware}.max" />
 										<!-- <set_value name="$stationAmount"
 											exact="$buyoffers.{$Counter2}.buyerentity.container.cargo.{$buyoffers.{$Counter2}.ware}.free"
 											/>
@@ -1127,7 +1127,7 @@
 									<set_value name="$offerAdd" exact="false" />
 									<set_value name="$offerAmount" exact="$buyoffers.{$Counter}.offeramount.{this}" />
 									<set_value name="$stationAmount"
-										exact="$destination.tradenpc.container.cargo.{$buyoffers.{$Counter}.ware}.free" />
+										exact="$destination.tradenpc.container.cargo.{$buyoffers.{$Counter}.ware}.max" />
 									<!-- <set_value name="$stationAmount"
 										exact="$buyoffers.{$Counter}.buyerentity.container.cargo.{$buyoffers.{$Counter}.ware}.free"
 										/>
