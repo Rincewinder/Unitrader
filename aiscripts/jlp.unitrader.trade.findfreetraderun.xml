@@ -1591,7 +1591,7 @@
 					<param name="TimeOut" value="$idletime" />
 					</run_script>
 				-->
-				<resume label="find sell offers" />
+				<resume label="find trade run" />
 			</do_if>
 			<do_if value="@$buyrange and @$buyclusters.count ge 1">
 				<set_value name="$checkrangeBuy" exact="null" />
@@ -1603,12 +1603,12 @@
 				<resume label="check buy range" />
 			</do_if>
 
-			<!-- if other sell cluster available, search with one of this -->
-			<do_if value="@$sellrange and @$sellclusters.count ge 1">
+			<!-- if other sell cluster available, search with one of this
+			<do_if value="@$buyrange and @$sellrange and @$sellclusters.count ge 1">
 				<set_value name="$checkrangeSell" exact="null" />
 				<resume label="check sell range" />
 			</do_if>
-			
+			 -->
 
 			<!-- can't find anything good at the moment... wait a while, then check again -->
 			<debug_text
