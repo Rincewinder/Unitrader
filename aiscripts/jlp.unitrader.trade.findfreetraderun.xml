@@ -1172,12 +1172,12 @@
 										<set_value name="$offerAmount" exact="$shipAmount" />
 									</do_if>
 									<set_value name="$riskAmount" exact="(($offerAmount) * 100 / $shipAmount)" />
-										<do_if value="$riskAmount lt 0">
-											<set_value name="$riskAmount" exact="0" />
-										</do_if>
-										<do_if value="$riskAmount gt 100">
-											<set_value name="$riskAmount" exact="100" />
-										</do_if>
+									<do_if value="$riskAmount lt 0">
+										<set_value name="$riskAmount" exact="0" />
+									</do_if>
+									<do_if value="$riskAmount gt 100">
+										<set_value name="$riskAmount" exact="100" />
+									</do_if>
 									<write_to_logbook category="missions"
 										text="this.ship.knownname+ ' $buyoffer check in Homebuy '+$buyoffers.{$Counter}.ware +' check it for Shipcargo risk ' + $riskAmount "
 										chance="$debugchance2" />
@@ -1214,12 +1214,12 @@
 										<set_value name="$offerAmount" exact="$stationAmount" />
 									</do_if>
 									<set_value name="$riskAmount" exact="(($offerAmount)) * 100 / $stationAmount" />
-										<do_if value="$riskAmount lt 0">
-											<set_value name="$riskAmount" exact="0" />
-										</do_if>
-										<do_if value="$riskAmount gt 100">
-											<set_value name="$riskAmount" exact="100" />
-										</do_if>
+									<do_if value="$riskAmount lt 0">
+										<set_value name="$riskAmount" exact="0" />
+									</do_if>
+									<do_if value="$riskAmount gt 100">
+										<set_value name="$riskAmount" exact="100" />
+									</do_if>
 									<write_to_logbook category="missions"
 										text="this.ship.knownname+ ' $buyoffer check in Homebuy '+$buyoffers.{$Counter}.ware +' check it for Stationcargo risk ' + $riskAmount "
 										chance="$debugchance2" />
@@ -1487,21 +1487,20 @@
 										<set_value name="$profitSell"
 											exact="(($checkoffer.unitprice - $selloffer.unitprice) * $checkamount)/1Cr" />
 										<!-- if we don't make at least X% of the ware price after expenses, this isn't worth our time -->
-										<set_value name="$profitBuy" exact="($selloffer.unitprice * $checkamount * (0.03f*((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)f /200f)f)f)/1Cr" />
+										<set_value name="$profitBuy"
+											exact="($selloffer.unitprice * $checkamount * (0.03f*((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)f /200f)f)f)/1Cr" />
 										<debug_text
 											text="'trip to buy %1 %2 at %3(%4) and sell to %5(%6) has potential profit of %7 Cr and costs %8 Cr. real profit: %9 Cr.'.[$checkamount, $checkoffer.ware, $selloffer.seller.knownname, $selloffer.seller, $checkoffer.buyer.knownname, $checkoffer.buyer, $profit/1Cr, $fuelcost/1Cr, $profit]"
 											chance="$debugchance" />
-										<do_if
-											value="$fuelcost ge ( $profitSell - $profitBuy )"
-										>
-											
+										<do_if value="$fuelcost ge ( $profitSell - $profitBuy )">
+
 											<debug_text
 												text="'skip buy offer, reason: %1, %2, %3, %4 => %5'.[$fuelcost, $profit, $selloffer.unitprice, $checkamount, ($profit - ($selloffer.unitprice * $checkamount * 0.02f))]"
 												chance="$debugchance" />
 											<continue />
 										</do_if>
 									</do_if>
-									<!-- check the buy trade owner's blackboard for whether someone already expressed interest in 
+									<!-- check the buy trade owner's blackboard for whether someone already expressed interest in
 										this
 										trade offer -->
 									<do_if value="$reservetrades and $reservableware">
@@ -1539,13 +1538,13 @@
 											<do_else>
 												<set_value name="$checkoffer.buyer.tradenpc.$reservedtrades" exact="[$checkoffer]" />
 											</do_else>
-											<set_value name="$buyoffer" exact="$checkoffer" />
-											<break />
+											<!-- <set_value name="$buyoffer" exact="$checkoffer" />
+												<break />
+											-->
 										</do_if>
 									</do_if>
-									<!-- <set_value name="$buyoffer" exact="$checkoffer" />
-										<break />
-									-->
+									<set_value name="$buyoffer" exact="$checkoffer" />
+									<break />
 								</do_if>
 							</do_if>
 						</do_all>
