@@ -218,7 +218,6 @@
 				<run_script name="'jlp.unitrader.trade.performtraderun'">
 					<param name="selloffer" value="$selloffer" />
 					<param name="buyoffer" value="$buyoffer" />
-					<param name="debugchance" value="$debugchance" />
 					<save_retval name="success" variable="$success" />
 					<save_retval name="lasttrade" variable="$lasttrade" />
 					<save_retval name="tradedetails" variable="$tradedetails" />
