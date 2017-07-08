@@ -1572,20 +1572,20 @@
 			</do_if>
 			<!-- <check again, but this time in the other range -->
 			<do_if
-				value="$checkrangeSell != null and $checkrangeSell == this.ship.zone and $checkrangeSell != $homeSell"
+				value="$checkrangeBuy != null and $checkrangeBuy == this.ship.zone and $checkrangeBuy != $homeBuy"
 			>
-				<set_value name="$checkrangeSell" exact="$homeSell" />
+				<set_value name="$checkrangeBuy" exact="$homeBuy" />
 				<!-- <set_value name="$idletime" min="5s" max="10s" />
 					<run_script name="'move.idle'" sinceversion="1">
 					<param name="TimeOut" value="$idletime" />
 					</run_script>
 				-->
-				<resume label="find trade run" />
+				<resume label="find sell offers" />
 			</do_if>
 			<do_if
-				value="$checkrangeBuy != null and $checkrangeBuy == this.ship.zone and $checkrangeBuy != $homeBuy"
+				value="$checkrangeSell != null and $checkrangeSell == this.ship.zone and $checkrangeSell != $homeSell"
 			>
-				<set_value name="$checkrangeBuy" exact="$homeBuy" />
+				<set_value name="$checkrangeSell" exact="$homeSell" />
 				<!-- <set_value name="$idletime" min="5s" max="10s" />
 					<run_script name="'move.idle'" sinceversion="1">
 					<param name="TimeOut" value="$idletime" />
@@ -1604,12 +1604,11 @@
 			</do_if>
 
 			<!-- if other sell cluster available, search with one of this -->
-			<!-- <do_if value="@$buyrange and not @$sellrange and @$buyclusters.count ge 1">
-				<set_value name="$checkrangeBuy" exact="null" />
-				<resume label="check buy range" />
-				</do_if>
-			-->
-
+			<do_if value="@$sellrange and @$sellclusters.count ge 1">
+				<set_value name="$checkrangeSell" exact="null" />
+				<resume label="check sell range" />
+			</do_if>
+			
 
 			<!-- can't find anything good at the moment... wait a while, then check again -->
 			<debug_text
@@ -1619,13 +1618,13 @@
 				text="player.age + ' no good trade offer found. \'%1\'(job: \'%5\'), looking for offers in \'%2\', warelist: \'%3\', cargo: \'%4\''.[this.ship.knownname, $checkrangeBuy.knownname, $warelist, this.ship.cargo.list, this.ship.job]"
 				chance="$debugchance2" />
 
-			<set_value name="$idletime" exact="this.$jlp_unitrader_searchtime" />
-
-			<run_script name="'move.idle'" sinceversion="1">
-				<param name="TimeOut" value="$idletime" />
-			</run_script>
 
 			<do_if value="@this.$trade_failedfindruns" min="10">
+				<set_value name="$idletime" exact="this.$jlp_unitrader_searchtime" />
+	
+				<run_script name="'move.idle'" sinceversion="1">
+					<param name="TimeOut" value="$idletime" />
+				</run_script>
 				<resume label="finish" />
 			</do_if>
 			<set_value name="this.$trade_failedfindruns" operation="add" />
