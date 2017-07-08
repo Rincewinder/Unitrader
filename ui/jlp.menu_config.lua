@@ -850,6 +850,8 @@ end
 
 function menu.onRowChanged(row, rowdata)
 	if menu.rowDataMap[Helper.currentDefaultTableRow] then
+
+	 
 		rowdata = menu.rowDataMap[Helper.currentDefaultTableRow]
 		Helper.removeButtonScripts(menu, menu.buttontable, 1, 8)
 		local name, mot_details
@@ -1030,7 +1032,8 @@ function menu.onRowChanged(row, rowdata)
 		Helper.removeButtonScripts(menu, menu.buttontable, 1, 8)
 		SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(ReadText(1001, 3105), "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, false, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_A", true)), 1, 8)
 	end
-
+    
+  menu.onUpdate()
 end
 
 --function menu.onSelectElement()
