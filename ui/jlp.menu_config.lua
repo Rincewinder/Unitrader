@@ -829,15 +829,15 @@ function menu.onCloseElement(dueToClose)
 end
 
 function menu.onUpdate()
+  menu.toprow = GetTopRow(menu.selecttable)
+  menu.selectrow = Helper.currentDefaultTableRow
+  if menu.selectrow < 1  then 
+    menu.selectrow = 1
+  end
+  if menu.selectrow > #menu.rowDataMap then
+    menu.selectrow = #menu.rowDataMap -1
+  end
 	if menu.lastupdate and menu.lastupdate + 20 < GetCurTime() then
-		menu.toprow = GetTopRow(menu.selecttable)
-		menu.selectrow = Helper.currentDefaultTableRow
-		if menu.selectrow < 1  then 
-			menu.selectrow = 1
-		end
-		if menu.selectrow > #menu.rowDataMap then
-			menu.selectrow = #menu.rowDataMap -1
-		end
 		menu.stopAllowed = true
 		if GetComponentData(menu.entity, "isdocked")  and GetComponentData(menu.entity, "isdocking")  then
 			menu.stopAllowed = false
