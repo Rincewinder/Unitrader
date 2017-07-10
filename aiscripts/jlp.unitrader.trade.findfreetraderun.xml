@@ -857,7 +857,7 @@
 									</do_if>
 									<set_value name="$destination" exact="$buyoffers.{$Counter2}.buyer" />
 									<do_if value="$destination.isclass.ship_xl" negate="true">
-										<do_if value="(not $destination.tradenpc.container.hastradesubscription) and $onlyTraderBuy">
+										<do_if value="(not $destination.tradenpc.container.hastradesubscription) and $onlyTraderSell">
 											<continue />
 										</do_if>
 									</do_if>
@@ -1101,7 +1101,7 @@
 
 								<set_value name="$destination" exact="$buyoffers.{$Counter}.buyer" />
 								<do_if value="$destination.isclass.ship_xl" negate="true">
-									<do_if value="(not $destination.tradenpc.container.hastradesubscription) and $onlyTraderBuy">
+									<do_if value="(not $destination.tradenpc.container.hastradesubscription) and $onlyTraderSell">
 										<continue />
 									</do_if>
 								</do_if>
@@ -1572,7 +1572,7 @@
 				<remove_value name="$selltobuildership" />
 				<resume label="find sell offers" />
 			</do_if>
-			<!-- <check again, but this time in the other range -->
+			<!-- check again, but this time in the other range -->
 			<do_if
 				value="$checkrangeBuy != null and $checkrangeBuy == this.ship.zone and $checkrangeBuy != $homeBuy"
 			>
