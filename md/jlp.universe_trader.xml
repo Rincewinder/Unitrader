@@ -72,13 +72,13 @@
 						<event_conversation_next_section sectionprefix="gJLPUniTrader_uiconfig" />
 						<event_conversation_returned_to_section sectionprefix="gJLPUniTrader_uiconfig" />
 					</check_any>
-					<check_object object="event.object.ship">
+					<check_object object="event.param2.{3}.ship">
 						<match_relation faction="faction.player" relation="self" comparison="exact" />
 					</check_object>
 				</check_all>
 			</conditions>
 			<actions>
-				<set_value name="$Captain" exact="event.object" />
+<!-- 				<set_value name="$Captain" exact="event.object" /> -->
 				<set_value name="$param2" exact="event.param2" />
 				<do_if value="$param2.{3} and $param2.{3}.isclass.{class.entity}">
 					<set_value name="$Captain" exact="$param2.{3}" />
@@ -104,8 +104,8 @@
 					</do_elseif>
 					<add_npc_line speaker="$Captain" line="[1012, 1013, 1018, 1019].random" comment="Confirmation" />
 					<add_conversation_view view="closeupdetailmonitor" />
-					<open_conversation_menu menu="jlp_unitrader_ConfigMenu" param="[0, 0, $Captain]"
-						param2="$param2" />
+					<open_conversation_menu menu="jlp_unitrader_ConfigMenu" param="$param2"
+						param2="event.param3" />
 				</do_elseif>
 				<do_elseif value="event.param" exact="'gJLPUniTrader_uiconfig_setJump'">
 					<open_conversation_menu menu="jlp_setJump" param="$param2" param2="event.param3" />
@@ -130,8 +130,8 @@
 					<add_conversation_view view="closeupdetailmonitor" />
 					<open_conversation_menu menu="gJLPUniTrader_uiconfig_gMain_map" param="$param2" param2="event.param3" />
 					<add_npc_line speaker="player.entity" line="1300" comment="give me the map" />
-						<remove_value name="this.$traderangeBuy_nexttime"/>
-						<remove_value name="this.$traderangeSell_nexttime"/>
+					<remove_value name="this.$traderangeBuy_nexttime"/>
+					<remove_value name="this.$traderangeSell_nexttime"/>
 				</do_elseif>
 				<do_elseif value="event.param" exact="'gJLPUniTrader_uiconfig_gTrade_details'">
 					<add_conversation_view view="closeupdetailmonitor" />

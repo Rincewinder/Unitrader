@@ -153,16 +153,16 @@ function menu.buttonDetails()
 	menu.holomap = 0
 	table.remove(menu.history)
 	if menu.mode == "selectplayerobject" then
-		Helper.closeMenuForSection(menu, false, menu.modeparam[1], { 0, 0, menu.selectedcomponent })
+		Helper.closeMenuForSection(menu, false, menu.modeparam[1], { 0, 0, menu.param[3], menu.selectedcomponent })
 		menu.cleanup()
 	elseif menu.mode == "selectobject" then
-		Helper.closeMenuForSection(menu, false, menu.modeparam[1], { 0, 0, menu.selectedcomponent })
+		Helper.closeMenuForSection(menu, false, menu.modeparam[1], { 0, 0, menu.param[3], menu.selectedcomponent })
 		menu.cleanup()
 	elseif menu.mode == "selectzone" then
-		Helper.closeMenuForSection(menu, false, menu.modeparam[1], { 0, 0, menu.selectedcomponent })
+		Helper.closeMenuForSection(menu, false, menu.modeparam[1], { 0, 0, menu.param[3], menu.selectedcomponent })
 		menu.cleanup()
 	else
-		Helper.closeMenuForSection(menu, false, "gMain_object_closeup", { 0, 0, menu.selectedcomponent, menu.history })
+		Helper.closeMenuForSection(menu, false, "gMain_object_closeup", { 0, 0, menu.param[3], menu.selectedcomponent, menu.history })
 		menu.cleanup()
 	end
 end
@@ -263,7 +263,7 @@ function menu.buttonNavigation(type, component, overridezoom)
 				end
 			elseif menu.componenttype == "sector" then
 				if menu.mode == "selectzone" then
-					Helper.closeMenuForSection(menu, false, menu.modeparam[1], { 0, 0, ffi.new("UniverseID", ConvertStringTo64Bit(tostring(component))) })
+					Helper.closeMenuForSection(menu, false, menu.modeparam[1], { 0, 0, menu.param[3], ffi.new("UniverseID", ConvertStringTo64Bit(tostring(component))) })
 					menu.cleanup()
 				else
 					menu.component = component
@@ -617,7 +617,7 @@ function menu.onShowMenu()
 	Helper.headerRow2FontSize = 11
 	Helper.headerRow2Height = 20
 	Helper.standardButtonWidth = 30
-
+  
 	if menu.param2 == nil or menu.param2[1] then
 		menu.component = ConvertIDTo64Bit(menu.param[5]) or 0
 		menu.componenttype = menu.param[4]
@@ -2141,7 +2141,8 @@ function menu.onCloseElement(dueToClose)
 	if dueToClose == "close" then
 		C.RemoveHoloMap2()
 		menu.holomap = 0
-		Helper.closeMenuAndCancel(menu)
+		--Helper.closeMenuAndCancel(menu)
+		Helper.closeMenuAndReturn(menu, false, {0, 0, menu.param[3]})
 		menu.cleanup()
 	else
 		local numhistory = #menu.history
@@ -2159,7 +2160,8 @@ function menu.onCloseElement(dueToClose)
 		else
 			C.RemoveHoloMap2()
 			menu.holomap = 0
-			Helper.closeMenuAndReturn(menu)
+			--Helper.closeMenuAndReturn(menu)
+			Helper.closeMenuAndReturn(menu, false, {0, 0, menu.param[3]})
 			menu.cleanup()
 		end
 	end
