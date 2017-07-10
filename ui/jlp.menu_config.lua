@@ -120,11 +120,14 @@ function menu.onShowMenu()
 		mot_toomanytrips = ReadText(1001, 2972)
 	}
 
+ 
 	menu.displayMenu(true)
 end
 
 function menu.cleanup()
-
+  if IsComponentOperational(menu.ships[menu.shipIndex].shipid) then
+    SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, false)
+  end
 	menu.title = nil
 	menu.lastupdate = nil
 	menu.strings = nil
@@ -557,7 +560,7 @@ function menu.displayMenu(firsttime)
     end
     menu.ship = GetTradeShipData(menu.ships[menu.shipIndex].shipid)
  end
-
+  SetVirtualCargoMode( menu.ship.shipid, true)
   -- Remove possible button scripts from previous view
   Helper.removeAllButtonScripts(menu)
   Helper.currentTableRow = {}
