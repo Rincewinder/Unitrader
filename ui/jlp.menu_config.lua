@@ -121,12 +121,21 @@ function menu.onShowMenu()
 	}
 	
   -- read params
-  menu.entity = menu.param[3]
-	menu.container = GetContextByClass(menu.entity, "container", false)
-  menu.ship = GetContextByClass(menu.entity, "ship", false)
+  menu.ship = GetContextByClass(menu.param[3], "ship", false)
+  menu.playership = GetPlayerPrimaryShipID()
 	
-  if menu.ship ~= nil then
-    menu.ship = GetTradeShipData(menu.ship)
+  -- Get the list of suitable ships
+  menu.getShipList()
+  
+  menu.shipIndex = 1
+  if menu.ship then
+    for i, ship in ipairs(menu.ships) do
+      if IsSameComponent(ship.shipid, menu.ship) then
+        menu.shipIndex = i
+        break
+      end
+    end
+    menu.ship = GetTradeShipData(menu.ships[menu.shipIndex].shipid)
  end
 
 	menu.displayMenu(true)
@@ -134,7 +143,7 @@ end
 
 function menu.cleanup()
 
-menu.entity = nil
+  menu.entity = nil
 	menu.container = nil
 	menu.title = nil
 	menu.lastupdate = nil
@@ -145,7 +154,7 @@ menu.entity = nil
 	menu.infotable = nil
 	menu.selecttable = nil
 	--menu.buttontable = nil --TODO: why i cannot delete this?
-
+	
 	-- Reset Helper
 	Helper.standardFontSize = 14
 	Helper.standardTextHeight = 24
@@ -155,6 +164,65 @@ end
 ---------------------------------------------------------------------------------------------
 -- Menu member functions
 ---------------------------------------------------------------------------------------------
+function menu.buttonShipLeft()
+  if IsComponentOperational(menu.ships[menu.shipIndex].shipid) then
+    SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, false)
+  else
+    menu.getShipList()
+    if menu.shipIndex > #menu.ships then
+      menu.shipIndex = #menu.ships
+    end
+  end
+
+  if menu.shipIndex == 1 then
+    menu.shipIndex = #menu.ships
+  else
+    menu.shipIndex = menu.shipIndex - 1
+  end
+
+  if not IsComponentOperational(menu.ships[menu.shipIndex].shipid) then
+    menu.getShipList()
+    if menu.shipIndex > #menu.ships then
+      menu.shipIndex = #menu.ships
+    end
+  end
+
+  SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, true)
+  menu.ship = menu.ships[menu.shipIndex]
+  menu.readConfigDatas()
+  menu.settoprow = GetTopRow(menu.offertable)
+  menu.displayMenu(true)
+end
+
+function menu.buttonShipRight()
+  if IsComponentOperational(menu.ships[menu.shipIndex].shipid) then
+    SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, false)
+  else
+    menu.getShipList()
+    if menu.shipIndex > #menu.ships then
+      menu.shipIndex = #menu.ships
+    end
+  end
+
+  if menu.shipIndex == #menu.ships then
+    menu.shipIndex = 1
+  else
+    menu.shipIndex = menu.shipIndex + 1
+  end
+
+  if not IsComponentOperational(menu.ships[menu.shipIndex].shipid) then
+    menu.getShipList()
+    if menu.shipIndex > #menu.ships then
+      menu.shipIndex = #menu.shipIndex
+    end
+  end
+
+  SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, true)
+  menu.ship = menu.ships[menu.shipIndex]
+  menu.readConfigDatas()
+  menu.settoprow = GetTopRow(menu.offertable)
+  menu.displayMenu(true)
+end
 
 -- Buttons functions
 function menu.buttonTransferMoney ()
@@ -521,17 +589,28 @@ function menu.displayMenu(firsttime)
 
 
 	setup:addHeaderRow({ emptyFontStringSmall }, nil, {6})
-	setup:addSimpleRow({
-		Helper.createIcon(shipimage ~= "" and shipimage or "transferSlider", false, 255, 255, 255, 100, 0, 0, 114, 214),
-		Helper.createFontString( menu.buildInfoString() , false, "left", 255, 255, 255, 100, Helper.standardFont, Helper.standardFontSize, true, Helper.standardTextOffsetx, Helper.standardTextOffsety, 114),
-		Helper.createFontString( menu.buildSkillString() , false, "left", 255, 255, 255, 100, Helper.standardFont, Helper.standardFontSize, true, Helper.standardTextOffsetx, Helper.standardTextOffsety, 114),
-	}, nil, {2, 3, 1})
+--	setup:addSimpleRow({
+--		Helper.createIcon(shipimage ~= "" and shipimage or "transferSlider", false, 255, 255, 255, 100, 0, 0, 114, 214),
+--		Helper.createFontString( menu.buildInfoString() , false, "left", 255, 255, 255, 100, Helper.standardFont, Helper.standardFontSize, true, Helper.standardTextOffsetx, Helper.standardTextOffsety, 114),
+--		Helper.createFontString( menu.buildSkillString() , false, "left", 255, 255, 255, 100, Helper.standardFont, Helper.standardFontSize, true, Helper.standardTextOffsetx, Helper.standardTextOffsety, 114),
+--	}, nil, {2, 3, 1})
+
+  setup:addSimpleRow({
+    Helper.createButton(nil, Helper.createButtonIcon("table_arrow_inv_left", nil, 255, 255, 255, 100), false, #menu.ships > 1 and menu.mode ~= "wareexchange", 0, 0, Helper.standardButtonWidth, 114, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_LB", true), nil, (#menu.ships == 1) and menu.strings.mot_noships or nil),
+    Helper.createIcon(shipimage ~= "" and shipimage or "transferSlider", false, 255, 255, 255, 100, 0, 0, 114, 214),
+    Helper.createFontString(menu.buildInfoString(), false, "left", 255, 255, 255, 100, Helper.standardFont, Helper.standardFontSize, true, Helper.standardTextOffsetx, Helper.standardTextOffsety, 114),
+    Helper.createFontString( menu.buildSkillString() , false, "left", 255, 255, 255, 100, Helper.standardFont, Helper.standardFontSize, true, Helper.standardTextOffsetx, Helper.standardTextOffsety, 114),
+    Helper.createButton(nil, Helper.createButtonIcon("table_arrow_inv_right", nil, 255, 255, 255, 100), false, #menu.ships > 1 and menu.mode ~= "wareexchange", 0, 0, Helper.standardButtonWidth, 114, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_RB", true), nil, (#menu.ships == 1) and menu.strings.mot_noships or nil)
+  }, nil, {1, 1, 1, 2, 1})
 
 	--setup:addHeaderRow({ emptyFontStringSmall }, nil, {6})
 	--setup:addHeaderRow({ emptyFontStringSmall }, nil, {6})
 	--local padding = math.max(1, 32 - Helper.scaleX(Helper.standardButtonWidth))
 	--local infodesc = setup:createCustomWidthTable({Helper.scaleX(Helper.standardButtonWidth), Helper.scaleX(250), 0, Helper.scaleX(450), padding, Helper.scaleX(Helper.standardButtonWidth)}, false, true, true, 3, 4, 0, 0, 0, false)
-	local infodesc = setup:createCustomWidthTable({  Helper.standardButtonWidth, 230 - Helper.standardButtonWidth - 5, 0, 125, 125, 275 - Helper.standardButtonWidth - 5}, false, false, true, 3, 3, 0, 0, 550)
+	local padding = math.max(1, 32 - Helper.scaleX(Helper.standardButtonWidth))
+  local infodesc = setup:createCustomWidthTable({Helper.scaleX(Helper.standardButtonWidth), Helper.scaleX(214), 0, Helper.scaleX(200), padding, Helper.scaleX(Helper.standardButtonWidth)}, false, true, true, 3, 3, 0, 0, 0, false)
+	
+	--local infodesc = setup:createCustomWidthTable({  Helper.standardButtonWidth, 230 - Helper.standardButtonWidth - 5, 0, 125, 125, 275 - Helper.standardButtonWidth - 5}, false, false, true, 3, 3, 0, 0, 550)
 
 	--------------------------------------------------------------------
 	-- create select table
@@ -797,6 +876,10 @@ function menu.displayMenu(firsttime)
 
 
 	-- set button scripts
+	 -- ship table
+  Helper.setButtonScript(menu, nil, menu.infotable, 3, 1, menu.buttonShipLeft)
+  Helper.setButtonScript(menu, nil, menu.infotable, 3, 6, menu.buttonShipRight)
+	
 	Helper.setButtonScript(menu, nil, menu.buttontable, 1, 2, function () return menu.onCloseElement("close") end)
 	if menu.jlp_unitrader_isminerrun == 1 or menu.jlp_unitrader_istraderrun == 1 then
 		Helper.setButtonScript(menu, nil, menu.buttontable, 1, 4, menu.buttonSop)
@@ -1054,9 +1137,29 @@ end
 ----------------------------------------------------------
 -- Internal
 ----------------------------------------------------------
+function menu.getShipList()
+  menu.ships = GetTradeShipList()
+  for i = #menu.ships, 1, -1 do
+    local ship = menu.ships[i]
+    local commander = GetCommander(ship.shipid)
+    if IsSameComponent(ship.shipid, menu.playership) then
+      table.remove(menu.ships, i)
+    elseif commander and not IsSameComponent(commander, menu.playership) then
+      table.remove(menu.ships, i)
+    elseif GetBuildAnchor(ship.shipid) then
+      table.remove(menu.ships, i)
+    elseif #GetTransportUnitMacros(GetComponentData(ship.shipid, "macro")) == 0 then
+      table.remove(menu.ships, i)
+    end
+  end    
+  table.sort(menu.ships, menu.sortName)
+end
 
 function menu.readConfigDatas()
 
+  menu.entity = GetComponentData(menu.ship.shipid, "pilot")
+  menu.container = GetContextByClass(menu.entity, "container", false)
+  
 	local zone
 	if menu.entity then
 		menu.owner = GetComponentData(menu.ship.shipid, "owner")
@@ -1157,12 +1260,18 @@ end
 
 function cleanupConfigData ()
 
+
 	menu.owner = nil
 	menu.zoneowner =nil
 	menu.zoneownername = nil
 	menu.ship =nil
+	menu.ships = {}
 	menu.stopAllowed = false
-
+  menu.entity = nil
+  menu.playership = nil
+  menu.shipIndex = nil
+  
+  
   menu.jlp_unitrader_mode = nil
 	menu.jlp_unitrader_istraderrun = nil
 	menu.jlp_unitrader_isminerrun = nil
@@ -1327,6 +1436,13 @@ function menu.sortCargo(a, b)
 		return Helper.sortWareName(a.ware, b.ware)
 	end
 	return a.amount > b.amount
+end
+
+function menu.sortName(a, b)
+  if a.name == b.name then
+    return GetComponentData(GetComponentData(a.shipid, "pilot"),"uiname") < GetComponentData(GetComponentData(b.shipid, "pilot"),"uiname")
+  end
+  return a.name < b.name
 end
 
 init()
