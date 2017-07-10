@@ -92,7 +92,6 @@
 				<save_retval name="selloffer" variable="$selloffer" />
 				<save_retval name="buyoffer" variable="$buyoffer" />
 			</run_script>
-			<set_value name="this.$trade_failedfindruns" exact="0" />
 			<!-- <write_to_logbook category="general"
 				text="'%1\n%2\n%3\n%4\n%5\n%6\n%7\n%8\n%9\n'.[this.$trade_failedfindruns, $range.name, $homeBuy.name
 				, $selloffer.sellerentity.container.zone.name , $selloffer.ware, $selloffer.offeramount.{this}, $buyoffer.entity.container.zone.name
@@ -102,6 +101,7 @@
 			<!-- Switch home <-> sell -->
 			<do_if value="not $selloffer.available and not $buyoffer.available">
 				<wait exact="this.$jlp_unitrader_searchtime" />
+				<set_value name="this.$trade_failedfindruns" exact="0" />
 				<run_script name="'jlp.unitrader.trade.findfreetraderun'">
 					<param name="warelist" value="$warelist" />
 					<param name="homeBuy" value="$homeSell" />
@@ -118,7 +118,7 @@
 				</run_script>
 			</do_if>
 
-			<!-- No trades found after 5 tries -->
+			<!-- No trades found after some tries -->
 			<do_if value="@this.$trade_failedfindruns" min="10">
 <!-- 				<wait exact="this.$jlp_unitrader_searchtime" /> -->
 				<return />
