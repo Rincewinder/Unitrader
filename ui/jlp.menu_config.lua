@@ -144,8 +144,6 @@ end
 
 function menu.cleanup()
 
-  menu.entity = nil
-	menu.container = nil
 	menu.title = nil
 	menu.lastupdate = nil
 	menu.strings = nil
@@ -331,14 +329,14 @@ function menu.buttonStart()
 			menu.saveConfigDatas()
 			Helper.closeMenuForSubSection(menu, false, "gJLPUniTrader_uiconfig_trader_start", {0, 0, menu.entity}, menu.ship)
       menu.cleanup()
-      --menu.displayMenu(true)
+      menu.displayMenu(true)
   	elseif menu.jlp_unitrader_mode == "miner" then
 			menu.jlp_unitrader_istraderrun = 0
 			menu.jlp_unitrader_isminerrun = 1
 			menu.saveConfigDatas()
 			Helper.closeMenuForSubSection(menu, false, "gJLPUniTrader_uiconfig_miner_start", {0, 0, menu.entity}, menu.ship)
       menu.cleanup()
-     --menu.displayMenu(true)
+     menu.displayMenu(true)
 		end
 	end
 end
@@ -351,14 +349,14 @@ function menu.buttonStop()
 			menu.saveConfigDatas()
 			Helper.closeMenuForSubSection(menu, false, "gJLPUniTrader_uiconfig_trader_stop", {0, 0, menu.entity}, menu.ship)
       menu.cleanup()
-      --menu.displayMenu(true)
+      menu.displayMenu(true)
     elseif menu.jlp_unitrader_mode == "miner" then
 			menu.jlp_unitrader_istraderrun = 0
 			menu.jlp_unitrader_isminerrun = 0
 			menu.saveConfigDatas()
 			Helper.closeMenuForSubSection(menu, false, "gJLPUniTrader_uiconfig_miner_stop", {0, 0, menu.entity}, menu.ship)
 			menu.cleanup()
-      --menu.displayMenu(true)
+      menu.displayMenu(true)
 		end
 	end
 end
@@ -429,7 +427,7 @@ function  menu.buttonSetRangeModus ()
 			end
 		end
 	end
-	--menu.cleanup()
+	menu.cleanup()
 	menu.displayMenu(false)
 end
 
@@ -451,7 +449,7 @@ function  menu.buttonChangeMode ()
 		SetNPCBlackboard(menu.entity, "$traderange_buyclusters", nil)
 		SetNPCBlackboard(menu.entity, "$traderange_sellclusters", nil)
 	end
-	--menu.cleanup()
+	menu.cleanup()
 	menu.displayMenu(false)
 end
 
@@ -465,7 +463,7 @@ function  menu.buttonChangeLogbookMode ()
 		SetNPCBlackboard(menu.entity, "$jlp_unitrader_show_extendedlogbook",1)
 		Helper.updateCellText(menu.selecttable,  Helper.currentDefaultTableRow, 3, ReadText(8570, 4012) )
 	end
-	--menu.cleanup()
+	menu.cleanup()
 	menu.displayMenu(false)
 end
 
@@ -503,7 +501,7 @@ function  menu.buttonSetSubscription ()
 		end
 	end
 
-	--menu.cleanup()
+	menu.cleanup()
 	menu.displayMenu(false)
 end
 
@@ -542,7 +540,7 @@ end
 		end
 	end
 
-	--menu.cleanup()
+	menu.cleanup()
 	menu.displayMenu(false)
 end
 
@@ -642,6 +640,7 @@ function menu.displayMenu(firsttime)
 	local zoneName, sectorName, clusterName
 	= GetComponentData(shipzone, "uiname", "sector", "cluster")
   if menu.jlp_unitrader_mode == "trader" then
+    -- trader buy
 	 if menu.jlp_unitrader_currentselloffer ~= nil and IsValidComponent(menu.jlp_unitrader_currentselloffer.station) then
 		  local name, zoneid, sectorid, clusterid, tradesubscription
 		  = GetComponentData(menu.jlp_unitrader_currentselloffer.station, "uiname", "zoneid" , "sectorid", "clusterid", "tradesubscription")
@@ -657,7 +656,24 @@ function menu.displayMenu(firsttime)
 			 Helper.createFontString(ReadText(1001, 2973), false, "left", 255, 255, 255, 100, Helper.standardFont)
 		  }, "showTradedetailsBuy", {2,4})
 	 end
-	end
+  else
+     -- miner resources 
+     if menu.jlp_unitrader_home_buy ~= nil and IsValidComponent(menu.jlp_unitrader_home_buy) then
+        local sectorid, clusterid
+        = GetComponentData(menu.jlp_unitrader_home_buy, "sectorid", "clusterid")
+  
+        setup:addSimpleRow({
+         Helper.createFontString(ReadText(1002, 2026) .. ": ", false, "left", 255, 255, 255, 100, Helper.standardFont),
+         Helper.createFontString(GetComponentData(clusterid, "mapshortname") .. " // " .. GetComponentData(sectorid, "mapshortname") .. " // " .. GetComponentData(menu.jlp_unitrader_home_buy, "mapshortname"), false, "left", 255, 255, 255, 100, Helper.standardFont)
+        }, "showMinerBuy", {2,4})
+     else
+        setup:addSimpleRow({
+         Helper.createFontString(ReadText(1001, 2931) .. ": ", false, "left", 255, 255, 255, 100, Helper.standardFont),
+         Helper.createFontString(ReadText(1001, 2973), false, "left", 255, 255, 255, 100, Helper.standardFont)
+        }, "showTradedetailsBuy", {2,4})
+   end
+  
+  end
 	if menu.jlp_unitrader_currentbuyoffer ~= nil  and IsValidComponent(menu.jlp_unitrader_currentbuyoffer.station) then
 		local name, zoneid, sectorid, clusterid, tradesubscription
 		= GetComponentData(menu.jlp_unitrader_currentbuyoffer.station, "uiname", "zoneid" , "sectorid", "clusterid", "tradesubscription")
@@ -878,6 +894,7 @@ function menu.displayMenu(firsttime)
   -- check the selected row
   menu.toprow = GetTopRow(menu.selecttable)
   menu.selectrow = Helper.currentDefaultTableRow
+  
   if menu.selectrow < 1  then 
     menu.selectrow = 1
   end
@@ -1285,9 +1302,10 @@ function cleanupConfigData ()
 	menu.ship =nil
 	menu.ships = {}
 	menu.stopAllowed = false
-  menu.entity = nil
   menu.playership = nil
   menu.shipIndex = nil
+  menu.entity = nil
+  menu.container = nil
   
   
   menu.jlp_unitrader_mode = nil
