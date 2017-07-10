@@ -593,7 +593,7 @@
 					<set_value name="$bestbuyoffers" exact="[]" />
 					<!--List all wares of the found trades so we can search for buy offers in our sell range. This
 						prevents the ship buying wares it can't sell -->
-					<do_all exact="$selloffers.count" counter="$Counter" reverse="true">
+					<do_all exact="$selloffers.count" counter="$Counter" >
 						<set_value name="$destination" exact="$selloffers.{$Counter}.seller" />
 						<do_if value="$destination.isclass.ship_xl" negate="true">
 							<do_if value="(not $destination.tradenpc.container.hastradesubscription) and $onlyTraderBuy">
@@ -845,7 +845,7 @@
 								<sort_trades name="$buyoffers" tradelist="$buyoffers" sorter="distance"
 									refobject="this" />
 								<sort_trades name="$buyoffers" tradelist="$buyoffers" sorter="relativeprice" />
-								<do_all exact="$buyoffers.count" counter="$Counter2">
+								<do_all exact="$buyoffers.count" counter="$Counter2" reverse="true">
 									<do_if
 										value="@$lasttrade and (not $lasttrade.{1}) and $lasttrade.{2} == $buyoffers.{$Counter2}.ware and $lasttrade.{3} == $buyoffers.{$Counter2}.buyer"
 									>
@@ -1088,7 +1088,7 @@
 							<sort_trades name="$buyoffers" tradelist="$buyoffers" sorter="distance"
 								refobject="this.ship" />
 							<sort_trades name="$buyoffers" tradelist="$buyoffers" sorter="relativeprice" />
-							<do_all exact="$buyoffers.count" counter="$Counter">
+							<do_all exact="$buyoffers.count" counter="$Counter" reverse="true">
 								<do_if
 									value="@$lasttrade and (not $lasttrade.{1}) and $lasttrade.{2} == $buyoffers.{$Counter}.ware and $lasttrade.{3} == $buyoffers.{$Counter}.buyer"
 								>
@@ -1538,13 +1538,15 @@
 											<do_else>
 												<set_value name="$checkoffer.buyer.tradenpc.$reservedtrades" exact="[$checkoffer]" />
 											</do_else>
-											<!-- <set_value name="$buyoffer" exact="$checkoffer" />
-												<break />
-											-->
+											<set_value name="$buyoffer" exact="$checkoffer" />
+											<break />
+
 										</do_if>
 									</do_if>
-									<set_value name="$buyoffer" exact="$checkoffer" />
-									<break />
+									<do_else>
+										<set_value name="$buyoffer" exact="$checkoffer" />
+										<break />
+									</do_else>
 								</do_if>
 							</do_if>
 						</do_all>
@@ -1604,11 +1606,11 @@
 			</do_if>
 
 			<!-- if other sell cluster available, search with one of this
-			<do_if value="@$buyrange and @$sellrange and @$sellclusters.count ge 1">
+				<do_if value="@$buyrange and @$sellrange and @$sellclusters.count ge 1">
 				<set_value name="$checkrangeSell" exact="null" />
 				<resume label="check sell range" />
-			</do_if>
-			 -->
+				</do_if>
+			-->
 
 			<!-- can't find anything good at the moment... wait a while, then check again -->
 			<debug_text
@@ -1621,7 +1623,7 @@
 
 			<do_if value="@this.$trade_failedfindruns" min="10">
 				<set_value name="$idletime" exact="this.$jlp_unitrader_searchtime" />
-	
+
 				<run_script name="'move.idle'" sinceversion="1">
 					<param name="TimeOut" value="$idletime" />
 				</run_script>
