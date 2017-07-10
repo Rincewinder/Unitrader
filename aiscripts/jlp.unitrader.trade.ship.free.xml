@@ -39,7 +39,7 @@
 			<set_value name="$selloffer" exact="null" />
 
 
-			
+
 			<!-- TODO: we should check for things like broken jump drive, so we can go in for repairs instead
 				of endlessly trying to jump to a trade -->
 
@@ -120,14 +120,14 @@
 
 			<!-- No trades found after some tries -->
 			<do_if value="@this.$trade_failedfindruns" min="10">
-<!-- 				<wait exact="this.$jlp_unitrader_searchtime" /> -->
+				<!-- <wait exact="this.$jlp_unitrader_searchtime" /> -->
 				<return />
 			</do_if>
 
 			<!--If no trade was found then at least fly back to the buy area before checking again -->
 			<do_if value="not $selloffer.available and not $buyoffer.available">
-<!-- 				<set_value name="this.$trade_failedfindruns" operation="add" />
- -->				<!--If the buyclusters are saved to the blackboard, fly to one of them -->
+				<!-- <set_value name="this.$trade_failedfindruns" operation="add" />
+				-->				<!--If the buyclusters are saved to the blackboard, fly to one of them -->
 				<do_if value="this.$traderange_buyclusters?">
 					<set_value name="$moveto" exact="true" />
 					<do_if value="this.$traderange_buyclusters.count">
@@ -151,24 +151,26 @@
 					</do_if>
 				</do_if>
 				<do_else>
-					<do_if value="$rangeBuy == 'sector'">
-						<set_value name="$destination" exact="$homeBuy.random" />
-					</do_if>
-					<do_elseif value="$rangeBuy == 'cluster'">
-						<set_value name="$destination" exact="$homeBuy.random" />
-					</do_elseif>
-					<do_elseif value="$rangeBuy == 'ranged'">
-						<set_value name="$destination" exact="$homeBuy.random" />
-					</do_elseif>
+					<do_if value="$rangeBuy != 'zone'">
+						<do_if value="$rangeBuy == 'sector'">
+							<set_value name="$destination" exact="$homeBuy" />
+						</do_if>
+						<do_elseif value="$rangeBuy == 'cluster'">
+							<set_value name="$destination" exact="$homeBuy.random" />
+						</do_elseif>
+						<do_elseif value="$rangeBuy == 'ranged'">
+							<set_value name="$destination" exact="$homeBuy.random" />
+						</do_elseif>
 
-					<run_script name="'move.generic'" sinceversion="2">
-						<param name="destination" value="$destination" />
-						<param name="endintargetzone" value="true" />
-					</run_script>
+						<run_script name="'move.generic'" sinceversion="2">
+							<param name="destination" value="$destination" />
+							<param name="endintargetzone" value="true" />
+						</run_script>
+					</do_if>
 				</do_else>
 
-<!-- 				<wait exact="this.$jlp_unitrader_searchtime" /> -->
-				<resume label="find trade run" />
+				 <wait exact="this.$jlp_unitrader_searchtime" />
+				<!-- <resume label="find trade run" /> -->
 			</do_if>
 
 
