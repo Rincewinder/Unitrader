@@ -123,6 +123,7 @@ function menu.onShowMenu()
   -- read params
   menu.ship = GetContextByClass(menu.param[3], "ship", false)
   menu.playership = GetPlayerPrimaryShipID()
+
 	
   -- Get the list of suitable ships
   menu.getShipList()
@@ -154,6 +155,7 @@ function menu.cleanup()
 	menu.infotable = nil
 	menu.selecttable = nil
 	--menu.buttontable = nil --TODO: why i cannot delete this?
+
 	
 	-- Reset Helper
 	Helper.standardFontSize = 14
@@ -190,7 +192,7 @@ function menu.buttonShipLeft()
   SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, true)
   menu.ship = menu.ships[menu.shipIndex]
   menu.readConfigDatas()
-  menu.settoprow = GetTopRow(menu.offertable)
+  menu.settoprow = GetTopRow(menu.selecttable)
   menu.displayMenu(true)
 end
 
@@ -216,11 +218,12 @@ function menu.buttonShipRight()
       menu.shipIndex = #menu.shipIndex
     end
   end
+ 
 
   SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, true)
   menu.ship = menu.ships[menu.shipIndex]
   menu.readConfigDatas()
-  menu.settoprow = GetTopRow(menu.offertable)
+  menu.settoprow = GetTopRow(menu.selecttable)
   menu.displayMenu(true)
 end
 
@@ -550,6 +553,7 @@ function menu.displayMenu(firsttime)
   Helper.currentTableRow = {}
   Helper.currentTableRowData = nil
   menu.rowDataMap = {}
+  
 	
 	menu.lastupdate = GetCurTime()
 	-- read personal configuration data from menu.entity
@@ -871,6 +875,16 @@ function menu.displayMenu(firsttime)
 	-- create button table
 	local buttondesc = setup:createCustomWidthTable({48, 150, 48, 150, 0, 150, 48, 150, 48}, false, false, true, 2, 1, 0, 560, 0, false)
 
+  -- check the selected row
+  menu.toprow = GetTopRow(menu.selecttable)
+  menu.selectrow = Helper.currentDefaultTableRow
+  if menu.selectrow < 1  then 
+    menu.selectrow = 1
+  end
+  if menu.selectrow > #menu.rowDataMap then
+    menu.selectrow = #menu.rowDataMap -1
+  end
+
 	-- join  tables
 	menu.infotable, menu.selecttable, menu.buttontable = Helper.displayThreeTableView(menu, infodesc, selectdesc, buttondesc, false, "", "", 0, 0, 0, 0, "both", firsttime)
 
@@ -879,7 +893,7 @@ function menu.displayMenu(firsttime)
 	 -- ship table
   Helper.setButtonScript(menu, nil, menu.infotable, 3, 1, menu.buttonShipLeft)
   Helper.setButtonScript(menu, nil, menu.infotable, 3, 6, menu.buttonShipRight)
-	
+	-- bottom button
 	Helper.setButtonScript(menu, nil, menu.buttontable, 1, 2, function () return menu.onCloseElement("close") end)
 	if menu.jlp_unitrader_isminerrun == 1 or menu.jlp_unitrader_istraderrun == 1 then
 		Helper.setButtonScript(menu, nil, menu.buttontable, 1, 4, menu.buttonSop)
