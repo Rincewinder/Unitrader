@@ -119,40 +119,29 @@ function menu.onShowMenu()
 		mot_noships = ReadText(1026, 2905),
 		mot_toomanytrips = ReadText(1001, 2972)
 	}
+  menu.ship =nil
+  menu.ships = {}
+  menu.shipIndex = nil
+	menu.playership = nil
 	
   -- read params
-  menu.ship = GetContextByClass(menu.param[3], "ship", false)
+  menu.ship = GetTradeShipData(GetContextByClass(menu.param[3], "ship", false))
   menu.playership = GetPlayerPrimaryShipID()
-
-	
-  -- Get the list of suitable ships
-  menu.getShipList()
-  
-  menu.shipIndex = 1
-  if menu.ship then
-    for i, ship in ipairs(menu.ships) do
-      if IsSameComponent(ship.shipid, menu.ship) then
-        menu.shipIndex = i
-        break
-      end
-    end
-    menu.ship = GetTradeShipData(menu.ships[menu.shipIndex].shipid)
- end
 
 	menu.displayMenu(true)
 end
 
 function menu.cleanup()
 
-	menu.title = nil
+	--menu.title = nil
 	menu.lastupdate = nil
-	menu.strings = nil
+	--menu.strings = nil
 
 	cleanupConfigData ()
 
 	menu.infotable = nil
 	menu.selecttable = nil
-	--menu.buttontable = nil --TODO: why i cannot delete this?
+	menu.buttontable = nil --TODO: why i cannot delete this?
 
 	
 	-- Reset Helper
@@ -165,14 +154,14 @@ end
 -- Menu member functions
 ---------------------------------------------------------------------------------------------
 function menu.buttonShipLeft()
-  if IsComponentOperational(menu.ships[menu.shipIndex].shipid) then
-    SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, false)
-  else
+--  if IsComponentOperational(menu.ships[menu.shipIndex].shipid) then
+--    SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, false)
+--  else
     menu.getShipList()
     if menu.shipIndex > #menu.ships then
       menu.shipIndex = #menu.ships
     end
-  end
+--  end
 
   if menu.shipIndex == 1 then
     menu.shipIndex = #menu.ships
@@ -187,22 +176,24 @@ function menu.buttonShipLeft()
     end
   end
 
-  SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, true)
+--  SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, true)
   menu.ship = menu.ships[menu.shipIndex]
-  menu.readConfigDatas()
-  menu.settoprow = GetTopRow(menu.selecttable)
-  menu.displayMenu(true)
+  --menu.cleanup()
+  --menu.readConfigDatas()
+  menu.toprow = GetTopRow(menu.selecttable)
+  menu.selectrow = Helper.currentDefaultTableRow
+  menu.displayMenu(false)
 end
 
 function menu.buttonShipRight()
-  if IsComponentOperational(menu.ships[menu.shipIndex].shipid) then
-    SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, false)
-  else
+--  if IsComponentOperational(menu.ships[menu.shipIndex].shipid) then
+--    SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, false)
+--  else
     menu.getShipList()
     if menu.shipIndex > #menu.ships then
       menu.shipIndex = #menu.ships
     end
-  end
+--  end
 
   if menu.shipIndex == #menu.ships then
     menu.shipIndex = 1
@@ -218,11 +209,13 @@ function menu.buttonShipRight()
   end
  
 
-  SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, true)
+--  SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, true)
   menu.ship = menu.ships[menu.shipIndex]
-  menu.readConfigDatas()
-  menu.settoprow = GetTopRow(menu.selecttable)
-  menu.displayMenu(true)
+ -- menu.cleanup()
+  --menu.readConfigDatas()
+  menu.toprow = GetTopRow(menu.selecttable)
+  menu.selectrow = Helper.currentDefaultTableRow
+  menu.displayMenu(false)
 end
 
 -- Buttons functions
@@ -545,6 +538,21 @@ end
 end
 
 function menu.displayMenu(firsttime)
+
+ -- Get the list of suitable ships
+  menu.getShipList()
+  
+  --menu.shipIndex = 1
+  if menu.ship then
+    for i, ship in ipairs(menu.ships) do
+      
+      if IsSameComponent(ship.shipid, menu.ship.shipid) then
+        menu.shipIndex = i
+        break
+      end
+    end
+    menu.ship = GetTradeShipData(menu.ships[menu.shipIndex].shipid)
+ end
 
   -- Remove possible button scripts from previous view
   Helper.removeAllButtonScripts(menu)
@@ -963,9 +971,8 @@ function menu.onUpdate()
 end
 
 function menu.onRowChanged(row, rowdata)
-	if menu.rowDataMap[Helper.currentDefaultTableRow] then
-
-	 
+  menu.selectrow = Helper.currentDefaultTableRow
+	if menu.rowDataMap[menu.selectrow] then
 		rowdata = menu.rowDataMap[Helper.currentDefaultTableRow]
 		Helper.removeButtonScripts(menu, menu.buttontable, 1, 8)
 		local name, mot_details
@@ -1119,7 +1126,7 @@ function menu.onRowChanged(row, rowdata)
 			-- money transfer
 			name = ReadText(1002, 2022)
 			mot_details = ReadText(1004, 1072)
-			local npcname = GetComponentData(menu.entity, "name")
+			local npcname = GetComponentData(menu.entity, "uiname")
 			mot_details  = string.format(string.gsub(mot_details,'$NPC$','%s'),  npcname)
 
 			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(name, "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, active, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_A", true), nil, active and mot_details or nil), 1, 4)
@@ -1139,15 +1146,14 @@ function menu.onRowChanged(row, rowdata)
 			Helper.setButtonScript(menu, nil, menu.buttontable, 1, 6, menu.buttonchooseModus)
 
 		else
+      Helper.removeButtonScripts(menu, menu.buttontable, 1, 8)
 			SetCellContent(menu.buttontable,Helper.getEmptyCellDescriptor(), 1, 8)
-			Helper.removeButtonScripts(menu, menu.buttontable, 1, 8)
 		end
 	else
 		Helper.removeButtonScripts(menu, menu.buttontable, 1, 8)
 		SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(ReadText(1001, 3105), "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, false, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_A", true)), 1, 8)
 	end
     
-  menu.onUpdate()
 end
 
 --function menu.onSelectElement()
@@ -1299,11 +1305,7 @@ function cleanupConfigData ()
 	menu.owner = nil
 	menu.zoneowner =nil
 	menu.zoneownername = nil
-	menu.ship =nil
-	menu.ships = {}
 	menu.stopAllowed = false
-  menu.playership = nil
-  menu.shipIndex = nil
   menu.entity = nil
   menu.container = nil
   
