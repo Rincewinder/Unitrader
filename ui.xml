@@ -10,6 +10,8 @@
      <file name="ui/jlp.menu_moneytransfer.lua" />
      <file name="ui/jlp.menu_setjumplimit.lua" />
      <file name="ui/jlp.menu_trading_details.lua" />
+     <file name="ui/jlp.menu_map.lua" />
+    
 
    <!--  <dependency name="jlp_detailmonitorHelper" /> -->
   </environment>

@@ -78,9 +78,11 @@
 				</check_all>
 			</conditions>
 			<actions>
-
 				<set_value name="$Captain" exact="event.object" />
 				<set_value name="$param2" exact="event.param2" />
+				<do_if value="$param2.{3} and $param2.{3}.isclass.{class.entity}">
+					<set_value name="$Captain" exact="$param2.{3}" />
+				</do_if>
 				<do_if
 					value="event.param == 'gJLPUniTrader_uiconfig' or event.name == 'event_conversation_returned_to_section' "
 				>
@@ -88,39 +90,25 @@
 						<add_npc_line line="4119" view="closeupdetailmonitor" comment="Here you go." />
 					</do_if>
 					<add_conversation_view view="closeupdetailmonitor" />
-					<open_conversation_menu menu="jlp_unitrader_ConfigMenu" param="[0, 0, event.object]"
+					<open_conversation_menu menu="jlp_unitrader_ConfigMenu" param="[0, 0, $Captain]"
 						param2="$param2" />
 				</do_if>
-				<do_elseif value="@$param2.{3}.isclass.zone">
+				<do_elseif value="@$param2.{4}.isclass.zone">
 					<do_if value="event.param" exact="'gJLPUniTrader_uiconfig_range_buy_home'">
-						<set_value name="$Captain.$jlp_unitrader_home_buy" exact="$param2.{3}" />
+						<set_value name="$Captain.$jlp_unitrader_home_buy" exact="$param2.{4}" />
 						<remove_value name="this.$traderangeBuy_nexttime"/>
 					</do_if>
 					<do_elseif value="event.param" exact="'gJLPUniTrader_uiconfig_range_sell_home'">
-						<set_value name="$Captain.$jlp_unitrader_home_sell" exact="$param2.{3}" />
+						<set_value name="$Captain.$jlp_unitrader_home_sell" exact="$param2.{4}" />
 						<remove_value name="this.$traderangeSell_nexttime"/>
 					</do_elseif>
 					<add_npc_line speaker="$Captain" line="[1012, 1013, 1018, 1019].random" comment="Confirmation" />
 					<add_conversation_view view="closeupdetailmonitor" />
-					<open_conversation_menu menu="jlp_unitrader_ConfigMenu" param="[0, 0, event.object]"
-						param2="$param2" />
-				</do_elseif>
-				<do_elseif value="event.param" exact="'gJLPUniTrader_uiconfig_range_buy'">
-					<set_value name="$Captain.$jlp_unitrader_range_buy" exact="event.param2" />
-					<add_npc_line speaker="$Captain" line="[1012, 1013, 1018, 1019].random" comment="Confirmation" />
-					<add_conversation_view view="closeupdetailmonitor" />
-					<open_conversation_menu menu="jlp_unitrader_ConfigMenu" param="[0, 0, event.object]"
-						param2="$param2" />
-				</do_elseif>
-				<do_elseif value="event.param" exact="'gJLPUniTrader_uiconfig_range_sell'">
-					<set_value name="$Captain.$jlp_unitrader_range_sell" exact="event.param2" />
-					<add_npc_line speaker="$Captain" line="[1012, 1013, 1018, 1019].random" comment="Confirmation" />
-					<add_conversation_view view="closeupdetailmonitor" />
-					<open_conversation_menu menu="jlp_unitrader_ConfigMenu" param="[0, 0, event.object]"
+					<open_conversation_menu menu="jlp_unitrader_ConfigMenu" param="[0, 0, $Captain]"
 						param2="$param2" />
 				</do_elseif>
 				<do_elseif value="event.param" exact="'gJLPUniTrader_uiconfig_setJump'">
-					<open_conversation_menu menu="jlp_setJump" param="event.param2" param2="event.param3" />
+					<open_conversation_menu menu="jlp_setJump" param="$param2" param2="event.param3" />
 					<add_conversation_view view="closeupdetailmonitor" />
 					<add_npc_line speaker="$Captain" line="[4160, 4750].random" comment="How many do you want? OR How much?" />
 						<remove_value name="this.$traderangeBuy_nexttime"/>
@@ -140,7 +128,7 @@
 				</do_elseif>
 				<do_elseif value="event.param" exact="'gJLPUniTrader_uiconfig_chooseZone'">
 					<add_conversation_view view="closeupdetailmonitor" />
-					<open_conversation_menu menu="MapMenu" param="event.param2" param2="event.param3" />
+					<open_conversation_menu menu="gJLPUniTrader_uiconfig_gMain_map" param="$param2" param2="event.param3" />
 					<add_npc_line speaker="player.entity" line="1300" comment="give me the map" />
 						<remove_value name="this.$traderangeBuy_nexttime"/>
 						<remove_value name="this.$traderangeSell_nexttime"/>
@@ -153,17 +141,12 @@
 				</do_elseif>
 
 				<do_elseif value="event.param" exact="'gJLPUniTrader_uiconfig_trader_start'">
-					<set_value name="$Captain" exact="event.object" />
+					
 					<add_npc_line speaker="$Captain" line="[1012, 1013, 1018, 1019].random" comment="Confirmation" />
 					<set_value name="$Captain.$jlpUniTraderRun" exact="true" />
 					<set_value name="$Captain.$jlpUniMiningRun" exact="false" />
 
 					<set_actor_account actor="$Captain"/>
-					<start_script object="$Captain" name="'jlp.unitrader.main'">
-						<param name="PageId" value="8570i" />
-						<param name="Mode" value="'trader'" />
-					</start_script>
-
 					<!-- check and send minbudget -->
 					<set_value name="$minBudget" exact="$Captain.$jlp_unitrader_budgetmin" />
 					<do_if value="$Captain.money" max="$minBudget">
@@ -179,23 +162,29 @@
 						</do_if>
 					</do_if>
 
+					<start_script object="$Captain" name="'jlp.unitrader.main'">
+						<param name="PageId" value="8570i" />
+						<param name="Mode" value="'trader'" />
+					</start_script>
+
+
 					<add_conversation_view view="closeupdetailmonitor" />
 					<open_conversation_menu menu="jlp_unitrader_ConfigMenu" param="[0, 0, $Captain]"
 						param2="$param2" />
 
 				</do_elseif>
 				<do_elseif value="event.param" exact="'gJLPUniTrader_uiconfig_trader_stop'">
-					<set_value name="$Captain" exact="event.object" />
+					
 					<set_value name="$Captain.$jlpUniTraderRun" exact="false" />
 					<set_value name="$Captain.$jlpUniMiningRun" exact="false" />
 					<add_npc_line speaker="$Captain" line="1058" comment="Ready for new orders, Sir." />
 					<start_script object="$Captain" name="'jlp.interrupt.stoporder'" />
 					<add_conversation_view view="closeupdetailmonitor" />
-					<open_conversation_menu menu="jlp_unitrader_ConfigMenu" param="[0, 0, event.object]"
+					<open_conversation_menu menu="jlp_unitrader_ConfigMenu" param="[0, 0, $Captain]"
 						param2="$param2" />
 				</do_elseif>
 				<do_elseif value="event.param" exact="'gJLPUniTrader_uiconfig_miner_start'">
-					<set_value name="$Captain" exact="event.object" />
+					
 					<do_if value="$Captain.ship.cargo.tags.indexof.{tag.liquid}">
 						<add_npc_line speaker="player.copilot" line="14001"
 							comment="Captain, we want you to start mining gases here." />
@@ -209,10 +198,6 @@
 					<set_value name="$Captain.$jlpUniMiningRun" exact="true" />
 					<set_value name="$Captain.$jlpUniTraderRun" exact="false" />
 					<set_actor_account actor="$Captain"/>
-					<start_script object="$Captain" name="'jlp.unitrader.main'">
-						<param name="PageId" value="8570i" />
-						<param name="Mode" value="'miner'" />
-					</start_script>
 					<!-- check and send minbudget -->
 					<set_value name="$minBudget" exact="$Captain.$jlp_unitrader_budgetmin" />
 					<do_if value="$Captain.money" max="$minBudget">
@@ -229,23 +214,28 @@
 						</do_if>
 					</do_if>
 
+					<start_script object="$Captain" name="'jlp.unitrader.main'">
+						<param name="PageId" value="8570i" />
+						<param name="Mode" value="'miner'" />
+					</start_script>
+
 					<add_conversation_view view="closeupdetailmonitor" />
 					<open_conversation_menu menu="jlp_unitrader_ConfigMenu" param="[0, 0, $Captain]"
 						param2="$param2" />
 				</do_elseif>
 				<do_elseif value="event.param" exact="'gJLPUniTrader_uiconfig_miner_stop'">
-					<set_value name="$Captain" exact="event.object" />
+					
 					<set_value name="$Captain.$jlpUniMiningRun" exact="false" />
 					<set_value name="$Captain.$jlpUniTraderRun" exact="false" />
 					<add_npc_line speaker="$Captain" line="1058" comment="Ready for new orders, Sir." />
 					<start_script object="$Captain" name="'jlp.interrupt.stoporder'" />
 					<add_conversation_view view="closeupdetailmonitor" />
-					<open_conversation_menu menu="jlp_unitrader_ConfigMenu" param="[0, 0, event.object]"
+					<open_conversation_menu menu="jlp_unitrader_ConfigMenu" param="[0, 0, $Captain]"
 						param2="$param2" />
 				</do_elseif>
 				<do_else>
 					<add_conversation_view view="closeupdetailmonitor" />
-					<open_conversation_menu menu="jlp_unitrader_ConfigMenu" param="[0, 0, event.object]"
+					<open_conversation_menu menu="jlp_unitrader_ConfigMenu" param="[0, 0, $Captain]"
 						param2="$param2" />
 
 				</do_else>

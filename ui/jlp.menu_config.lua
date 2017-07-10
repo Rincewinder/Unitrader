@@ -119,30 +119,26 @@ function menu.onShowMenu()
 		mot_noships = ReadText(1026, 2905),
 		mot_toomanytrips = ReadText(1001, 2972)
 	}
-  menu.ship =nil
-  menu.ships = {}
-  menu.shipIndex = nil
-	menu.playership = nil
-	
-  -- read params
-  menu.ship = GetTradeShipData(GetContextByClass(menu.param[3], "ship", false))
-  menu.playership = GetPlayerPrimaryShipID()
 
 	menu.displayMenu(true)
 end
 
 function menu.cleanup()
 
-	--menu.title = nil
+	menu.title = nil
 	menu.lastupdate = nil
-	--menu.strings = nil
+	menu.strings = nil
+  --menu.ship =nil
+  --menu.ships = {}
+  --menu.shipIndex = nil
+  menu.playership = nil
+  
 
 	cleanupConfigData ()
 
 	menu.infotable = nil
 	menu.selecttable = nil
-	menu.buttontable = nil --TODO: why i cannot delete this?
-
+	menu.buttontable = nil 
 	
 	-- Reset Helper
 	Helper.standardFontSize = 14
@@ -153,70 +149,6 @@ end
 ---------------------------------------------------------------------------------------------
 -- Menu member functions
 ---------------------------------------------------------------------------------------------
-function menu.buttonShipLeft()
---  if IsComponentOperational(menu.ships[menu.shipIndex].shipid) then
---    SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, false)
---  else
-    menu.getShipList()
-    if menu.shipIndex > #menu.ships then
-      menu.shipIndex = #menu.ships
-    end
---  end
-
-  if menu.shipIndex == 1 then
-    menu.shipIndex = #menu.ships
-  else
-    menu.shipIndex = menu.shipIndex - 1
-  end
-
-  if not IsComponentOperational(menu.ships[menu.shipIndex].shipid) then
-    menu.getShipList()
-    if menu.shipIndex > #menu.ships then
-      menu.shipIndex = #menu.ships
-    end
-  end
-
---  SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, true)
-  menu.ship = menu.ships[menu.shipIndex]
-  --menu.cleanup()
-  --menu.readConfigDatas()
-  menu.toprow = GetTopRow(menu.selecttable)
-  menu.selectrow = Helper.currentDefaultTableRow
-  menu.displayMenu(false)
-end
-
-function menu.buttonShipRight()
---  if IsComponentOperational(menu.ships[menu.shipIndex].shipid) then
---    SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, false)
---  else
-    menu.getShipList()
-    if menu.shipIndex > #menu.ships then
-      menu.shipIndex = #menu.ships
-    end
---  end
-
-  if menu.shipIndex == #menu.ships then
-    menu.shipIndex = 1
-  else
-    menu.shipIndex = menu.shipIndex + 1
-  end
-
-  if not IsComponentOperational(menu.ships[menu.shipIndex].shipid) then
-    menu.getShipList()
-    if menu.shipIndex > #menu.ships then
-      menu.shipIndex = #menu.shipIndex
-    end
-  end
- 
-
---  SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, true)
-  menu.ship = menu.ships[menu.shipIndex]
- -- menu.cleanup()
-  --menu.readConfigDatas()
-  menu.toprow = GetTopRow(menu.selecttable)
-  menu.selectrow = Helper.currentDefaultTableRow
-  menu.displayMenu(false)
-end
 
 -- Buttons functions
 function menu.buttonTransferMoney ()
@@ -255,6 +187,72 @@ function menu.buttonSetRangeJumpMin()
 	end
 end
 
+function menu.buttonShipLeft()
+  if IsComponentOperational(menu.ships[menu.shipIndex].shipid) then
+    SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, false)
+  else
+    menu.getShipList()
+    if menu.shipIndex > #menu.ships then
+      menu.shipIndex = #menu.ships
+    end
+  end
+
+  if menu.shipIndex == 1 then
+    menu.shipIndex = #menu.ships
+  else
+    menu.shipIndex = menu.shipIndex - 1
+  end
+
+  if not IsComponentOperational(menu.ships[menu.shipIndex].shipid) then
+    menu.getShipList()
+    if menu.shipIndex > #menu.ships then
+      menu.shipIndex = #menu.ships
+    end
+  end
+
+  SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, true)
+  menu.ship = menu.ships[menu.shipIndex]
+  --menu.cleanup()
+  --menu.readConfigDatas()
+  menu.toprow = GetTopRow(menu.selecttable)
+  menu.selectrow = Helper.currentDefaultTableRow
+  menu.displayMenu(true)
+end
+
+function menu.buttonShipRight()
+  if IsComponentOperational(menu.ships[menu.shipIndex].shipid) then
+    SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, false)
+  else
+    menu.getShipList()
+    if menu.shipIndex > #menu.ships then
+      menu.shipIndex = #menu.ships
+    end
+  end
+
+  if menu.shipIndex == #menu.ships then
+    menu.shipIndex = 1
+  else
+    menu.shipIndex = menu.shipIndex + 1
+  end
+
+  if not IsComponentOperational(menu.ships[menu.shipIndex].shipid) then
+    menu.getShipList()
+    if menu.shipIndex > #menu.ships then
+      menu.shipIndex = #menu.shipIndex
+    end
+  end
+ 
+
+  SetVirtualCargoMode(menu.ships[menu.shipIndex].shipid, true)
+  menu.ship = menu.ships[menu.shipIndex]
+ -- menu.cleanup()
+  --menu.readConfigDatas()
+  menu.toprow = GetTopRow(menu.selecttable)
+  menu.selectrow = Helper.currentDefaultTableRow
+  menu.displayMenu(true)
+end
+
+
 function menu.buttonSetRangeJumpMax()
 	if IsValidComponent(menu.entity) then
 		if menu.rowDataMap[Helper.currentDefaultTableRow] then
@@ -278,14 +276,14 @@ end
 
 function menu.buttonDetailsBuy()
 	if menu.jlp_unitrader_currentselloffer ~= nil and IsValidComponent(menu.jlp_unitrader_currentselloffer.station) then
-		Helper.closeMenuForSubSection(menu, false, "gJLPUniTrader_uiconfig_gTrade_details", {0, 0, menu.jlp_unitrader_currentselloffer, menu.ship and menu.ship.shipid or nil, menu.jlp_unitrader_currentsellofferentity, menu.entity }, menu.ship)
+		Helper.closeMenuForSubSection(menu, false, "gJLPUniTrader_uiconfig_gTrade_details", {0, 0, menu.entity, menu.jlp_unitrader_currentselloffer, menu.ship and menu.ship.shipid or nil, menu.jlp_unitrader_currentsellofferentity, menu.entity }, menu.ship)
 		menu.cleanup()
 	end
 end
 
 function menu.buttonDetailsSell()
 	if menu.jlp_unitrader_currentbuyoffer ~= nil and IsValidComponent(menu.jlp_unitrader_currentbuyoffer.station) then
-		Helper.closeMenuForSubSection(menu, false, "gJLPUniTrader_uiconfig_gTrade_details", {0, 0, menu.jlp_unitrader_currentbuyoffer, menu.ship and menu.ship.shipid or nil, menu.jlp_unitrader_currentbuyofferentity, menu.entity }, menu.ship)
+		Helper.closeMenuForSubSection(menu, false, "gJLPUniTrader_uiconfig_gTrade_details", {0, 0, menu.entity, menu.jlp_unitrader_currentbuyoffer, menu.ship and menu.ship.shipid or nil, menu.jlp_unitrader_currentbuyofferentity, menu.entity }, menu.ship)
 		menu.cleanup()
 	end
 end
@@ -294,22 +292,22 @@ function menu.buttonChooseZone ()
 	if menu.rowDataMap[Helper.currentDefaultTableRow] then
 		local rowdata = menu.rowDataMap[Helper.currentDefaultTableRow]
 		if rowdata == "setRangeSell" then
-			Helper.closeMenuForSubSection(menu, false, "gJLPUniTrader_uiconfig_chooseZone", {0, 0, 'sector', GetComponentData(menu.jlp_unitrader_home_sell, "sectorid"), null, null, "selectzone", {"gJLPUniTrader_uiconfig_range_sell_home"}}, menu.ship)
+			Helper.closeMenuForSubSection(menu, false, "gJLPUniTrader_uiconfig_chooseZone", {0, 0, menu.entity, 'sector', GetComponentData(menu.jlp_unitrader_home_sell, "sectorid"), null, null, "selectzone", {"gJLPUniTrader_uiconfig_range_sell_home"}}, menu.ship)
 			SetNPCBlackboard(menu.entity, "$nextbuyoffercheck", nil) -- miner
 			SetNPCBlackboard(menu.entity, "$traderangeBuy_nexttime", nil) -- trader
 			SetNPCBlackboard(menu.entity, "$traderangeSell_nexttime", nil)
 			SetNPCBlackboard(menu.entity, "$traderange_buyclusters", nil)
 			SetNPCBlackboard(menu.entity, "$traderange_sellclusters", nil)
 
-			menu.cleanup()
+			--menu.cleanup()
 		elseif rowdata == "setRangeBuy" then
-			Helper.closeMenuForSubSection(menu, false, "gJLPUniTrader_uiconfig_chooseZone", {0, 0, 'sector', GetComponentData(menu.jlp_unitrader_home_buy, "sectorid"), null, null, "selectzone", {"gJLPUniTrader_uiconfig_range_buy_home"}}, menu.ship)
+			Helper.closeMenuForSubSection(menu, false, "gJLPUniTrader_uiconfig_chooseZone", {0, 0, menu.entity, 'sector', GetComponentData(menu.jlp_unitrader_home_buy, "sectorid"), null, null, "selectzone", {"gJLPUniTrader_uiconfig_range_buy_home"}}, menu.ship)
 			SetNPCBlackboard(menu.entity, "$nextbuyoffercheck", nil) -- miner
 			SetNPCBlackboard(menu.entity, "$traderangeBuy_nexttime", nil) -- trader
 			SetNPCBlackboard(menu.entity, "$traderangeSell_nexttime", nil)
 			SetNPCBlackboard(menu.entity, "$traderange_buyclusters", nil)
 			SetNPCBlackboard(menu.entity, "$traderange_sellclusters", nil)
-			menu.cleanup()
+			--menu.cleanup()
 		end
 	end
 end
@@ -321,14 +319,14 @@ function menu.buttonStart()
 			menu.jlp_unitrader_isminerrun = 0
 			menu.saveConfigDatas()
 			Helper.closeMenuForSubSection(menu, false, "gJLPUniTrader_uiconfig_trader_start", {0, 0, menu.entity}, menu.ship)
-      menu.cleanup()
+      --menu.cleanup()
       menu.displayMenu(true)
   	elseif menu.jlp_unitrader_mode == "miner" then
 			menu.jlp_unitrader_istraderrun = 0
 			menu.jlp_unitrader_isminerrun = 1
 			menu.saveConfigDatas()
 			Helper.closeMenuForSubSection(menu, false, "gJLPUniTrader_uiconfig_miner_start", {0, 0, menu.entity}, menu.ship)
-      menu.cleanup()
+      --menu.cleanup()
      menu.displayMenu(true)
 		end
 	end
@@ -341,14 +339,14 @@ function menu.buttonStop()
 			menu.jlp_unitrader_isminerrun = 0
 			menu.saveConfigDatas()
 			Helper.closeMenuForSubSection(menu, false, "gJLPUniTrader_uiconfig_trader_stop", {0, 0, menu.entity}, menu.ship)
-      menu.cleanup()
+     -- menu.cleanup()
       menu.displayMenu(true)
     elseif menu.jlp_unitrader_mode == "miner" then
 			menu.jlp_unitrader_istraderrun = 0
 			menu.jlp_unitrader_isminerrun = 0
 			menu.saveConfigDatas()
 			Helper.closeMenuForSubSection(menu, false, "gJLPUniTrader_uiconfig_miner_stop", {0, 0, menu.entity}, menu.ship)
-			menu.cleanup()
+			--menu.cleanup()
       menu.displayMenu(true)
 		end
 	end
@@ -420,7 +418,7 @@ function  menu.buttonSetRangeModus ()
 			end
 		end
 	end
-	menu.cleanup()
+	--menu.cleanup()
 	menu.displayMenu(false)
 end
 
@@ -442,7 +440,7 @@ function  menu.buttonChangeMode ()
 		SetNPCBlackboard(menu.entity, "$traderange_buyclusters", nil)
 		SetNPCBlackboard(menu.entity, "$traderange_sellclusters", nil)
 	end
-	menu.cleanup()
+	--menu.cleanup()
 	menu.displayMenu(false)
 end
 
@@ -456,7 +454,7 @@ function  menu.buttonChangeLogbookMode ()
 		SetNPCBlackboard(menu.entity, "$jlp_unitrader_show_extendedlogbook",1)
 		Helper.updateCellText(menu.selecttable,  Helper.currentDefaultTableRow, 3, ReadText(8570, 4012) )
 	end
-	menu.cleanup()
+	--menu.cleanup()
 	menu.displayMenu(false)
 end
 
@@ -494,7 +492,7 @@ function  menu.buttonSetSubscription ()
 		end
 	end
 
-	menu.cleanup()
+	--menu.cleanup()
 	menu.displayMenu(false)
 end
 
@@ -533,11 +531,17 @@ end
 		end
 	end
 
-	menu.cleanup()
+	--menu.cleanup()
 	menu.displayMenu(false)
 end
 
 function menu.displayMenu(firsttime)
+
+  -- read params
+  if menu.ship == nil then
+    menu.ship = GetTradeShipData(GetContextByClass(menu.param[3], "ship", false))
+  end
+  menu.playership = GetPlayerPrimaryShipID()
 
  -- Get the list of suitable ships
   menu.getShipList()
@@ -606,11 +610,11 @@ function menu.displayMenu(firsttime)
 --	}, nil, {2, 3, 1})
 
   setup:addSimpleRow({
-    Helper.createButton(nil, Helper.createButtonIcon("table_arrow_inv_left", nil, 255, 255, 255, 100), false, #menu.ships > 1 and menu.mode ~= "wareexchange", 0, 0, Helper.standardButtonWidth, 114, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_LB", true), nil, (#menu.ships == 1) and menu.strings.mot_noships or nil),
+    Helper.createButton(nil, Helper.createButtonIcon("table_arrow_inv_left", nil, 255, 255, 255, 100), false, #menu.ships > 1 , 0, 0, Helper.standardButtonWidth, 114, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_LB", true), nil, (#menu.ships == 1) and menu.strings.mot_noships or nil),
     Helper.createIcon(shipimage ~= "" and shipimage or "transferSlider", false, 255, 255, 255, 100, 0, 0, 114, 214),
     Helper.createFontString(menu.buildInfoString(), false, "left", 255, 255, 255, 100, Helper.standardFont, Helper.standardFontSize, true, Helper.standardTextOffsetx, Helper.standardTextOffsety, 114),
     Helper.createFontString( menu.buildSkillString() , false, "left", 255, 255, 255, 100, Helper.standardFont, Helper.standardFontSize, true, Helper.standardTextOffsetx, Helper.standardTextOffsety, 114),
-    Helper.createButton(nil, Helper.createButtonIcon("table_arrow_inv_right", nil, 255, 255, 255, 100), false, #menu.ships > 1 and menu.mode ~= "wareexchange", 0, 0, Helper.standardButtonWidth, 114, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_RB", true), nil, (#menu.ships == 1) and menu.strings.mot_noships or nil)
+    Helper.createButton(nil, Helper.createButtonIcon("table_arrow_inv_right", nil, 255, 255, 255, 100), false, #menu.ships > 1, 0, 0, Helper.standardButtonWidth, 114, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_RB", true), nil, (#menu.ships == 1) and menu.strings.mot_noships or nil)
   }, nil, {1, 1, 1, 2, 1})
 
 	--setup:addHeaderRow({ emptyFontStringSmall }, nil, {6})
@@ -961,10 +965,12 @@ function menu.onUpdate()
   end
 	if menu.lastupdate and menu.lastupdate + 20 < GetCurTime() then
 		menu.stopAllowed = true
-		if GetComponentData(menu.entity, "isdocked")  and GetComponentData(menu.entity, "isdocking")  then
+		if GetComponentData(menu.entity, "isdocked")  or GetComponentData(menu.entity, "isdocking")  then
 			menu.stopAllowed = false
 		end
-    menu.displayMenu(false)
+    
+     --Helper.updateCellText(menu.infotable,3,4, menu.buildSkillString())
+     menu.displayMenu(false)
 	end
   Helper.updateCellText(menu.infotable,3,3, menu.buildInfoString())
   
@@ -979,7 +985,7 @@ function menu.onRowChanged(row, rowdata)
 		local active = false
 		if rowdata ~= nil then
 			if  (menu.owner == "player") then
-				if GetComponentData(menu.entity, "isdocked") == true and GetComponentData(menu.entity, "isdocking") == true then
+				if GetComponentData(menu.entity, "isdocked") == true or GetComponentData(menu.entity, "isdocking") == true then
 					menu.stopAllowed = false
 				end
 			end
@@ -996,6 +1002,7 @@ function menu.onRowChanged(row, rowdata)
 			Helper.setButtonScript(menu, nil, menu.buttontable, 1, 4, menu.buttonStart)
 		end
 		Helper.removeButtonScripts(menu, menu.buttontable, 1, 6)
+		Helper.removeButtonScripts(menu, menu.buttontable, 1, 6)
 		SetCellContent(menu.buttontable, Helper.getEmptyCellDescriptor(), 1, 6)
 
 		if rowdata == "setBuyStationMode"  or rowdata == "setSellStationMode" then
@@ -1007,6 +1014,7 @@ function menu.onRowChanged(row, rowdata)
 
 			name = ReadText(1001, 3105)
 			mot_details = ReadText(8570, 55006)
+			Helper.removeButtonScripts(menu, menu.buttontable, 1, 8)
 			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(name, "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, active, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_X", true), nil, active and mot_details or nil), 1, 8)
 			Helper.setButtonScript(menu, nil, menu.buttontable, 1, 8, menu.setButtonStationMode)
 
@@ -1018,6 +1026,7 @@ function menu.onRowChanged(row, rowdata)
 
 			name = ReadText(8570, 1001)
 			mot_details = ReadText(8570, 55002)
+			Helper.removeButtonScripts(menu, menu.buttontable, 1, 8)
 			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(name, "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, active, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_X", true), nil, active and mot_details or nil), 1, 8)
 			Helper.setButtonScript(menu, nil, menu.buttontable, 1, 8, menu.buttonChangeMode)
 
@@ -1029,10 +1038,12 @@ function menu.onRowChanged(row, rowdata)
 			end
 			name = ReadText(8570, 5112)
 			mot_details = ReadText(8570, 55002)
+		  Helper.removeButtonScripts(menu, menu.buttontable, 1, 6)
 			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(name, "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, active, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_X", true), nil, active and mot_details or nil), 1, 6)
 			Helper.setButtonScript(menu, nil, menu.buttontable, 1, 6, menu.buttonSetRangeJumpMin)
 			name = ReadText(8570, 5111)
 			mot_details = ReadText(8570, 55002)
+			Helper.removeButtonScripts(menu, menu.buttontable, 1, 8)
 			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(name, "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, active, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_Y", true), nil, active and mot_details or nil), 1, 8)
 			Helper.setButtonScript(menu, nil, menu.buttontable, 1, 8, menu.buttonSetRangeJumpMax)
 
@@ -1046,6 +1057,7 @@ function menu.onRowChanged(row, rowdata)
 			-- Choose sell/buy zone
 			name = ReadText(1001, 3105)
 			mot_details = ReadText(8570, 55000)
+			Helper.removeButtonScripts(menu, menu.buttontable, 1, 8)
 			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(name, "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, active, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_X", true), nil, active and mot_details or nil), 1, 8)
 			Helper.setButtonScript(menu, nil, menu.buttontable, 1, 8, menu.buttonChooseZone)
 
@@ -1057,6 +1069,7 @@ function menu.onRowChanged(row, rowdata)
 			end
 			name = ReadText(1001, 3105)
 			mot_details = ReadText(8570, 55001)
+			Helper.removeButtonScripts(menu, menu.buttontable, 1, 8)
 			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(name, "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, active, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_X", true), nil, active and mot_details or nil), 1, 8)
 			Helper.setButtonScript(menu, nil, menu.buttontable, 1, 8, menu.buttonSetRangeModus)
 
@@ -1069,6 +1082,7 @@ function menu.onRowChanged(row, rowdata)
 
 			name = ReadText(1001, 3105)
 			mot_details = ReadText(8570, 55005)
+			Helper.removeButtonScripts(menu, menu.buttontable, 1, 8)
 			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(name, "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, active, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_X", true), nil, active and mot_details or nil), 1, 8)
 			Helper.setButtonScript(menu, nil, menu.buttontable, 1, 8, menu.buttonSetSubscription)
 
@@ -1080,6 +1094,7 @@ function menu.onRowChanged(row, rowdata)
 
 			name = ReadText(1001, 3105)
 			mot_details = ReadText(8570, 55004)
+			Helper.removeButtonScripts(menu, menu.buttontable, 1, 8)
 			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(name, "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, active, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_X", true), nil, active and mot_details or nil), 1, 8)
 			Helper.setButtonScript(menu, nil, menu.buttontable, 1, 8, menu.buttonChangeLogbookMode)
 
@@ -1104,6 +1119,7 @@ function menu.onRowChanged(row, rowdata)
 
 			end
 
+			Helper.removeButtonScripts(menu, menu.buttontable, 1, 8)
 			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(name, "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, active, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_X", true), nil, true and mot_details or nil), 1, 8)
 			Helper.setButtonScript(menu, nil, menu.buttontable, 1, 8, chooseMenu)
 
@@ -1116,19 +1132,22 @@ function menu.onRowChanged(row, rowdata)
 			-- minimal Budget
 			name = ReadText(1001, 1909)
 			mot_details = ReadText(1001, 2101)
+			Helper.removeButtonScripts(menu, menu.buttontable, 1, 6)
 			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(name, "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, active, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_Y", true), nil, active and mot_details or nil), 1, 6)
 			Helper.setButtonScript(menu, nil, menu.buttontable, 1, 6, menu.buttonChangeMinBudget)
 			-- maximal Budget
 			name = ReadText(1001, 1910)
 			mot_details = ReadText(1001, 2102)
+			Helper.removeButtonScripts(menu, menu.buttontable, 1, 8)
 			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(name, "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, active, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_B", true), nil, active and mot_details or nil), 1, 8)
 			Helper.setButtonScript(menu, nil, menu.buttontable, 1, 8, menu.buttonChangeMaxBudget)
 			-- money transfer
 			name = ReadText(1002, 2022)
 			mot_details = ReadText(1004, 1072)
-			local npcname = GetComponentData(menu.entity, "uiname")
+			local npcname = GetComponentData(menu.entity, "name")
 			mot_details  = string.format(string.gsub(mot_details,'$NPC$','%s'),  npcname)
 
+			Helper.removeButtonScripts(menu, menu.buttontable, 1, 4)
 			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(name, "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, active, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_A", true), nil, active and mot_details or nil), 1, 4)
 			Helper.setButtonScript(menu, nil, menu.buttontable, 1, 4, menu.buttonTransferMoney)
 
@@ -1151,7 +1170,8 @@ function menu.onRowChanged(row, rowdata)
 		end
 	else
 		Helper.removeButtonScripts(menu, menu.buttontable, 1, 8)
-		SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(ReadText(1001, 3105), "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, false, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_A", true)), 1, 8)
+		--SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(ReadText(1001, 3105), "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, false, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_A", true)), 1, 8)
+   SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(ReadText(1002, 1001), "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, active, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_Y", true), nil, active and ReadText(8570, 55001) or nil), 1, 6)
 	end
     
 end
@@ -1358,22 +1378,23 @@ function menu.buildInfoString()
 	--		end
 	--	end
 
-  if aicommand ~= nil and aicommand ~= "" and IsComponentClass(aicommand, "component") and IsValidComponent(aicommand) then
+  if aicommand ~= nil and aicommand ~= ""and IsValidComponent(aicommand)   then
     aicommand =  ffi.string(C.GetComponentName(ConvertIDTo64Bit(aicommand)))
     --GetComponentData(aicommand,"uiname")
   end
-	if aicommandParam1 ~= nil and aicommandParam1 ~= "" and IsComponentClass(aicommandParam1, "component") and IsValidComponent(aicommandParam1) then
+  --and IsComponentClass(aicommandParam1, "component")
+	if aicommandParam1 ~= nil and aicommandParam1 ~= ""  and IsValidComponent(aicommandParam1) then
 		aicommandParam1 = ffi.string(C.GetComponentName(ConvertIDTo64Bit(aicommandParam1)))
 		--GetComponentData(aicommandParam1,"uiname")
 	end
 --  if aicommandParam2 ~= nil and IsValidComponent(aicommandParam2) then
 --    aicommandParam2 = GetComponentData(aicommandParam2,"uiname")
 --  end
-  if aicommandAction ~= nil and aicommandAction ~= "" and IsComponentClass(aicommandAction, "component") and IsValidComponent(aicommandAction) then
+  if aicommandAction ~= nil and aicommandAction ~= "" and IsValidComponent(aicommandAction) then
     aicommandAction = ffi.string(C.GetComponentName(ConvertIDTo64Bit(aicommandAction)))
     --GetComponentData(aicommandAction,"uiname")
   end
-	if aicommandActionParam1 ~= nil  and aicommandActionParam1 ~= "" and IsComponentClass(aicommandActionParam1, "component") and IsValidComponent(aicommandActionParam1) then
+	if aicommandActionParam1 ~= nil  and aicommandActionParam1 ~= "" and IsValidComponent(aicommandActionParam1) then
 		aicommandActionParam1 =  ffi.string(C.GetComponentName(ConvertIDTo64Bit(aicommandActionParam1)))
 		--GetComponentData(aicommandActionParam1,"uiname")
 	end

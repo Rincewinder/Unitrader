@@ -1,6 +1,6 @@
 
 -- section == gJLPUniTrader_gTrade_details
--- param == { 0, 0, tradeoffer, shipid, tradeoffercontainer, entity] }
+-- param == { 0, 0, entity, tradeoffer, shipid, tradeoffercontainer] }
 
 -- ffi setup
 local ffi = require("ffi")
@@ -102,12 +102,12 @@ end
 -- Menu member functions
 
 function menu.onShowMenu()
-	menu.trade = GetTradeData( menu.param[3].id)
+	menu.trade = GetTradeData( menu.param[4].id)
 	menu.tradeid = menu.trade.id
 	menu.tradeware = menu.trade.ware
 	
-	menu.shipid = menu.param[4]
-	menu.tradeoffercontainer = menu.param[5]
+	menu.shipid = menu.param[5]
+	menu.tradeoffercontainer = menu.param[6]
 
 	if menu.shipid and IsComponentOperational(menu.shipid) then
 		SetVirtualCargoMode(menu.shipid, true)
@@ -331,7 +331,7 @@ function menu.onCloseElement(dueToClose)
 		Helper.closeMenuAndReturn(menu, false, {0, 0, menu.param[3]})
 	else
 		menu.cleanup()
-		Helper.closeMenuAndReturn(menu, false, {0, 0, menu.param[6], {menu.tradeid, menu.tradeware}, menu.tradeoffercontainer})
+		Helper.closeMenuAndReturn(menu, false, {0, 0, menu.param[3], {menu.tradeid, menu.tradeware}, menu.tradeoffercontainer})
 	end
 end
 

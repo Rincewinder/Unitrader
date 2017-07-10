@@ -4,7 +4,7 @@
 		sel="/mdscript[@name='Orders']/cues/cue[@name='SectionHandler']/actions/do_elseif/add_player_choice_sub[@section='gOrders_selectlist']"
 	>
 		<add_player_choice_sub text="'Universe Trader'" position="top_right"
-			section="gJLPUniTrader_uiconfig"  />
+			section="gJLPUniTrader_uiconfig"  choiceparam ="[0, 0, event.object]"  />
 <!--  			selectable="(not @event.object.$shiptrader_docking) and (not @event.object.$ship_parking) and (not @event.object.ship.dockslot) and (not @$event.object.ship.docklink)" -->
 	</add>
 </diff>
