@@ -362,9 +362,9 @@ function  menu.buttonSetRangeModus ()
 		if rowdata == "setRangeModusBuy" then
 			SetNPCBlackboard(menu.entity, "$nextbuyoffercheck", nil) -- miner
 			SetNPCBlackboard(menu.entity, "$traderangeBuy_nexttime", nil) -- trader
-			SetNPCBlackboard(menu.entity, "$traderangeSell_nexttime", nil)
+			--SetNPCBlackboard(menu.entity, "$traderangeSell_nexttime", nil)
 			SetNPCBlackboard(menu.entity, "$traderange_buyclusters", nil)
-			SetNPCBlackboard(menu.entity, "$traderange_sellclusters", nil)
+			--SetNPCBlackboard(menu.entity, "$traderange_sellclusters", nil)
 			
 			if menu.jlp_unitrader_range_buy == nil or  menu.jlp_unitrader_range_buy == "ranged" then
 				SetNPCBlackboard(menu.entity, "$jlp_unitrader_range_buy", "zone")
@@ -392,9 +392,9 @@ function  menu.buttonSetRangeModus ()
 			end
 		elseif rowdata == "setRangeModusSell" then
 			SetNPCBlackboard(menu.entity, "$nextbuyoffercheck", nil) -- miner
-			SetNPCBlackboard(menu.entity, "$traderangeBuy_nexttime", nil) -- trader
+			--SetNPCBlackboard(menu.entity, "$traderangeBuy_nexttime", nil) -- trader
 			SetNPCBlackboard(menu.entity, "$traderangeSell_nexttime", nil)
-			SetNPCBlackboard(menu.entity, "$traderange_buyclusters", nil)
+			--SetNPCBlackboard(menu.entity, "$traderange_buyclusters", nil)
 			SetNPCBlackboard(menu.entity, "$traderange_sellclusters", nil)
 			if menu.jlp_unitrader_range_sell == nil or  menu.jlp_unitrader_range_sell == "ranged" then
 				SetNPCBlackboard(menu.entity, "$jlp_unitrader_range_sell", "zone")
