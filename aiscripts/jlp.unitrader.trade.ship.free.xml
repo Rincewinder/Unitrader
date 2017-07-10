@@ -118,11 +118,7 @@
 				</run_script>
 			</do_if>
 
-			<!-- No trades found after some tries -->
-			<do_if value="@this.$trade_failedfindruns" min="10">
-				<!-- <wait exact="this.$jlp_unitrader_searchtime" /> -->
-				<return />
-			</do_if>
+
 
 			<!--If no trade was found then at least fly back to the buy area before checking again -->
 			<do_if value="not $selloffer.available and not $buyoffer.available">
@@ -169,11 +165,18 @@
 					</do_if>
 				</do_else>
 
-				 <wait exact="this.$jlp_unitrader_searchtime" />
 				<!-- <resume label="find trade run" /> -->
 			</do_if>
 
+			<do_if value="not $selloffer.available and not $buyoffer.available">
+				<!-- No trades found after some tries -->
+				<do_if value="@this.$trade_failedfindruns" min="10">
+					<wait exact="this.$jlp_unitrader_searchtime" />
+					<return />
+				</do_if>
+			</do_if>
 
+			<wait exact="this.$jlp_unitrader_searchtime" />
 			<label name="perform trade run" />
 
 			<!-- remember for notification -->
