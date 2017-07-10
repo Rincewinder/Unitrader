@@ -1192,7 +1192,11 @@ function menu.readConfigDatas()
 	menu.jlp_unitrader_jump_sell_max = GetNPCBlackboard(menu.entity, "$jlp_unitrader_jump_sell_max") or 24
 	menu.jlp_unitrader_jump_buy_min = GetNPCBlackboard(menu.entity, "$jlp_unitrader_jump_buy_min") or 0
 	menu.jlp_unitrader_jump_buy_max = GetNPCBlackboard(menu.entity, "$jlp_unitrader_jump_buy_max") or 24
-
+  menu.jlp_unitrader_currentselloffer = nil
+  menu.jlp_unitrader_currentsellofferentity = nil
+  menu.jlp_unitrader_currentbuyoffer = nil 
+  menu.jlp_unitrader_currentbuyofferentity = nil
+  
 	-- TODO check if stop allowed
 	menu.stopAllowed = true
 
