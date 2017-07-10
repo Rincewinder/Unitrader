@@ -326,10 +326,11 @@ end
 
 function menu.onCloseElement(dueToClose)
 	if dueToClose == "close" then
-		--menu.cleanup()
-		Helper.closeMenuAndCancel(menu)
+		menu.cleanup()
+		--Helper.closeMenuAndCancel(menu)
+		Helper.closeMenuAndReturn(menu, false, {0, 0, menu.param[3]})
 	else
-		--menu.cleanup()
+		menu.cleanup()
 		Helper.closeMenuAndReturn(menu, false, {0, 0, menu.param[6], {menu.tradeid, menu.tradeware}, menu.tradeoffercontainer})
 	end
 end

@@ -128,10 +128,12 @@ end
 
 function menu.onCloseElement(dueToClose)
 	if dueToClose == "close" then
-		Helper.closeMenuAndCancel(menu)
+		--Helper.closeMenuAndCancel(menu)
 		menu.cleanup()
+		Helper.closeMenuAndReturn(menu, false, {0, 0, menu.param[3]})
 	else
-		Helper.closeMenuAndReturn(menu)
+		--Helper.closeMenuAndReturn(menu)
+	  Helper.closeMenuAndReturn(menu, false, {0, 0, menu.param[3]})
 		menu.cleanup()
 	end
 end
