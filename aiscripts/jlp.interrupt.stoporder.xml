@@ -19,7 +19,7 @@
 
 			<cease_fire object="this.ship" />
 			<abort_jump object="this.ship" />
-			<remove_actor_account actor="this" transfer="true" />
+			<!--<remove_actor_account actor="this" transfer="true" /> -->
 			<stop_moving object="this.ship" immediate="false" />
 			<set_to_default_flight_control_model object="this.ship" />
 
