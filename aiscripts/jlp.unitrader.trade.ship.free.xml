@@ -231,21 +231,24 @@
 					<set_value name="$selloffer" exact="null" />
 					<set_value name="$buyoffer" exact="null" />
 				</do_if>
-				<!-- <do_if value="@$selloffer.available" negate="true">
+				<do_if value="@$selloffer.available" negate="true">
 					<remove_value name="this.$jlp_unitrader_currentselloffer" />
-					</do_if>
-					<do_if value="@$buyoffer.available" negate="true">
+				</do_if>
+				<do_if value="@$buyoffer.available" negate="true">
 					<remove_value name="this.$jlp_unitrader_currentbuyoffer" />
-					</do_if>
-				-->
+				</do_if>
+				<do_if value="@$buyoffer.available or @$selloffer.available" negate="true">
+					<break/>
+				</do_if>
+
 				<wait exact="this.$jlp_unitrader_searchtime" />
 			</do_while>
 
 			<set_value name="$buyoffer" exact="null" />
 			<set_value name="$selloffer" exact="null" />
-			<remove_value name="this.$jlp_unitrader_currentbuyoffer" />
-			<remove_value name="this.$jlp_unitrader_currentselloffer" />
-
+			<!-- <remove_value name="this.$jlp_unitrader_currentbuyoffer" />
+				<remove_value name="this.$jlp_unitrader_currentselloffer" />
+			-->
 			<do_if value="$success" exact="true">
 				<set_known object="this.ship.cluster" known="true" />
 				<wait exact="50ms" />

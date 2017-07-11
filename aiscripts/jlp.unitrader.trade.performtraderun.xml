@@ -92,13 +92,19 @@
 					<remove_ware_reservation object="$buyer_reserved" entity="this"
 						virtual="true" />
 				</do_if>
-				<do_if value="@$targetobject.exists and (@$buyer_reserved != $targetobject)">
+				<do_if value="@$seller_reserved.exists">
+					<remove_ware_reservation object="$seller_reserved" entity="this" />
+					<remove_ware_reservation object="$seller_reserved" entity="this"
+						virtual="true" />
+				</do_if>
+				<do_if value="@$targetobject.exists and (@$buyer_reserved != $targetobject and @$seller_reserved != $targetobject)">
 					<remove_ware_reservation object="$targetobject" entity="this" />
 					<remove_ware_reservation object="$targetobject" entity="this" virtual="true" />
 				</do_if>
 
 				<return>
-					<retval name="success" value="true" />
+					<!-- TODO: Why return = true. it should happen -->
+					<retval name="success" value="false" />
 					<retval name="tradedetails" value="$tradedetails" />
 					<retval name="lasttrade" value="@$lasttrade" />
 				</return>
@@ -245,14 +251,28 @@
 
 				<!-- special handling for station-owned ships: make a reservation for the buyer if we are getting
 					resources or selling products to better coordinate -->
+				<!-- <do_if
+					value="not $buyer_reserved? and $buyoffer.available and ($buyoffer.buyer == this.ship.commander 
+					or ($selloffer.available and $selloffer.seller == this.ship.commander))"
+					>
+				-->
 				<do_if
-					value="not $buyer_reserved? and $buyoffer.available and ($buyoffer.buyer == this.ship.commander or ($selloffer.available and $selloffer.seller == this.ship.commander))"
+					value="not $buyer_reserved?  and $buyoffer.available and ($buyoffer.buyer == this or ($selloffer.available and $selloffer.seller == this))"
 				>
 					<debug_text text="'adding sell reservation for %1 %2 at %3'.[$amount, $tradeware, $buyoffer.buyer]"
 						chance="$debugchance" />
 					<add_ware_reservation object="$buyoffer.buyer" type="sell" entity="this"
 						ware="$tradeware" amount="$amount" duration="5h" virtual="$buyoffer.unbundle" />
 					<set_value name="$buyer_reserved" exact="$buyoffer.buyer" />
+				</do_if>
+				<do_if
+					value="not $seller_reserved?  and $selloffer.available and ($buyoffer.buyer == this or ($selloffer.available and $selloffer.seller == this))"
+				>
+					<debug_text text="'adding buy reservation for %1 %2 at %3'.[$amount, $tradeware, $targetobject]"
+						chance="$debugchance" />
+					<add_ware_reservation object="$targetobject" type="buy" entity="this"
+						virtual="$tradeoffer.rebundle" ware="$tradeware" amount="$amount" result="$reserved" />
+					<set_value name="$seller_reserved" exact="$selloffer.seller" />
 				</do_if>
 
 				<!-- <return>
@@ -263,7 +283,7 @@
 			</do_if>
 
 			<set_command command="command.trade" param="$targetobject" />
-			<set_value name="this.$trade_failedfindruns" exact="0" /> 
+			<set_value name="this.$trade_failedfindruns" exact="0" />
 			<label name="move to target object" />
 			<do_if value="this.zone != $targetobject.zone">
 				<run_script name="'move.generic'">
@@ -338,10 +358,19 @@
 				</do_else>
 			</do_if>
 			<do_else>
-				<debug_text text="'adding buy reservation for %1 %2 at %3'.[$amount, $tradeware, $targetobject]"
-					chance="$debugchance" />
-				<add_ware_reservation object="$targetobject" type="buy" entity="this"
-					virtual="$tradeoffer.rebundle" ware="$tradeware" amount="$amount" result="$reserved" />
+				<do_if value="not $seller_reserved?">
+					<debug_text text="'adding buy reservation for %1 %2 at %3'.[$amount, $tradeware, $targetobject]"
+						chance="$debugchance" />
+					<add_ware_reservation object="$targetobject" type="buy" entity="this"
+						virtual="$tradeoffer.rebundle" ware="$tradeware" amount="$amount" result="$reserved" />
+					<set_value name="$seller_reserved" exact="$targetobject" />
+				</do_if>
+				<do_else>
+					<debug_text text="'checking sell reservation for %1 at %2'.[$tradeware, $targetobject]"
+						chance="$debugchance" />
+					<add_ware_reservation object="$targetobject" type="buy" entity="this"
+						virtual="$tradeoffer.rebundle" ware="$tradeware" amount="0" result="$reserved" />
+				</do_else>
 			</do_else>
 			<do_if value="$reserved != $amount">
 				<debug_text
@@ -569,7 +598,7 @@
 
 			<remove_value name="$traderesult" />
 			<wait min="1s" max="3s" />
-			<resume label="check trade offers" />
+			<!-- <resume label="check trade offers" /> -->
 
 			<label name="finish" />
 			<do_if value="@$targetobject.exists">
@@ -579,6 +608,10 @@
 			<do_if value="@$buyer_reserved.exists and (@$buyer_reserved != $targetobject)">
 				<remove_ware_reservation object="$buyer_reserved" entity="this" />
 				<remove_ware_reservation object="$buyer_reserved" entity="this" virtual="1" />
+			</do_if>
+			<do_if value="@$seller_reserved.exists and (@$seller_reserved != $targetobject)">
+				<remove_ware_reservation object="$seller_reserved" entity="this" />
+				<remove_ware_reservation object="$seller_reserved" entity="this" virtual="1" />
 			</do_if>
 			<do_if value="$failreason != ''">
 				<debug_text
@@ -626,7 +659,11 @@
 			<remove_ware_reservation object="$buyer_reserved" entity="this" />
 			<remove_ware_reservation object="$buyer_reserved" entity="this" virtual="1" />
 		</do_if>
-		<do_if value="@$targetobject.exists and (@$buyer_reserved != $targetobject) ">
+		<do_if value="@$seller_reserved.exists">
+			<remove_ware_reservation object="$seller_reserved" entity="this" />
+			<remove_ware_reservation object="$seller_reserved" entity="this" virtual="1" />
+		</do_if>
+		<do_if value="@$targetobject.exists and (@$buyer_reserved != $targetobject and @$seller_reserved != $targetobject) ">
 			<remove_ware_reservation object="$targetobject" entity="this" />
 			<remove_ware_reservation object="$targetobject" entity="this" virtual="1" />
 		</do_if>
