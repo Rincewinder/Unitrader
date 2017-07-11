@@ -103,7 +103,6 @@
 				</do_if>
 
 				<return>
-					<!-- TODO: Why return = true. it should happen -->
 					<retval name="success" value="false" />
 					<retval name="tradedetails" value="$tradedetails" />
 					<retval name="lasttrade" value="@$lasttrade" />
