@@ -689,11 +689,11 @@
 								chance="$debugchance2" />
 
 							<do_if
-								value="($priceRisk - 10 * this.$trade_failedfindruns) le 10+((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+								value="($priceRisk - 10 * this.$trade_failedfindruns) le ((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
 								exact="true"
 							>
 								<do_if
-									value="($priceRisk + 10 * this.$trade_failedfindruns) ge 90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+									value="($priceRisk + 10 * this.$trade_failedfindruns) ge 100-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
 									exact="true"
 								>
 									<set_value name="$offerAdd" exact="true" />
@@ -714,12 +714,12 @@
 								text="this.ship.knownname+ ' $selloffer check '+$selloffers.{$Counter}.ware +' check it for Shipcargo $riskAmount ' + $riskAmount "
 								chance="$debugchance2" />
 							<do_if
-								value="($riskAmount - 10 * this.$trade_failedfindruns) le 10+((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+								value="($riskAmount - 10 * this.$trade_failedfindruns) le ((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
 								exact="true"
 							>
 								<do_if value="this.ship.isclass.ship_xl">
 									<do_if
-										value="($riskAmount + 10 * this.$trade_failedfindruns) ge 90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+										value="($riskAmount + 10 * this.$trade_failedfindruns) ge 100-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
 										exact="true"
 									>
 										<set_value name="$offerAdd" exact="true" />
@@ -745,11 +745,11 @@
 								text="this.ship.knownname+ ' $selloffer check '+$selloffers.{$Counter}.ware +' check it for station $riskAmount ' + $riskAmount "
 								chance="$debugchance2" />
 							<do_if
-								value="($riskAmount - 10 * this.$trade_failedfindruns) le 10+((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+								value="($riskAmount - 10 * this.$trade_failedfindruns) le ((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
 								exact="true"
 							>
 								<do_if
-									value="($riskAmount + 10 * this.$trade_failedfindruns) ge 90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+									value="($riskAmount + 10 * this.$trade_failedfindruns) ge 100-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
 									exact="true"
 								>
 									<set_value name="$offerAdd" exact="true" />
@@ -909,11 +909,11 @@
 											text="this.ship.knownname+ ' $buyoffer check '+$buyoffers.{$Counter2}.ware +' check it for $priceRisk ' + $priceRisk + ' price' + $warePrice+ ' min price' + $warePriceMin + ' max price' + $warePriceMax"
 											chance="$debugchance2" />
 										<do_if
-											value="($priceRisk - 10 * this.$trade_failedfindruns) le 10+((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+											value="($priceRisk - 10 * this.$trade_failedfindruns) le ((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
 											exact="true"
 										>
 											<do_if
-												value="($priceRisk + 10 * this.$trade_failedfindruns) ge 90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+												value="($priceRisk + 10 * this.$trade_failedfindruns) ge 100-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
 												exact="true"
 											>
 												<set_value name="$offerAdd" exact="true" />
@@ -939,12 +939,12 @@
 											text="this.ship.knownname+ ' $buyoffer check '+$buyoffers.{$Counter2}.ware +' check it for  Shipcargo risk ' + $riskAmount "
 											chance="$debugchance2" />
 										<do_if
-											value="($riskAmount - 10 * this.$trade_failedfindruns) le 10+((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+											value="($riskAmount - 10 * this.$trade_failedfindruns) le ((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
 											exact="true"
 										>
 											<do_if value="this.ship.isclass.ship_xl">
 												<do_if
-													value="($riskAmount + 10 * this.$trade_failedfindruns) ge 90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+													value="($riskAmount + 10 * this.$trade_failedfindruns) ge 100-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
 													exact="true"
 												>
 													<set_value name="$offerAdd" exact="true" />
@@ -979,11 +979,11 @@
 											text="this.ship.knownname+ ' $buyoffer check '+$buyoffers.{$Counter2}.ware +' check it for  Stationcargo risk ' + $riskAmount "
 											chance="$debugchance2" />
 										<do_if
-											value="($riskAmount - 10 * this.$trade_failedfindruns) le 10+((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+											value="($riskAmount - 10 * this.$trade_failedfindruns) le ((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
 											exact="true"
 										>
 											<do_if
-												value="($riskAmount + 10 * this.$trade_failedfindruns) ge 90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+												value="($riskAmount + 10 * this.$trade_failedfindruns) ge 100-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
 												exact="true"
 											>
 												<set_value name="$offerAdd" exact="true" />
@@ -1151,11 +1151,11 @@
 										text="this.ship.knownname+ ' $buyoffer check in Homebuy '+$buyoffers.{$Counter}.ware +' check it for $priceRisk ' + $priceRisk + ' price' + $warePrice+ ' min price' + $warePriceMin + ' max price' + $warePriceMax"
 										chance="$debugchance2" />
 									<do_if
-										value="($priceRisk - 10 * this.$trade_failedfindruns) le 10+((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+										value="($priceRisk - 10 * this.$trade_failedfindruns) le ((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
 										exact="true"
 									>
 										<do_if
-											value="($priceRisk + 10 * this.$trade_failedfindruns) ge 90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+											value="($priceRisk + 10 * this.$trade_failedfindruns) ge 100-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
 											exact="true"
 										>
 											<set_value name="$offerAdd" exact="true" />
@@ -1182,12 +1182,12 @@
 										text="this.ship.knownname+ ' $buyoffer check in Homebuy '+$buyoffers.{$Counter}.ware +' check it for Shipcargo risk ' + $riskAmount "
 										chance="$debugchance2" />
 									<do_if
-										value="($riskAmount - 10 * this.$trade_failedfindruns) le 10+((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+										value="($riskAmount - 10 * this.$trade_failedfindruns) le ((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
 										exact="true"
 									>
 										<do_if value="this.ship.isclass.ship_xl">
 											<do_if
-												value="($riskAmount + 10 * this.$trade_failedfindruns) ge 90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+												value="($riskAmount + 10 * this.$trade_failedfindruns) ge 100-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
 												exact="true"
 											>
 												<set_value name="$offerAdd" exact="true" />
@@ -1224,11 +1224,11 @@
 										text="this.ship.knownname+ ' $buyoffer check in Homebuy '+$buyoffers.{$Counter}.ware +' check it for Stationcargo risk ' + $riskAmount "
 										chance="$debugchance2" />
 									<do_if
-										value="($riskAmount - 10 * this.$trade_failedfindruns) le 10+((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+										value="($riskAmount - 10 * this.$trade_failedfindruns) le ((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
 										exact="true"
 									>
 										<do_if
-											value="($riskAmount + 10 * this.$trade_failedfindruns) ge 90-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+											value="($riskAmount + 10 * this.$trade_failedfindruns) ge 100-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
 											exact="true"
 										>
 											<set_value name="$offerAdd" exact="true" />
