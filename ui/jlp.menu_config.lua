@@ -131,9 +131,9 @@ function menu.cleanup()
 	menu.title = nil
 	menu.lastupdate = nil
 	menu.strings = nil
-  --menu.ship =nil
-  --menu.ships = {}
-  --menu.shipIndex = nil
+  menu.ship =nil
+  menu.ships = {}
+  menu.shipIndex = nil
   menu.playership = nil
   
 
@@ -966,7 +966,7 @@ function menu.onUpdate()
   if menu.selectrow > #menu.rowDataMap then
     menu.selectrow = #menu.rowDataMap -1
   end
-	if menu.lastupdate and menu.lastupdate + 20 < GetCurTime() then
+	if menu.lastupdate and menu.lastupdate + 10 < GetCurTime() then
 		menu.stopAllowed = true
 		if GetComponentData(menu.entity, "isdocked")  or GetComponentData(menu.entity, "isdocking")  then
 			menu.stopAllowed = false
