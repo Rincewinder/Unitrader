@@ -689,11 +689,11 @@
 								chance="$debugchance2" />
 
 							<do_if
-								value="($priceRisk - 10 * this.$trade_failedfindruns) le ((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+								value="($priceRisk - 10 * this.$trade_failedfindruns) le ((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2Cr)"
 								exact="true"
 							>
 								<do_if
-									value="($priceRisk + 10 * this.$trade_failedfindruns) ge 100-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+									value="($priceRisk + 10 * this.$trade_failedfindruns) ge 100-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2Cr)"
 									exact="true"
 								>
 									<set_value name="$offerAdd" exact="true" />
@@ -909,11 +909,11 @@
 											text="this.ship.knownname+ ' $buyoffer check '+$buyoffers.{$Counter2}.ware +' check it for $priceRisk ' + $priceRisk + ' price' + $warePrice+ ' min price' + $warePriceMin + ' max price' + $warePriceMax"
 											chance="$debugchance2" />
 										<do_if
-											value="($priceRisk - 10 * this.$trade_failedfindruns) le ((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+											value="($priceRisk - 10 * this.$trade_failedfindruns) le ((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2Cr)"
 											exact="true"
 										>
 											<do_if
-												value="($priceRisk + 10 * this.$trade_failedfindruns) ge 100-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+												value="($priceRisk + 10 * this.$trade_failedfindruns) ge 100-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2Cr)"
 												exact="true"
 											>
 												<set_value name="$offerAdd" exact="true" />
@@ -1151,11 +1151,11 @@
 										text="this.ship.knownname+ ' $buyoffer check in Homebuy '+$buyoffers.{$Counter}.ware +' check it for $priceRisk ' + $priceRisk + ' price' + $warePrice+ ' min price' + $warePriceMin + ' max price' + $warePriceMax"
 										chance="$debugchance2" />
 									<do_if
-										value="($priceRisk - 10 * this.$trade_failedfindruns) le ((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+										value="($priceRisk - 10 * this.$trade_failedfindruns) le ((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2Cr)"
 										exact="true"
 									>
 										<do_if
-											value="($priceRisk + 10 * this.$trade_failedfindruns) ge 100-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2)"
+											value="($priceRisk + 10 * this.$trade_failedfindruns) ge 100-((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /2Cr)"
 											exact="true"
 										>
 											<set_value name="$offerAdd" exact="true" />
@@ -1385,13 +1385,13 @@
 						<do_if value="$currentoffer.available">
 							<!-- do not reserve certain wares (otherwise they can't be dispatched fast enough) -->
 							<set_value name="$reservableware" exact="true" />
-							<do_if
+<!-- 							<do_if
 								value="$currentoffer.ware == ware.bofu or $currentoffer.ware == ware.energycells or $currentoffer.ware == ware.foodrations or $currentoffer.ware == ware.water"
 							>
 								<debug_text text="$currentoffer.ware + ' must not be reserved'" chance="$debugchance" />
 								<set_value name="$reservableware" exact="false" />
 							</do_if>
-							<!-- check the trade owner's blackboard for whether someone already expressed interest in this
+ -->							<!-- check the trade owner's blackboard for whether someone already expressed interest in this
 								trade offer -->
 							<do_if value="$reservetrades and $reservableware">
 								<debug_text text="'checking if sell trade ' + $currentoffer + ' is reserved'"
