@@ -113,7 +113,8 @@
 			</do_if>
 			<do_if value="not $ValidDistance">
 				<!-- Fly to a $homebuy, when not in buy or sell range -->
-				<get_jump_cost ship="this.ship" start="this.ship.sector" end="$homeBuy.sector" result="$trip" />
+				<get_jump_cost ship="this.ship" start="this.ship.sector" end="$homeBuy.sector"
+					result="$trip" />
 				<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 100">
 					<run_script name="'jlp.unitrader.move.refuel'" />
 				</do_if>
@@ -147,7 +148,7 @@
 				<set_value name="$homeSell" exact="$homeSell.cluster" />
 			</do_elseif>
 
- 			<set_value name="this.$trade_failedfindruns" exact="0" /> 
+			<set_value name="this.$trade_failedfindruns" exact="0" />
 
 			<do_if value="this.ship.cargo.{ware.fuelcells}.count lt 1000">
 				<run_script name="'jlp.unitrader.move.refuel'" />
@@ -155,7 +156,7 @@
 
 
 
-<!-- 			<wait exact="this.$jlp_unitrader_searchtime" /> -->
+			<!-- <wait exact="this.$jlp_unitrader_searchtime" /> -->
 			<run_script name="'jlp.unitrader.trade.ship.free'">
 				<param name="PageId" value="$PageId" />
 				<param name="homeBuy" value="$homeBuy" />
@@ -207,22 +208,21 @@
 								<do_else>
 									<debug_text text="'No trade was found. Flying back to random buy range cluster.'"
 										chance="$debugchance" />
-									<get_jump_cost ship="this.ship" start="this.ship.sector" end="$newCluster.random"
-										result="$trip" />
-									<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 100">
-										<run_script name="'jlp.unitrader.move.refuel'" />
+									<set_value name="$rSec" exact="$newCluster.random" />
+									<do_if value="$rSec.exists">
+										<get_jump_cost ship="this.ship" start="this.ship.sector" end="$rSec" result="$trip" />
+										<do_if value="this.ship.cargo.{ware.fuelcells}.count lt $trip + 100">
+											<run_script name="'jlp.unitrader.move.refuel'" />
+										</do_if>
+										<run_script name="'move.generic'" sinceversion="2">
+											<param name="destination" value="$rSec" />
+											<param name="endintargetzone" value="true" />
+										</run_script>
+										<set_known object="this.ship.cluster" known="true" />
+										<set_known object="this.ship.sector" known="true" />
+										<set_known object="this.ship.zone" known="true" />
+										<break />
 									</do_if>
-									<run_script name="'move.generic'" sinceversion="2">
-										<param name="destination" value="$newCluster.random" />
-										<param name="endintargetzone" value="true" />
-									</run_script>
-									<set_known object="this.ship.cluster" known="true" />
-									<wait exact="1s" />
-									<set_known object="this.ship.sector" known="true" />
-									<wait exact="1s" />
-									<set_known object="this.ship.zone" known="true" />
-									<wait exact="1s" />
-									<break />
 								</do_else>
 							</do_all>
 						</do_if>

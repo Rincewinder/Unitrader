@@ -672,19 +672,19 @@
 						<do_if value="$offerAdd" exact="true">
 							<set_value name="$offerAdd" exact="false" />
 
-							<set_value name="$warePrice" exact="$selloffers.{$Counter}.unitprice" />
+							<set_value name="$warePrice" exact="$selloffers.{$Counter}.minprice" />
 							<set_value name="$warePriceMin" exact="$selloffers.{$Counter}.ware.minprice" />
 							<set_value name="$warePriceMax" exact="$selloffers.{$Counter}.ware.maxprice" />
 							<set_value name="$warePriceRange" exact="$warePriceMax - $warePriceMin" />
 							<!-- risk of price that buy to min price of ware (min price give max %) -->
 							<set_value name="$priceRisk" exact="(($warePrice - $warePriceMin) * 100 / $warePriceRange)" />
-							<do_if value="$priceRisk lt 0">
+<!-- 							<do_if value="$priceRisk lt 0">
 								<set_value name="$priceRisk" exact="0" />
 							</do_if>
 							<do_if value="$priceRisk gt 100">
 								<set_value name="$priceRisk" exact="100" />
 							</do_if>
-							<write_to_logbook category="missions"
+ -->							<write_to_logbook category="missions"
 								text="this.ship.knownname+ ' $selloffer check '+$selloffers.{$Counter}.ware +' check it for $priceRisk ' + $priceRisk + ' price' + $warePrice+ ' min price' + $warePriceMin + ' max price' + $warePriceMax"
 								chance="$debugchance2" />
 
@@ -892,20 +892,20 @@
 									<!-- Price risk: better skills - more price range is used -->
 									<do_if value="$offerAdd" exact="true">
 										<set_value name="$offerAdd" exact="false" />
-										<set_value name="$warePrice" exact="$buyoffers.{$Counter2}.unitprice" />
+										<set_value name="$warePrice" exact="$buyoffers.{$Counter2}.minprice" />
 										<set_value name="$warePriceMin" exact="$buyoffers.{$Counter2}.ware.minprice" />
 										<set_value name="$warePriceMax" exact="$buyoffers.{$Counter2}.ware.maxprice" />
 										<set_value name="$warePriceRange" exact="$warePriceMax - $warePriceMin" />
 										<!-- risk of price that buy to min price of ware (min price give max %) -->
 										<set_value name="$priceRisk" exact="(($warePrice - $warePriceMin) * 100 / $warePriceRange)" />
 										<set_value name="$priceRisk" exact="(($warePrice - $warePriceMin) * 100 / $warePriceRange)" />
-										<do_if value="$priceRisk lt 0">
+	<!-- 									<do_if value="$priceRisk lt 0">
 											<set_value name="$priceRisk" exact="0" />
 										</do_if>
 										<do_if value="$priceRisk gt 100">
 											<set_value name="$priceRisk" exact="100" />
 										</do_if>
-										<write_to_logbook category="missions"
+ -->										<write_to_logbook category="missions"
 											text="this.ship.knownname+ ' $buyoffer check '+$buyoffers.{$Counter2}.ware +' check it for $priceRisk ' + $priceRisk + ' price' + $warePrice+ ' min price' + $warePriceMin + ' max price' + $warePriceMax"
 											chance="$debugchance2" />
 										<do_if
@@ -1135,19 +1135,19 @@
 								<!-- price risk -->
 								<do_if value="$offerAdd" exact="true">
 									<set_value name="$offerAdd" exact="false" />
-									<set_value name="$warePrice" exact="$buyoffers.{$Counter}.unitprice" />
+									<set_value name="$warePrice" exact="$buyoffers.{$Counter}.minprice" />
 									<set_value name="$warePriceMin" exact="$buyoffers.{$Counter}.ware.minprice" />
 									<set_value name="$warePriceMax" exact="$buyoffers.{$Counter}.ware.maxprice" />
 									<set_value name="$warePriceRange" exact="$warePriceMax - $warePriceMin" />
 									<!-- risk of price that buy to min price of ware (min price give max %) -->
 									<set_value name="$priceRisk" exact="(($warePrice - $warePriceMin) * 100 / $warePriceRange)" />
-									<do_if value="$priceRisk lt 0">
+<!-- 									<do_if value="$priceRisk lt 0">
 										<set_value name="$priceRisk" exact="0" />
 									</do_if>
 									<do_if value="$priceRisk gt 100">
 										<set_value name="$priceRisk" exact="100" />
 									</do_if>
-									<write_to_logbook category="missions"
+ -->									<write_to_logbook category="missions"
 										text="this.ship.knownname+ ' $buyoffer check in Homebuy '+$buyoffers.{$Counter}.ware +' check it for $priceRisk ' + $priceRisk + ' price' + $warePrice+ ' min price' + $warePriceMin + ' max price' + $warePriceMax"
 										chance="$debugchance2" />
 									<do_if
@@ -1481,21 +1481,28 @@
 											result="$trip1" />
 										<get_jump_cost ship="this.ship" start="$selloffer.seller.sector" end="$checkoffer.buyer.sector"
 											result="$trip2" />
-										<set_value name="$fuelcost" exact="(($trip1 + $trip2) * ware.fuelcells.averageprice)/1Cr" />
-										<!-- <set_value name="$profitSell" exact="(($checkoffer.unitprice - $selloffer.unitprice) *
+										<set_value name="$fuelcost" exact="(($trip1 + $trip2) * ware.fuelcells.averageprice)" />
+										<!-- <set_value name="$profitSell" exact="(($checkoffer.minprice - $selloffer.minprice) *
 											$checkamount)i" /> -->
 										<set_value name="$profitSell"
-											exact="(($checkoffer.unitprice - $selloffer.unitprice) * $checkamount)/1Cr" />
+											exact="($checkoffer.minprice  * $checkamount)" />
 										<!-- if we don't make at least X% of the ware price after expenses, this isn't worth our time -->
 										<set_value name="$profitBuy"
-											exact="($selloffer.unitprice * $checkamount * (0.03f*((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)f /200f)f)f)/1Cr" />
+											exact="($selloffer.minprice * $checkamount)" />
 										<debug_text
 											text="'trip to buy %1 %2 at %3(%4) and sell to %5(%6) has potential profit of %7 Cr and costs %8 Cr. real profit: %9 Cr.'.[$checkamount, $checkoffer.ware, $selloffer.seller.knownname, $selloffer.seller, $checkoffer.buyer.knownname, $checkoffer.buyer, $profit/1Cr, $fuelcost/1Cr, $profit]"
 											chance="$debugchance" />
-										<do_if value="$fuelcost ge ( $profitSell - $profitBuy )">
+ 										<do_if value="$fuelcost ge ( $profitSell - $profitBuy )">
 
 											<debug_text
-												text="'skip buy offer, reason: %1, %2, %3, %4 => %5'.[$fuelcost, $profit, $selloffer.unitprice, $checkamount, ($profit - ($selloffer.unitprice * $checkamount * 0.02f))]"
+												text="'skip buy offer, reason: %1, %2, %3, %4 => %5'.[$fuelcost, $profit, $selloffer.minprice, $checkamount, ($profit - ($selloffer.minprice * $checkamount * 0.02f))]"
+												chance="$debugchance" />
+											<continue />
+										</do_if>
+ 										<do_if value="($profitBuy + ($profitBuy * (0.33f*((this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency)f /200f)f)f))  ge $profitSell ">
+
+											<debug_text
+												text="'skip buy offer, bad profit %1, %2, %3, %4 => %5'.[$fuelcost, $profit, $selloffer.minprice, $checkamount, ($profit - ($selloffer.minprice * $checkamount * 0.02f))]"
 												chance="$debugchance" />
 											<continue />
 										</do_if>
@@ -1649,21 +1656,21 @@
 					text="player.age + ' Traderun found for [' + this.ship + '] ' + this.ship.knownname + ' in ' + this.ship.sector.knownname"
 					chance="$debugchance" />
 				<debug_text
-					text="player.age + ' SELLOFFER INFO:\'%1\' sells %2 units of %3 for %4 Cr each; total price of %5 Cr.'.[$selloffer.seller.knownname, $selloffer.offeramount.{this}, $selloffer.ware.name, $selloffer.unitprice / 1Cr, $selloffer.price / 1Cr]"
+					text="player.age + ' SELLOFFER INFO:\'%1\' sells %2 units of %3 for %4 Cr each; total price of %5 Cr.'.[$selloffer.seller.knownname, $selloffer.offeramount.{this}, $selloffer.ware.name, $selloffer.minprice / 1Cr, $selloffer.minprice / 1Cr]"
 					chance="$debugchance" />
 				<debug_text
-					text="player.age + ' BUYOFFER INFO:\'%1\' wants %2 units of %3 for %4 Cr each; total price of %5 Cr.'.[$buyoffer.buyer.knownname, $buyoffer.offeramount.{this}, $buyoffer.ware.name, $buyoffer.unitprice / 1Cr, $buyoffer.price / 1Cr]"
+					text="player.age + ' BUYOFFER INFO:\'%1\' wants %2 units of %3 for %4 Cr each; total price of %5 Cr.'.[$buyoffer.buyer.knownname, $buyoffer.offeramount.{this}, $buyoffer.ware.name, $buyoffer.minprice / 1Cr, $buyoffer.minprice / 1Cr]"
 					chance="$debugchance" />
 			</do_if>
 			<do_else>
 				<do_if value="$buyoffer.exists">
 					<debug_text
-						text="player.age + ' BUYOFFER INFO:\'%1\' wants %2 units of %3 for %4 Cr each; total price of %5 Cr.'.[$buyoffer.buyer.knownname, $buyoffer.offeramount.{this}, $buyoffer.ware.name, $buyoffer.unitprice / 1Cr, $buyoffer.price / 1Cr]"
+						text="player.age + ' BUYOFFER INFO:\'%1\' wants %2 units of %3 for %4 Cr each; total price of %5 Cr.'.[$buyoffer.buyer.knownname, $buyoffer.offeramount.{this}, $buyoffer.ware.name, $buyoffer.minprice / 1Cr, $buyoffer.minprice / 1Cr]"
 						chance="$debugchance" />
 				</do_if>
 				<do_if value="$selloffer.exists">
 					<debug_text
-						text="player.age + ' SELLOFFER INFO:\'%1\' sells %2 units of %3 for %4 Cr each; total price of %5 Cr.'.[$selloffer.seller.knownname, $selloffer.offeramount.{this}, $selloffer.ware.name, $selloffer.unitprice / 1Cr, $selloffer.price / 1Cr]"
+						text="player.age + ' SELLOFFER INFO:\'%1\' sells %2 units of %3 for %4 Cr each; total price of %5 Cr.'.[$selloffer.seller.knownname, $selloffer.offeramount.{this}, $selloffer.ware.name, $selloffer.minprice / 1Cr, $selloffer.minprice / 1Cr]"
 						chance="$debugchance" />
 				</do_if>
 			</do_else>

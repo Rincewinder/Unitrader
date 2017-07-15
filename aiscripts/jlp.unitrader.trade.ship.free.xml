@@ -181,21 +181,11 @@
 
 			<!-- remember for notification -->
 			<do_if value="$buyoffer.available">
-				<set_value name="$Buyer" exact="$buyoffer.buyer" />
 				<set_value name="$BuyerEntity" exact="$buyoffer.buyerentity" />
-				<set_value name="$tradeBuyWare" exact="$buyoffer.ware" />
-				<set_value name="$tradeBuyWareOfferAmount" exact="$buyoffer.offeramount.{this}" />
-				<set_value name="$tradeBuyOfferUnitprice" exact="$buyoffer.unitprice" />
-				<set_value name="$tradeBuyOfferPrice" exact="$buyoffer.price" />
 				<set_value name="this.$jlp_unitrader_currentbuyoffer" exact="[$buyoffer, $BuyerEntity]" />
 			</do_if>
 			<do_if value="$selloffer.available">
-				<set_value name="$Seller" exact="$selloffer.seller" />
 				<set_value name="$SellerEntity" exact="$selloffer.sellerentity" />
-				<set_value name="$tradeSellWare" exact="$selloffer.ware" />
-				<set_value name="$tradeSellWareOfferAmount" exact="$selloffer.offeramount.{this}" />
-				<set_value name="$tradeSellOfferUnitprice" exact="$selloffer.unitprice" />
-				<set_value name="$tradeSellOfferPrice" exact="$selloffer.price" />
 				<set_value name="this.$jlp_unitrader_currentselloffer" exact="[$selloffer, $SellerEntity]" />
 			</do_if>
 
@@ -292,7 +282,7 @@
 					<do_if value="$Buyer.owner != faction.player">
 
 						<set_value name="$priceSell" exact="$tradedetails.{2}.{4}" />
-						<set_value name="$profit" exact="($tradedetails.{2}.{5} + $tradedetails.{1}.{5})/-1ct" />
+						<set_value name="$profit" exact="($tradedetails.{2}.{5} - $tradedetails.{1}.{5})" />
 						<set_value name="$priceBuy" exact="$tradedetails.{1}.{4}" />
 						<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction+80)" />
 						<do_if value="$chance" max="0">

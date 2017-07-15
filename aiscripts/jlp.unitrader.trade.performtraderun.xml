@@ -129,14 +129,14 @@
 				<set_value name="$warePriceMin" exact="$tradeoffer.ware.minprice" />
 				<set_value name="$warePriceMax" exact="$tradeoffer.ware.maxprice" />
 				<set_value name="$warePriceRange" exact="$warePriceMax - $warePriceMin" />
-				<set_value name="$warePrice" exact="$tradeoffer.unitprice" />
-				<set_value name="$warePriceBuyOffer" exact="$tradeoffer.unitprice" />
+				<set_value name="$warePrice" exact="$tradeoffer.minprice" />
+				<set_value name="$warePriceBuyOffer" exact="$tradeoffer.minprice" />
 				<set_value name="$Tradesource" exact="$targetobject" />
 				<set_value name="$Tradedestination" exact="null" />
 
 
 				<do_if value="$buyoffer.available">
-					<set_value name="$warePriceBuyOffer" exact="$buyoffer.unitprice" />
+					<set_value name="$warePriceBuyOffer" exact="$buyoffer.minprice" />
 					<set_value name="$Tradedestination" exact="$buyoffer.buyer" />
 					<set_value name="$maxBuyofferCargoAmount" exact="$buyoffer.offeramount.{this}" />
 					<!-- greater 100% calculation not allowed -->
@@ -497,13 +497,13 @@
 						<remove_value name="$maxamount" />
 					</do_if>
 					<do_elseif
-						value="(not $tradeoffer.buyfree.{this}) and (($tradeoffer.unitprice * $amount) gt this.money)"
+						value="(not $tradeoffer.buyfree.{this}) and (($tradeoffer.minprice * $amount) gt this.money)"
 					>
 						<!-- we are buying and the transaction is not free -->
 						<debug_text
-							text="'%1(%2) reducing amount of %3 to buy from %4(%5) from %6 to %7 (directly before trade start; not enough money)'.[this.ship.knownname, this.ship, $tradeware.name, $targetobject.knownname, $targetobject, $amount, this.money / $tradeoffer.unitprice]"
+							text="'%1(%2) reducing amount of %3 to buy from %4(%5) from %6 to %7 (directly before trade start; not enough money)'.[this.ship.knownname, this.ship, $tradeware.name, $targetobject.knownname, $targetobject, $amount, this.money / $tradeoffer.price]"
 							chance="$debugchance" />
-						<set_value name="$amount" exact="this.money / $tradeoffer.unitprice" />
+						<set_value name="$amount" exact="this.money / $tradeoffer.minprice" />
 					</do_elseif>
 					<do_if value="$amount gt $tradeoffer.offeramount.{this}">
 						<debug_text
@@ -533,7 +533,7 @@
 							<set_value name="$AMOUNT" exact="$tradeoffer.transferredamount + $tradeoffer.destroyedamount" />
 						</do_else>
 						<!-- <set_value name="$PRICE" exact="$AMOUNT * $price" /> -->
-						<set_value name="$PRICE" exact="$tradeoffer.unitprice" />
+						<set_value name="$PRICE" exact="$tradeoffer.minprice" />
 						<set_value name="$WARE" exact="$tradeoffer.ware.name" />
 						<append_to_list name="$tradedetails" exact="[$targetobject, $AMOUNT, $WARE, $PRICE, $shipmoney]" />
 					</do_if>
@@ -622,7 +622,7 @@
 					<run_script name="'move.undock'" />
 				</do_if>
 				<return>
-					<retval name="success" value="false" />
+					<retval name="success" value="true" />
 					<retval name="tradedetails" value="$tradedetails" />
 					<retval name="lasttrade" value="@$lasttrade" />
 				</return>
