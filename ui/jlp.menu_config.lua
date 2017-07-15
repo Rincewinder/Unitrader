@@ -131,7 +131,7 @@ function menu.cleanup()
 	menu.title = nil
 	menu.lastupdate = nil
 	menu.strings = nil
-  menu.ship =nil
+--  menu.ship =nil
   menu.ships = {}
   menu.shipIndex = nil
   menu.playership = nil
