@@ -182,11 +182,11 @@
 			<!-- remember for notification -->
 			<do_if value="$buyoffer.available">
 				<set_value name="$BuyerEntity" exact="$buyoffer.buyerentity" />
-				<set_value name="this.$jlp_unitrader_currentbuyoffer" exact="[$buyoffer, $BuyerEntity]" />
+				<set_value name="this.$jlp_unitrader_currentbuyoffer" exact="[$buyoffer.clone, $BuyerEntity]" />
 			</do_if>
 			<do_if value="$selloffer.available">
 				<set_value name="$SellerEntity" exact="$selloffer.sellerentity" />
-				<set_value name="this.$jlp_unitrader_currentselloffer" exact="[$selloffer, $SellerEntity]" />
+				<set_value name="this.$jlp_unitrader_currentselloffer" exact="[$selloffer.clone, $SellerEntity]" />
 			</do_if>
 
 
@@ -254,7 +254,7 @@
 				</do_if>
 				<do_else>
 					<set_value name="$CommissionAmount"
-						exact="20*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
+						exact="2*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
 					<set_value name="$CommissionTime"
 						exact="4h*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
 				</do_else>
