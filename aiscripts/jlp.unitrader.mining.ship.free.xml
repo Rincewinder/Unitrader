@@ -780,7 +780,7 @@
 										<set_value name="$chance" exact="100" />
 									</do_if>
 									<add_faction_relation faction="faction.player" otherfaction="$Buyer.owner"
-										value="this.$jlp_unitrader_extrafaction/10.0f" chance="$chance" />
+										value="this.$jlp_unitrader_extrafaction/100.0f" chance="$chance" />
 									<wait min="4s" max="9s" />
 
 									<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction-40)" />
