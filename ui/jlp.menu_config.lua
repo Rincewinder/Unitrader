@@ -131,7 +131,7 @@ function menu.cleanup()
 	menu.title = nil
 	menu.lastupdate = nil
 	menu.strings = nil
---  menu.ship =nil
+  menu.ship =nil
   menu.ships = {}
   menu.shipIndex = nil
   menu.playership = nil
@@ -541,7 +541,7 @@ end
 function menu.displayMenu(firsttime)
 
   -- read params
-  if menu.ship == nil then
+  if menu.param[3] ~= nil and menu.ship == nil then
     menu.ship = GetTradeShipData(GetContextByClass(menu.param[3], "ship", false))
   end
   menu.playership = GetPlayerPrimaryShipID()
@@ -946,13 +946,14 @@ menu.updateInterval = 2.0
 -- commons
 ----------------------------------------------------------
 function menu.onCloseElement(dueToClose)
+
 	if dueToClose == "close" then
 		Helper.closeMenuForSubConversation(menu, false, "default", "gMainInfo_property",{0, 0, "player"})
 		--Helper.closeMenuAndReturn(menu)
 		menu.cleanup()
 	else
-		Helper.closeMenuAndCancel(menu)
-		--Helper.closeMenuAndReturn(menu, false, menu.param)
+		--Helper.closeMenuAndCancel(menu)
+		Helper.closeMenuAndReturn(menu, false, menu.param)
 		menu.cleanup()
 	end
 end
@@ -1142,7 +1143,7 @@ function menu.onRowChanged(row, rowdata)
 			name = ReadText(1001, 1910)
 			mot_details = ReadText(1001, 2102)
 			Helper.removeButtonScripts(menu, menu.buttontable, 1, 8)
-			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(name, "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, active, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_B", true), nil, active and mot_details or nil), 1, 8)
+			SetCellContent(menu.buttontable, Helper.createButton(Helper.createButtonText(name, "center", Helper.standardFont, 11, 255, 255, 255, 100), nil, false, active, 0, 0, 150, 25, nil, Helper.createButtonHotkey("INPUT_STATE_DETAILMONITOR_X", true), nil, active and mot_details or nil), 1, 8)
 			Helper.setButtonScript(menu, nil, menu.buttontable, 1, 8, menu.buttonChangeMaxBudget)
 			-- money transfer
 			name = ReadText(1002, 2022)
