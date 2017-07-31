@@ -248,7 +248,7 @@
 				<wait exact="50ms" />
 				<do_if value="this.ship.isclass.ship_l or this.ship.isclass.ship_xl" negate="true">
 					<set_value name="$CommissionAmount"
-						exact="10*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
+						exact="1*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
 					<set_value name="$CommissionTime"
 						exact="2h*(this.$jlp_unitrader_extrafaction + this.$jlp_unitrader_courage + this.$jlp_unitrader_efficiency) /300" />
 				</do_if>
@@ -310,7 +310,7 @@
 							<set_value name="$chance" exact="100" />
 						</do_if>
 						<add_faction_relation faction="faction.player" otherfaction="$Buyer.owner"
-							value="this.$jlp_unitrader_extrafaction/100000f" chance="$chance" />
+							value="this.$jlp_unitrader_extrafaction/10.0f" chance="$chance" />
 						<wait min="4s" max="9s" />
 
 						<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction-40)" />
@@ -377,7 +377,7 @@
 							<set_value name="$chance" exact="100" />
 						</do_if>
 						<add_faction_relation faction="faction.player" otherfaction="$Seller.owner"
-							value="this.$jlp_unitrader_extrafaction" chance="$chance" />
+							value="this.$jlp_unitrader_extrafaction/10.0f" chance="$chance" />
 						<wait min="4s" max="9s" />
 
 						<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction-40)" />

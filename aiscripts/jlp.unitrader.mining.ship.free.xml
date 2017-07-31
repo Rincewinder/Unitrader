@@ -527,7 +527,7 @@
 				<set_value name="$ware" exact="$buyoffer.ware" />
 				<set_value name="$buyer" exact="$buyoffer.buyer" />
 				<set_command command="command.trade" param="$buyoffer.buyer" param2="$buyoffer.ware" />
-				<set_value name="this.$jlp_unitrader_currentbuyoffer" exact="[$buyoffer, $buyoffer.buyerentity]" />
+				<set_value name="this.$jlp_unitrader_currentbuyoffer" exact="[$buyoffer.clone, $buyoffer.buyerentity.clone]" />
 
 				<debug_text
 					text="player.age + ' %1 in zone %2 wants %3 units of %4'.[$buyer.knownname, $buyer.zone.knownname, $buyoffer.amount, $buyoffer.ware.name]"
@@ -780,7 +780,7 @@
 										<set_value name="$chance" exact="100" />
 									</do_if>
 									<add_faction_relation faction="faction.player" otherfaction="$Buyer.owner"
-										value="this.$jlp_unitrader_extrafaction" chance="$chance" />
+										value="this.$jlp_unitrader_extrafaction/10.0f" chance="$chance" />
 									<wait min="4s" max="9s" />
 
 									<set_value name="$chance" exact="(this.$jlp_unitrader_extrafaction-40)" />
